@@ -4,6 +4,10 @@ Code de l'application Web pour l'utilisation en ligne de Telosys Tools.
 
 ## Démarrer l'application back-end
 
+* Tout démarrer une base MongoDB
+
+* Ensuite démarrer l'application back-end :
+
 ```mvn spring-boot:run```
 
 ## Lancer les tests
