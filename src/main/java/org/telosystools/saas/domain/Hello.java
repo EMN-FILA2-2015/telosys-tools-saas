@@ -1,4 +1,4 @@
-package org.telosystools.saas.domain.web;
+package org.telosystools.saas.domain;
 
 public class Hello {
 
