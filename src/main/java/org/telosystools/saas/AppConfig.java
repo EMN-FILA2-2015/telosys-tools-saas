@@ -1,4 +1,4 @@
-package com.mycompany.myapp;
+package org.telosystools.saas;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
