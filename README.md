@@ -7,3 +7,6 @@ Code de l'application Web pour l'utilisation en ligne de Telosys Tools.
 Lancer en ligne de commandes :
 
 ```mvn spring-boot:run```
+
+## Lancer les tests
+```mvn test```
