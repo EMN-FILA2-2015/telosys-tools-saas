@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan
 public class AppConfig {
 
-  /* Classe de lancement de l'application */
   public static void main(String[] args) {
     SpringApplication.run(AppConfig.class, args);
   }
