@@ -1,0 +1,11 @@
+logging:
+    level:
+        org.telosystools.saas : 'WARN'
+
+spring:
+    profiles:
+        active: prod
+    data:
+        mongodb:
+            host: localhost
+            port: 27017

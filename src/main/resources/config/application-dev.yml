@@ -1,0 +1,11 @@
+logging:
+    level:
+        org.telosystools.saas : 'DEBUG'
+
+spring:
+    profiles:
+        active: dev
+    data:
+        mongodb:
+            host: localhost
+            port: 27017
