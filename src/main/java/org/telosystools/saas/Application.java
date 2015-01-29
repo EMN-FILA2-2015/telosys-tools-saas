@@ -8,6 +8,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.SimpleCommandLinePropertySource;
 import org.telosystools.saas.config.Constants;
+import org.telosystools.saas.domain.Project;
+import org.telosystools.saas.service.ProjectService;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -22,6 +24,9 @@ public class Application {
 
   @Inject
   private Environment env;
+
+  @Inject
+  private ProjectService projectService;
 
 
   /**
