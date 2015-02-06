@@ -19,17 +19,17 @@ public class ProjectController {
     @Inject
     private ProjectService projectService;
 
-    @RequestMapping("/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Project get(@PathVariable("id") String id) {
         return projectService.find(id);
     }
 
-    @RequestMapping("/")
+    @RequestMapping(method = RequestMethod.GET)
     public List<Project> getAll() {
         return projectService.list();
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public Project create(@RequestBody Project project) {
         return projectService.insert(project);
@@ -41,4 +41,3 @@ public class ProjectController {
         projectService.delete(id);
     }
 }
-
