@@ -29,7 +29,7 @@ public class ProjectController {
         return projectService.list();
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.PUT)
+    @RequestMapping(value = "/", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public Project create(@RequestBody Project project) {
         return projectService.insert(project);

@@ -1,6 +1,5 @@
 package org.telosystools.saas.web.controller;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +12,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.telosystools.saas.Application;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,9 +31,9 @@ public class ProjectControllerTest {
     }
 
     @Test
-    @Ignore
+    //@Ignore
     public void testProject() throws Exception {
-        this.mockMvc.perform(put("/projects/telosys").contentType(MediaType.APPLICATION_JSON).content("{name:'telosys'}"))
+        this.mockMvc.perform(post("/projects/").contentType(MediaType.APPLICATION_JSON).content("{'name':'telosys'}"))
                 .andExpect(status().isCreated());
 
         this.mockMvc.perform(get("/projects/")).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8"));
