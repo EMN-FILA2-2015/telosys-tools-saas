@@ -29,9 +29,9 @@ public class ProjectController {
         return projectService.list();
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(headers = "Access-Control-Allow-Headers:*", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public Project create(@RequestBody Project project) {
+    public @ResponseBody Project create(@RequestBody Project project) {
         return projectService.insert(project);
     }
 
