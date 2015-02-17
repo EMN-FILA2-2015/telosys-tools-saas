@@ -18,6 +18,6 @@ RUN echo "export JAVA_HOME=/usr/lib/jvm/java-8-oracle" >> ~/.bashrc
 
 EXPOSE 8080
 
-ADD target/telosys-tools-saas-*.jar ~/telosys-tools-saas.jar
+ADD target/telosys-tools-saas-*.jar /opt/telosys-tools-saas.jar
 
-CMD java -jar ~/telosys-tools-saas.jar
+CMD java -jar /opt/telosys-tools-saas.jar
