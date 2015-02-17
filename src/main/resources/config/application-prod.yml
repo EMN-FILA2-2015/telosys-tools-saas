@@ -7,5 +7,5 @@ spring:
         active: prod
     data:
         mongodb:
-            host: localhost
+            host: mongodb
             port: 27017
