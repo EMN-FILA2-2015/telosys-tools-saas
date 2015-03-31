@@ -25,11 +25,9 @@ public class ProjectController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<Project> getAll() {
-        return projectService.list();
-    }
+    public List<Project> getAll() { return projectService.list(); }
 
-    @RequestMapping(headers = "Access-Control-Allow-Headers:*", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody Project create(@RequestBody Project project) {
         return projectService.insert(project);
@@ -37,7 +35,5 @@ public class ProjectController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
-    public void delete(@PathVariable("id") String id) {
-        projectService.delete(id);
-    }
+    public void delete(@PathVariable("id") String id) { projectService.delete(id); }
 }
