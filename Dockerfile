@@ -20,4 +20,4 @@ EXPOSE 8080
 
 ADD target/telosys-tools-saas-*.jar /opt/telosys-tools-saas.jar
 
-CMD java -jar /opt/telosys-tools-saas.jar --spring.profiles.active=production
+CMD java -jar /opt/telosys-tools-saas.jar --spring.profiles.active=prod
