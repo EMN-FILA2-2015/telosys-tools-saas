@@ -18,7 +18,7 @@ public class MongodbConfiguration {
     }
 
     public @Bean
-    MongoTemplate mongoTemplateUsers() throws Exception {
+    MongoTemplate mongoTemplate() throws Exception {
         return new MongoTemplate(mongo(), "db_users");
     }
 
