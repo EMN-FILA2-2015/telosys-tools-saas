@@ -2,10 +2,14 @@ package org.telosystools.saas.domain;
 
 import org.springframework.data.annotation.Id;
 
+import java.io.Serializable;
+
 /**
  * Created by Adrian on 29/01/15.
  */
-public class Project {
+public class Project implements Serializable{
+
+    public static final String ID = "project";
 
     @Id
     private String id;
