@@ -32,27 +32,24 @@ public class ProjectServiceImplIntegrationTest {
         Project telosys;
         Project docker;
 
-        telosys = projectService.insert(new Project("telosys"));
-        docker = projectService.insert(new Project("docker"));
+        telosys = projectService.createProject(new Project("telosys"));
+        docker = projectService.createProject(new Project("docker"));
 
         assertNotNull(telosys);
         assertNotNull(docker);
-        assertNotNull(telosys.getId());
-        assertNotNull(docker.getId());
 
         List<Project> list = projectService.list();
 
         assertEquals("2 elements", 2, list.size());
-        assertEquals("Name", telosys.getName(), list.get(0).getName());
+        assertEquals("Name", telosys.getName(), list.get(1).getName());
 
-        Project project = projectService.find(telosys.getId());
+        Project project = projectService.loadProject(telosys.getName());
         assertEquals("Telosys", telosys.getName(), project.getName());
 
-        projectService.delete(telosys.getId());
+        projectService.delete(telosys.getName());
 
-        assertNull(projectService.find(telosys.getId()));
         assertEquals("1 element", 1, projectService.list().size());
 
-        projectService.delete(docker.getId());
+        projectService.delete(docker.getName());
     }
 }

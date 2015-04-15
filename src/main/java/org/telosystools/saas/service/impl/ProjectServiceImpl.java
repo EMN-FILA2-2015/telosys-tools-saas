@@ -2,10 +2,12 @@ package org.telosystools.saas.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telosystools.saas.dao.ProjectDao;
 import org.telosystools.saas.domain.Project;
-import org.telosystools.saas.repository.ProjectRepository;
 import org.telosystools.saas.service.ProjectService;
+import org.telosystools.saas.service.WorkspaceService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,30 +17,35 @@ import java.util.List;
 public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
-    private ProjectRepository repository;
+    private ProjectDao projectDao;
+
+    @Autowired
+    private WorkspaceService workspaceService;
 
 
     @Override
     public List<Project> list() {
-        return repository.findAll();
+        List<Project> projects = new ArrayList<>();
+        projectDao.findAll().forEach(e -> projects.add(new Project(e)));
+
+        return projects;
     }
 
     @Override
-    public Project find(String id) {
-        return repository.findOne(id);
+    public Project loadProject(String id) {
+        return projectDao.load(id);
     }
 
     @Override
     public void delete(String id) {
-        repository.delete(id);
+        projectDao.remove(id);
     }
 
     @Override
-    public Project insert(Project project) {
-        return repository.save(project);
+    public Project createProject(Project project) {
+        projectDao.save(project, project.getName());
+        workspaceService.createWorkspace(project.getName());
+        return project;
     }
 
-    public void setRepository(ProjectRepository repository) {
-        this.repository = repository;
-    }
 }

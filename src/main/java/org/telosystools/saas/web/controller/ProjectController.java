@@ -25,7 +25,7 @@ public class ProjectController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Project get(@PathVariable("id") String id) {
-        return projectService.find(id);
+        return projectService.loadProject(id);
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -34,7 +34,7 @@ public class ProjectController {
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody Project create(@RequestBody Project project) {
-        return projectService.insert(project);
+        return projectService.createProject(project);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

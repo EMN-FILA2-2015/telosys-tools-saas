@@ -12,7 +12,7 @@ public class Project implements Serializable{
     public static final String ID = "project";
 
     @Id
-    private String id;
+    private final String id = ID;
 
     private String name;
 
@@ -28,10 +28,6 @@ public class Project implements Serializable{
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getId() {
-        return id;
     }
 
     @Override

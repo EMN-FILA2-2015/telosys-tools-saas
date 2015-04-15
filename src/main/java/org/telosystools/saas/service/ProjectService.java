@@ -11,9 +11,9 @@ public interface ProjectService {
 
     List<Project> list();
 
-    Project find(String id);
+    Project loadProject(String id);
 
     void delete(String id);
 
-    Project insert(Project project);
+    Project createProject(Project project);
 }
