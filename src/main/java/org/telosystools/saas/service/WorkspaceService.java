@@ -245,6 +245,10 @@ public class WorkspaceService {
         return null;
     }
 
+    public InputStream getFileContent(File file, String projectId) {
+        return fileDao.load(file, projectId);
+    }
+
     /**
      * Return the root folder corresponding to the path
      * @param path Path

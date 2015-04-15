@@ -169,7 +169,7 @@ public class WorkspaceServiceIT {
         assertNotNull(actualFile);
         assertEquals(expectedFile, actualFile);
 
-        InputStream actualIn = fileDao.load(actualFile, PROJECT);
+        InputStream actualIn = workspaceService.getFileContent(actualFile, PROJECT);
         assertNotNull(actualIn);
         expectedIn = getInputStream(RESOURCE_FILE);
         assertEqualsInputStream(expectedIn, actualIn);
@@ -191,7 +191,7 @@ public class WorkspaceServiceIT {
     public void testRemoveFile() throws Exception {
         File file = workspaceService.createFile(FILE_PATH, getInputStream(RESOURCE_FILE), PROJECT);
         workspaceService.removeFile(FILE_PATH,PROJECT);
-        fileDao.load(file, PROJECT);
+        workspaceService.getFileContent(file, PROJECT);
     }
 
     @Test
@@ -239,7 +239,7 @@ public class WorkspaceServiceIT {
         assertNotNull(actualFile);
         assertEquals(expectedFile,actualFile);
 
-        InputStream actualIn = fileDao.load(actualFile, PROJECT);
+        InputStream actualIn = workspaceService.getFileContent(actualFile, PROJECT);
         assertNotNull(actualIn);
         expectedIn = getInputStream(RESOURCE_FILE);
         assertEqualsInputStream(expectedIn, actualIn);
@@ -259,7 +259,7 @@ public class WorkspaceServiceIT {
         assertNotNull(actualFile);
         assertEquals(expectedFile, actualFile);
 
-        InputStream actualIn = fileDao.load(actualFile, PROJECT);
+        InputStream actualIn = workspaceService.getFileContent(actualFile, PROJECT);
         assertNotNull(actualIn);
         expectedIn = getInputStream(RESOURCE_FILE);
         assertEqualsInputStream(expectedIn, actualIn);
@@ -284,7 +284,7 @@ public class WorkspaceServiceIT {
     public void testRemoveFileInSubFolder() throws Exception {
         File file = workspaceService.createFile(FILE_PATH, getInputStream(RESOURCE_FILE), PROJECT);
         workspaceService.removeFile(FILE_PATH,PROJECT);
-        fileDao.load(file, PROJECT);
+        workspaceService.getFileContent(file, PROJECT);
     }
 
 
