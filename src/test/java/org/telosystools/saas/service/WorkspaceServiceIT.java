@@ -298,7 +298,7 @@ public class WorkspaceServiceIT {
     }
 
     private InputStream getInputStream(String fileName) throws FileNotFoundException {
-        ClassLoader classLoader = getClass().getClassLoader();
-        return new FileInputStream(classLoader.getResource(fileName).getFile());
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        return classLoader.getResourceAsStream(fileName);
     }
 }
