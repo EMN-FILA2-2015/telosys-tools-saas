@@ -73,5 +73,12 @@ public class ProjectController {
         projectService.updateProjectConfig(projectId, projectConfig);
     }
 
+    @RequestMapping(value = "/projects/{id}/config/telosystoolscfg", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    public
+    @ResponseBody
+    ProjectConfiguration getProjectConfiguration(@PathVariable("id") String projectId) {
+        return projectService.loadProject(projectId).getProjectConfiguration();
+    }
 }
 
