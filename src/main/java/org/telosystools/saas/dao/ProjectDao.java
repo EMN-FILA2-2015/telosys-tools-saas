@@ -2,12 +2,15 @@ package org.telosystools.saas.dao;
 
 import com.mongodb.Mongo;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.query.Query;
 import org.telosystools.saas.domain.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 /**
  * DAO : projects
@@ -36,4 +39,7 @@ public class ProjectDao {
         return mongoTemplateGeneral.findAll(Project.class, COLLECTION_PROJECTS);
     }
 
+    public List<Project> findByUser(String userLogin) {
+        return mongoTemplateGeneral.find(new Query(where("ownerId").is(userLogin)), Project.class);
+    }
 }

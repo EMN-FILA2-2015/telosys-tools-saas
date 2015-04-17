@@ -14,6 +14,8 @@ public interface ProjectService {
 
     List<Project> list();
 
+    List<Project> listByUser();
+
     Project loadProject(String id);
 
     void delete(String id);

@@ -2,13 +2,15 @@ package org.telosystools.saas.domain;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 
 /**
  * Created by Adrian on 29/01/15.
  */
-public class Project implements Serializable{
+@Document(collection = "projects")
+public class Project implements Serializable {
 
     @Id
     private ObjectId id;
@@ -17,11 +19,12 @@ public class Project implements Serializable{
 
     private String description;
 
-    private ObjectId ownerId;
+    private String ownerId;
 
     private ProjectConfiguration projectConfiguration;
 
-    public Project() {}
+    public Project() {
+    }
 
     public Project(String name) {
         this.name = name;

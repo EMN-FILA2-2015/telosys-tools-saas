@@ -5,8 +5,6 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -16,7 +14,7 @@ import java.util.Set;
 public class User {
 
     @Id
-    private ObjectId id;
+    private String login;
 
     private String email;
 
@@ -31,8 +29,8 @@ public class User {
 
     public User() {}
 
-    public String getId() {
-        return id.toString();
+    public String getLogin() {
+        return login;
     }
 
     public String getEmail() {

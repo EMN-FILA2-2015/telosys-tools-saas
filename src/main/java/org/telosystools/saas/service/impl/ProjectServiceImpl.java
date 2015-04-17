@@ -9,6 +9,7 @@ import org.telosystools.saas.domain.ProjectConfiguration;
 import org.telosystools.saas.domain.User;
 import org.telosystools.saas.service.ProjectService;
 import org.telosystools.saas.service.WorkspaceService;
+import org.telosystools.saas.web.SecurityUtils;
 
 import java.util.List;
 
@@ -35,8 +36,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project loadProject(String id) {
-        return projectDao.load(id);
+    public List<Project> listByUser() {
+        return projectDao.findByUser(SecurityUtils.getCurrentLogin());
+    }
+
+
+    @Override
+    public Project loadProject(String projectId) {
+        return projectDao.load(projectId);
     }
 
     @Override

@@ -32,7 +32,7 @@ public class ProjectController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<Project> getAll() { return projectService.list(); }
+    public List<Project> getAll() { return projectService.listByUser(); }
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
