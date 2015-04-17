@@ -21,6 +21,9 @@ public class ProjectDao {
     private static final String COLLECTION_PROJECTS = "projects";
 
     @Autowired
+    private Mongo mongo;
+
+    @Autowired
     private MongoTemplate mongoTemplateGeneral;
 
     public Project load(String projectId) {
@@ -42,4 +45,5 @@ public class ProjectDao {
     public List<Project> findByUser(String userLogin) {
         return mongoTemplateGeneral.find(new Query(where("ownerId").is(userLogin)), Project.class);
     }
+
 }

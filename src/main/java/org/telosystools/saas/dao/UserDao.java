@@ -1,10 +1,13 @@
 package org.telosystools.saas.dao;
 
+import com.mongodb.Mongo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.telosystools.saas.domain.User;
+
+import java.util.List;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
@@ -15,10 +18,13 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 public class UserDao {
 
     @Autowired
+    private Mongo mongo;
+
+    @Autowired
     private MongoTemplate mongoTemplateGeneral;
 
-    public User findByLogin(String email, String password) {
-        return mongoTemplateGeneral.findOne(new Query(where("users.email").is(email).and("users.password").is(password)), User.class);
+    public User findByLogin(String login, String password) {
+        return mongoTemplateGeneral.findOne(new Query(where("_id").is(login).and("password").is(password)), User.class);
     }
 
     public void save(User user) {
@@ -27,5 +33,9 @@ public class UserDao {
 
     public User findById(String userId) {
         return mongoTemplateGeneral.findById(userId, User.class);
+    }
+
+    public List<User> listContributors(String projectId) {
+        return mongoTemplateGeneral.find(new Query(where("contributions").in(projectId)), User.class);
     }
 }

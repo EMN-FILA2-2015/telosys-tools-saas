@@ -20,7 +20,7 @@ public class User {
 
     private String password;
 
-    private Set<ObjectId> contributions;
+    private Set<String> contributions;
 
     public User(String email, String password) {
         this.email = email;
@@ -28,6 +28,10 @@ public class User {
     }
 
     public User() {}
+
+    public User(String login) {
+        this.login = login;
+    }
 
     public String getLogin() {
         return login;
@@ -49,11 +53,11 @@ public class User {
         this.password = password;
     }
 
-    public Set<ObjectId> getContributions() {
+    public Set<String> getContributions() {
         return contributions;
     }
 
-    public void addContribution(ObjectId projectId) {
+    public void addContribution(String projectId) {
         contributions.add(projectId);
     }
 

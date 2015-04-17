@@ -13,13 +13,13 @@ import java.io.Serializable;
 public class Project implements Serializable {
 
     @Id
-    private ObjectId id;
+    private String id;
 
     private String name;
 
     private String description;
 
-    private String ownerId;
+    private String owner;
 
     private ProjectConfiguration projectConfiguration;
 
@@ -36,6 +36,10 @@ public class Project implements Serializable {
 
     public String getName() {
         return name;
+    }
+
+    public String getOwner() {
+        return owner;
     }
 
     public String getDescription() {

@@ -9,8 +9,11 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.telosystools.saas.Application;
+import org.telosystools.saas.MongodbConfiguration;
 import org.telosystools.saas.config.MongoConfiguration;
+import org.telosystools.saas.dao.UserDao;
 import org.telosystools.saas.domain.Project;
+import org.telosystools.saas.domain.User;
 
 import java.util.List;
 
@@ -19,37 +22,24 @@ import java.util.List;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
-@Import(MongoConfiguration.class)
+@Import(MongodbConfiguration.class)
 public class ProjectServiceImplIntegrationTest {
+
+    public static final String MAIL = "mail@gmail.com";
 
     @Autowired
     private ProjectServiceImpl projectService;
 
+    @Autowired
+    private UserDao userDao;
+
     @Test
     public void testIntegration() {
-        assertNotNull(projectService);
+        User user = new User("testeur");
+        user.setEmail(MAIL);
+        user.setPassword("password");
 
-        Project telosys;
-        Project docker;
-
-//        telosys = projectService.createProject(new Project("telosys"));
-//        docker = projectService.createProject(new Project("docker"));
-
-//        assertNotNull(telosys);
-//        assertNotNull(docker);
-//
-//        List<Project> list = projectService.list();
-//
-//        assertEquals("2 elements", 2, list.size());
-//        assertEquals("Name", telosys.getName(), list.get(1).getName());
-//
-//        Project project = projectService.loadProject(telosys.getName());
-//        assertEquals("Telosys", telosys.getName(), project.getName());
-//
-//        projectService.delete(telosys.getName());
-//
-//        assertEquals("1 element", 1, projectService.list().size());
-//
-//        projectService.delete(docker.getName());
+        userDao.save(user);
+        assertEquals(user.getLogin(), userDao.findByLogin("testeur", "password").getLogin());
     }
 }
