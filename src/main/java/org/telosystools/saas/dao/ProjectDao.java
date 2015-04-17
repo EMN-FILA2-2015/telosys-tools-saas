@@ -1,6 +1,7 @@
 package org.telosystools.saas.dao;
 
 import com.mongodb.Mongo;
+import org.bson.types.ObjectId;
 import org.telosystools.saas.domain.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -14,33 +15,25 @@ import java.util.List;
 @Repository
 public class ProjectDao {
 
-    private static final String COLLECTION_FOLDERS = "docs";
+    private static final String COLLECTION_PROJECTS = "projects";
 
     @Autowired
-    private Mongo mongo;
+    private MongoTemplate mongoTemplateGeneral;
 
-    MongoTemplate mongoTemplate(String database) {
-        // Warn : Database name must only contain letters, numbers, underscores and dashes!
-        return new MongoTemplate(mongo, database);
+    public Project load(String projectId) {
+        return mongoTemplateGeneral.findById(projectId, Project.class, COLLECTION_PROJECTS);
     }
 
-    public Project load(String database) {
-        // WARN : si la base n'existe pas, en crée une vide
-        return mongoTemplate(database)
-                .findById(Project.ID, Project.class, COLLECTION_FOLDERS);
+    public void save(Project project) {
+        mongoTemplateGeneral.save(project, COLLECTION_PROJECTS);
     }
 
-    public void save(Project folder, String database) {
-        mongoTemplate(database)
-                .save(folder, COLLECTION_FOLDERS);
+    public void remove(String projectId) {
+        mongoTemplateGeneral.remove(projectId);
     }
 
-    public void remove(String database) {
-        mongo.dropDatabase(database);
-    }
-
-    public List<String> findAll() {
-        return mongo.getDatabaseNames();
+    public List<Project> findAll() {
+        return mongoTemplateGeneral.findAll(Project.class, COLLECTION_PROJECTS);
     }
 
 }

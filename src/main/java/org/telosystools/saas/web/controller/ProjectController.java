@@ -1,6 +1,8 @@
 package org.telosystools.saas.web.controller;
 
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.telosystools.saas.domain.*;
 import org.telosystools.saas.service.ProjectService;
@@ -34,7 +36,7 @@ public class ProjectController {
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody Project create(@RequestBody Project project) {
-        return projectService.createProject(project);
+        return projectService.createProject(project, null);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -51,10 +53,20 @@ public class ProjectController {
         try {
             return workspaceService.createFile(fileName, null, projectId);
         } catch (FolderNotFoundException e) {
-            return null;
+            return null; // ResponseEntity() ?
         }
     }
 
+    @RequestMapping(value = "/{id}/workspace/files/{fileId}", method = RequestMethod.GET)
+    public @ResponseBody String getFileContent(@PathVariable("id") String projectId, @PathVariable String fileId) {
+        return workspaceService.getFileContent(fileId, projectId);
+    }
 
+    @RequestMapping(value = "/{projectId}/workspace/files/{fileId}", method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.OK)
+    public void getFileContent(@PathVariable("projectId") String projectId, @PathVariable("fileId") String fileId, @RequestBody String fileContent) {
+        workspaceService.setFileContent(projectId, fileId, fileContent);
+    }
 
 }
+

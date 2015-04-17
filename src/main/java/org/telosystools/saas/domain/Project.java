@@ -1,5 +1,6 @@
 package org.telosystools.saas.domain;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
@@ -9,12 +10,14 @@ import java.io.Serializable;
  */
 public class Project implements Serializable{
 
-    public static final String ID = "project";
-
     @Id
-    private final String id = ID;
+    private ObjectId id;
 
     private String name;
+
+    private String description;
+
+    private ObjectId ownerId;
 
     public Project() {}
 
@@ -22,12 +25,24 @@ public class Project implements Serializable{
         this.name = name;
     }
 
+    public String getId() {
+        return id.toString();
+    }
+
     public String getName() {
         return name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override

@@ -18,8 +18,8 @@ public class MongodbConfiguration {
     }
 
     public @Bean
-    MongoTemplate mongoTemplateUsers() throws Exception {
-        return new MongoTemplate(mongo(), "db_users");
+    MongoTemplate mongoTemplateGeneral() throws Exception {
+        return new MongoTemplate(mongo(), "db_general");
     }
 
 }

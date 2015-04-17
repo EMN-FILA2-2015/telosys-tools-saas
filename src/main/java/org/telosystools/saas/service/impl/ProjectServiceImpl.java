@@ -3,11 +3,12 @@ package org.telosystools.saas.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telosystools.saas.dao.ProjectDao;
+import org.telosystools.saas.dao.UserDao;
 import org.telosystools.saas.domain.Project;
+import org.telosystools.saas.domain.User;
 import org.telosystools.saas.service.ProjectService;
 import org.telosystools.saas.service.WorkspaceService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,13 +23,14 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     private WorkspaceService workspaceService;
 
+    @Autowired
+    private UserDao userDao;
+
 
     @Override
     public List<Project> list() {
-        List<Project> projects = new ArrayList<>();
-        projectDao.findAll().forEach(e -> projects.add(new Project(e)));
 
-        return projects;
+        return projectDao.findAll();
     }
 
     @Override
@@ -42,10 +44,19 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project createProject(Project project) {
-        projectDao.save(project, project.getName());
-        workspaceService.createWorkspace(project.getName());
+    public Project createProject(Project project, String userId) {
+        // Vérification unicité du nom vis à vis du projet
+        User user = userDao.findById(userId);
+
+        projectDao.save(project);
+//        user.getProjects().put(project.getId(), "owner");
+        userDao.save(user);
+        workspaceService.createWorkspace(project.getId());
         return project;
+    }
+
+    public User loadUser(String email, String password) {
+        return userDao.findByLogin(email, password);
     }
 
 }

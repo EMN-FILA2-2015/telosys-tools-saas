@@ -1,13 +1,15 @@
 package org.telosystools.saas.service;
 
 import org.telosystools.saas.bean.Path;
-import org.telosystools.saas.dao.FileDao;
-import org.telosystools.saas.dao.WorkspaceDao;
+import org.telosystools.saas.dao.*;
 import org.telosystools.saas.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telosystools.saas.domain.File;
 
-import java.io.InputStream;
+import java.io.*;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Created by luchabou on 27/02/2015.
@@ -245,8 +247,12 @@ public class WorkspaceService {
         return null;
     }
 
-    public InputStream getFileContent(File file, String projectId) {
-        return fileDao.load(file, projectId);
+    public String getFileContent(String projectId, String fileId) {
+        return readInputStream(fileDao.loadContent(fileId, projectId));
+    }
+
+    public void setFileContent(String projectId, String fileId, String content) {
+        fileDao.saveContent(fileId, createInputStream(content), projectId);
     }
 
     /**
@@ -256,6 +262,36 @@ public class WorkspaceService {
      */
     public RootFolder getRootFolderForPath(Workspace workspace, Path path) {
         return workspace.getRootFolderByName(path.getRootName());
+    }
+
+    private InputStream createInputStream(String string) {
+        return new ByteArrayInputStream(string.getBytes());
+    }
+
+    private String readInputStream(InputStream in) {
+        BufferedReader br = null;
+        StringBuilder sb = new StringBuilder();
+
+        String line;
+        try {
+
+            br = new BufferedReader(new InputStreamReader(in, UTF_8));
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return sb.toString();
     }
 
 }

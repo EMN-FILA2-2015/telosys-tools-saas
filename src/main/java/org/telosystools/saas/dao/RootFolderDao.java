@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class RootFolderDao {
 
-    private static final String COLLECTION_FOLDERS = "docs";
+    private static final String COLLECTION_FOLDERS = "folders";
 
     @Autowired
     private Mongo mongo;

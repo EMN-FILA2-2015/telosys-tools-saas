@@ -45,6 +45,8 @@ public class WorkspaceServiceIT {
     private static final String MODIFIED_FILE_PATH = Workspace.MODELS+"/"+ MODIFIED_FILE_NAME;
     private static final String RESOURCE_FILE = "file.txt";
     private static final String MODIFIED_RESOURCE_FILE = "modified_file.txt";
+    private static final String RESOURCE_FILE_CONTENT = "Fichier example";
+    private static final String MODIFIED_RESOURCE_CONTENT = "Fichier modifié";
 
     @Autowired
     WorkspaceService workspaceService;
@@ -89,7 +91,7 @@ public class WorkspaceServiceIT {
     @Test
     public void testGetWorkspace() throws Exception {
         Workspace expected = buildWorkspace();
-        workspaceDao.save(expected,PROJECT);
+        workspaceDao.save(expected, PROJECT);
         Workspace actual = workspaceService.getWorkspace(PROJECT);
         assertNotNull(actual);
         assertEquals(expected,actual);
@@ -118,7 +120,7 @@ public class WorkspaceServiceIT {
     @Test
     public void testRemoveFolder() throws Exception {
         workspaceService.createFolder(FOLDER_PATH, PROJECT);
-        workspaceService.removeFolder(FOLDER_PATH,PROJECT);
+        workspaceService.removeFolder(FOLDER_PATH, PROJECT);
         Workspace workspace = workspaceDao.load(PROJECT);
 
         Folder absent = workspaceService.getFolderForPath(workspace, Path.valueOf(FOLDER_PATH));
@@ -135,27 +137,12 @@ public class WorkspaceServiceIT {
         assertNotNull(actualFile);
         assertEquals(expectedFile,actualFile);
 
-        InputStream actualIn = fileDao.load(actualFile, PROJECT);
+        InputStream actualIn = fileDao.loadContent(actualFile.getGridFSId(), PROJECT);
         assertNotNull(actualIn);
         expectedIn = getInputStream(RESOURCE_FILE);
         assertEqualsInputStream(expectedIn, actualIn);
     }
 
-    private void assertEqualsInputStream(InputStream expectedIn, InputStream actualIn) {
-        BufferedReader actualReader = new BufferedReader(new InputStreamReader(actualIn, StandardCharsets.UTF_8));
-        BufferedReader expectedReader = new BufferedReader(new InputStreamReader(expectedIn, StandardCharsets.UTF_8));
-        try {
-            String actualLine = actualReader.readLine();
-            String expected = expectedReader.readLine();
-            while ((actualLine) != null) {
-                assertEquals(expected, actualLine);
-                actualLine = actualReader.readLine();
-                expected = expectedReader.readLine();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Test
     public void testSaveFile_modify() throws Exception {
@@ -169,10 +156,11 @@ public class WorkspaceServiceIT {
         assertNotNull(actualFile);
         assertEquals(expectedFile, actualFile);
 
-        InputStream actualIn = workspaceService.getFileContent(actualFile, PROJECT);
+        workspaceService.setFileContent(PROJECT, actualFile.getGridFSId(), "fichier modifié");
+
+        String actualIn = workspaceService.getFileContent(PROJECT, actualFile.getGridFSId());
         assertNotNull(actualIn);
-        expectedIn = getInputStream(RESOURCE_FILE);
-        assertEqualsInputStream(expectedIn, actualIn);
+        assertEquals(MODIFIED_RESOURCE_CONTENT, actualIn.trim());
     }
 
     @Test
@@ -191,7 +179,7 @@ public class WorkspaceServiceIT {
     public void testRemoveFile() throws Exception {
         File file = workspaceService.createFile(FILE_PATH, getInputStream(RESOURCE_FILE), PROJECT);
         workspaceService.removeFile(FILE_PATH,PROJECT);
-        workspaceService.getFileContent(file, PROJECT);
+        workspaceService.getFileContent(PROJECT, file.getGridFSId());
     }
 
     @Test
@@ -239,10 +227,9 @@ public class WorkspaceServiceIT {
         assertNotNull(actualFile);
         assertEquals(expectedFile,actualFile);
 
-        InputStream actualIn = workspaceService.getFileContent(actualFile, PROJECT);
+        String actualIn = workspaceService.getFileContent(PROJECT, actualFile.getGridFSId());
         assertNotNull(actualIn);
-        expectedIn = getInputStream(RESOURCE_FILE);
-        assertEqualsInputStream(expectedIn, actualIn);
+        assertEquals(RESOURCE_FILE_CONTENT, actualIn.trim());
     }
 
     @Test
@@ -259,10 +246,9 @@ public class WorkspaceServiceIT {
         assertNotNull(actualFile);
         assertEquals(expectedFile, actualFile);
 
-        InputStream actualIn = workspaceService.getFileContent(actualFile, PROJECT);
+        String actualIn = workspaceService.getFileContent(PROJECT, actualFile.getGridFSId());
         assertNotNull(actualIn);
-        expectedIn = getInputStream(RESOURCE_FILE);
-        assertEqualsInputStream(expectedIn, actualIn);
+        assertEquals(RESOURCE_FILE_CONTENT, actualIn.trim());
     }
 
     @Test
@@ -284,7 +270,7 @@ public class WorkspaceServiceIT {
     public void testRemoveFileInSubFolder() throws Exception {
         File file = workspaceService.createFile(FILE_PATH, getInputStream(RESOURCE_FILE), PROJECT);
         workspaceService.removeFile(FILE_PATH,PROJECT);
-        workspaceService.getFileContent(file, PROJECT);
+        workspaceService.getFileContent(PROJECT, file.getGridFSId());
     }
 
 
@@ -300,5 +286,21 @@ public class WorkspaceServiceIT {
     private InputStream getInputStream(String fileName) throws FileNotFoundException {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         return classLoader.getResourceAsStream(fileName);
+    }
+
+    private void assertEqualsInputStream(InputStream expectedIn, InputStream actualIn) {
+        BufferedReader actualReader = new BufferedReader(new InputStreamReader(actualIn, StandardCharsets.UTF_8));
+        BufferedReader expectedReader = new BufferedReader(new InputStreamReader(expectedIn, StandardCharsets.UTF_8));
+        try {
+            String actualLine = actualReader.readLine();
+            String expected = expectedReader.readLine();
+            while ((actualLine) != null) {
+                assertEquals(expected, actualLine);
+                actualLine = actualReader.readLine();
+                expected = expectedReader.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
