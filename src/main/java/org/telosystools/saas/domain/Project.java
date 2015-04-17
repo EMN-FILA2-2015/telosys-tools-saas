@@ -19,6 +19,8 @@ public class Project implements Serializable{
 
     private ObjectId ownerId;
 
+    private ProjectConfiguration projectConfiguration;
+
     public Project() {}
 
     public Project(String name) {
