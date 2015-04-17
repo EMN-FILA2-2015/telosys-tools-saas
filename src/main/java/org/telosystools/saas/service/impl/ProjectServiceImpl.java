@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.telosystools.saas.dao.ProjectDao;
 import org.telosystools.saas.dao.UserDao;
 import org.telosystools.saas.domain.Project;
+import org.telosystools.saas.domain.ProjectConfiguration;
 import org.telosystools.saas.domain.User;
 import org.telosystools.saas.service.ProjectService;
 import org.telosystools.saas.service.WorkspaceService;
@@ -53,6 +54,15 @@ public class ProjectServiceImpl implements ProjectService {
         userDao.save(user);
         workspaceService.createWorkspace(project.getId());
         return project;
+    }
+
+    @Override
+    public void updateProjectConfig(String projectId, ProjectConfiguration projectConfig) {
+        Project project = projectDao.load(projectId);
+        if (project != null) {
+            project.setProjectConfiguration(projectConfig);
+            projectDao.save(project);
+        }
     }
 
     public User loadUser(String email, String password) {

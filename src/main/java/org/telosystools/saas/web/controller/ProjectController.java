@@ -68,5 +68,10 @@ public class ProjectController {
         workspaceService.setFileContent(projectId, fileId, fileContent);
     }
 
+    @RequestMapping(value = "/projects/{id}/config/telosystoolscfg", method = RequestMethod.POST)
+    public void setProjectConfig(@PathVariable("id") String projectId, @RequestBody ProjectConfiguration projectConfig) {
+        projectService.updateProjectConfig(projectId, projectConfig);
+    }
+
 }
 

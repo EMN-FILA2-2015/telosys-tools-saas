@@ -47,6 +47,14 @@ public class Project implements Serializable{
         this.description = description;
     }
 
+    public ProjectConfiguration getProjectConfiguration() {
+        return projectConfiguration;
+    }
+
+    public void setProjectConfiguration(ProjectConfiguration projectConfiguration) {
+        this.projectConfiguration = projectConfiguration;
+    }
+
     @Override
     public String toString() {
         return String.format("Project[id=%s, name='%s']", id, name);
