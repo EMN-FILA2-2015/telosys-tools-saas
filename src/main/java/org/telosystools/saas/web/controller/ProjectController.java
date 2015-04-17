@@ -26,8 +26,9 @@ public class ProjectController {
     private WorkspaceService workspaceService;
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public Project get(@PathVariable("id") String id) {
-        return projectService.loadProject(id);
+    public ResponseEntity<Project> get(@PathVariable("id") String id) {
+        Project result = projectService.loadProject(id);
+        return new ResponseEntity<>(result, null, result == null ? HttpStatus.NOT_FOUND : HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.GET)

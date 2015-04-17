@@ -1,6 +1,5 @@
 package org.telosystools.saas.dao;
 
-import com.sun.tools.doclets.internal.toolkit.util.DocFinder;
 import org.telosystools.saas.domain.File;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
