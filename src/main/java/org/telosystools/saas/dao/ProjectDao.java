@@ -34,8 +34,8 @@ public class ProjectDao {
         mongoTemplateGeneral.save(project, COLLECTION_PROJECTS);
     }
 
-    public void remove(String projectId) {
-        mongoTemplateGeneral.remove(projectId);
+    public void remove(Project project) {
+        mongoTemplateGeneral.remove(project);
     }
 
     public List<Project> findAll() {
@@ -43,7 +43,7 @@ public class ProjectDao {
     }
 
     public List<Project> findByUser(String userLogin) {
-        return mongoTemplateGeneral.find(new Query(where("ownerId").is(userLogin)), Project.class);
+        return mongoTemplateGeneral.find(new Query(where("owner").is(userLogin)), Project.class);
     }
 
 }

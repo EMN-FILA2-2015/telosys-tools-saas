@@ -70,12 +70,12 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "/projects/{id}/config/telosystoolscfg", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
     public void setProjectConfig(@PathVariable("id") String projectId, @RequestBody ProjectConfiguration projectConfig) {
         projectService.updateProjectConfig(projectId, projectConfig);
     }
 
     @RequestMapping(value = "/projects/{id}/config/telosystoolscfg", method = RequestMethod.GET)
-    @ResponseStatus(HttpStatus.OK)
     public  @ResponseBody ProjectConfiguration getProjectConfiguration(@PathVariable("id") String projectId) {
         return projectService.loadProject(projectId).getProjectConfiguration();
     }

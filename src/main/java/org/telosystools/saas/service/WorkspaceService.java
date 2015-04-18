@@ -294,4 +294,7 @@ public class WorkspaceService {
         return sb.toString();
     }
 
+    public void deleteWorkspace(String projectId) {
+        workspaceDao.delete(projectId);
+    }
 }

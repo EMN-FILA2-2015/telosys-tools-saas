@@ -8,7 +8,7 @@ import org.springframework.web.client.HttpServerErrorException;
  * Created by Adrian on 18/04/15.
  * TODO : Voir quelle implémentation est la plus adaptée - Annotation + Extends = overkill
  */
-@ResponseStatus(HttpStatus.BAD_REQUEST)
+@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "")
 public class BadRequestException extends HttpServerErrorException {
 
     public BadRequestException(String statusText) {

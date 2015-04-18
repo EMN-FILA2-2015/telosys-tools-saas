@@ -42,4 +42,8 @@ public class WorkspaceDao {
 
     }
 
+    public void delete(String database) {
+        rootFolderDao.mongoTemplate(database).getDb().dropDatabase();
+    }
+
 }

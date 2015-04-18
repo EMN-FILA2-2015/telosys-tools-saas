@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.telosystools.saas.Application;
 import org.telosystools.saas.MongodbConfiguration;
 import org.telosystools.saas.dao.UserDao;
+import org.telosystools.saas.domain.Project;
 import org.telosystools.saas.domain.User;
 
 /**
@@ -30,12 +31,25 @@ public class ProjectServiceImplIntegrationTest {
     private UserDao userDao;
 
     @Test
-    public void testIntegration() {
+    public void testUser() {
         User user = new User("testeur");
         user.setEmail(MAIL);
         user.setPassword("password");
 
         userDao.save(user);
         assertEquals(user.getLogin(), userDao.findAuthenticate("testeur", "password").getLogin());
+    }
+
+    @Test
+    public void testCreateProject() {
+        Project project = new Project();
+        project.setName("projet-test");
+        projectService.createProject(project);
+
+        assertNotNull(project.getId());
+        assertEquals(project.getOwner(), "user_default");
+        assertNotNull(projectService.listByUser());
+
+        projectService.delete(project.getId());
     }
 }

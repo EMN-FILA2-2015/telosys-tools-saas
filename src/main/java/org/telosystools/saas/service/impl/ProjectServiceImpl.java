@@ -50,7 +50,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void delete(String id) {
-        projectDao.remove(id);
+        projectDao.remove(new Project(id));
+        workspaceService.deleteWorkspace(id);
     }
 
     @Override
