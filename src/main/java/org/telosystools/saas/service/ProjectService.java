@@ -1,6 +1,7 @@
 package org.telosystools.saas.service;
 
 
+import org.springframework.web.client.HttpServerErrorException;
 import org.telosystools.saas.domain.Project;
 import org.telosystools.saas.domain.ProjectConfiguration;
 import org.telosystools.saas.domain.User;
@@ -20,7 +21,7 @@ public interface ProjectService {
 
     void delete(String id);
 
-    Project createProject(Project project, String userId);
+    Project createProject(Project project) throws HttpServerErrorException;
 
     void updateProjectConfig(String projectId, ProjectConfiguration projectConfig);
 }

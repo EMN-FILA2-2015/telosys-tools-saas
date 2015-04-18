@@ -1,5 +1,6 @@
 package org.telosystools.saas.service.impl;
 
+import com.mongodb.MongoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telosystools.saas.dao.ProjectDao;
@@ -9,6 +10,7 @@ import org.telosystools.saas.domain.ProjectConfiguration;
 import org.telosystools.saas.domain.User;
 import org.telosystools.saas.service.ProjectService;
 import org.telosystools.saas.service.WorkspaceService;
+import org.telosystools.saas.service.exceptions.BadRequestException;
 import org.telosystools.saas.web.SecurityUtils;
 
 import java.util.List;
@@ -52,13 +54,16 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project createProject(Project project, String userId) {
-        // Vérification unicité du nom vis à vis du projet
-        User user = userDao.findById(userId);
-
-        projectDao.save(project);
-//        user.getProjects().put(project.getId(), "owner");
-        userDao.save(user);
+    public Project createProject(Project project) {
+        // Vérification unicité du nom vis à vis du projet fait par la base
+        project.setOwner(SecurityUtils.getCurrentLogin());
+        try {
+            projectDao.save(project);
+        } catch (MongoException e) {
+            // Sont ou les logs ?
+            throw new BadRequestException("Le nom de projet : " + project.getName() + " est déjà utilisé");
+        }
+        // Création du workspace
         workspaceService.createWorkspace(project.getId());
         return project;
     }
@@ -73,7 +78,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     public User loadUser(String email, String password) {
-        return userDao.findByLogin(email, password);
+        return userDao.findAuthenticate(email, password);
     }
 
 }

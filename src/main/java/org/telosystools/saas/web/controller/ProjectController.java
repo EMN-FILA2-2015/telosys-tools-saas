@@ -37,7 +37,7 @@ public class ProjectController {
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody Project create(@RequestBody Project project) {
-        return projectService.createProject(project, null);
+        return projectService.createProject(project);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -76,9 +76,7 @@ public class ProjectController {
 
     @RequestMapping(value = "/projects/{id}/config/telosystoolscfg", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public
-    @ResponseBody
-    ProjectConfiguration getProjectConfiguration(@PathVariable("id") String projectId) {
+    public  @ResponseBody ProjectConfiguration getProjectConfiguration(@PathVariable("id") String projectId) {
         return projectService.loadProject(projectId).getProjectConfiguration();
     }
 }

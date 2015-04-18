@@ -10,12 +10,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.telosystools.saas.Application;
 import org.telosystools.saas.MongodbConfiguration;
-import org.telosystools.saas.config.MongoConfiguration;
 import org.telosystools.saas.dao.UserDao;
-import org.telosystools.saas.domain.Project;
 import org.telosystools.saas.domain.User;
-
-import java.util.List;
 
 /**
  * Created by Adrian on 29/01/15.
@@ -40,6 +36,6 @@ public class ProjectServiceImplIntegrationTest {
         user.setPassword("password");
 
         userDao.save(user);
-        assertEquals(user.getLogin(), userDao.findByLogin("testeur", "password").getLogin());
+        assertEquals(user.getLogin(), userDao.findAuthenticate("testeur", "password").getLogin());
     }
 }

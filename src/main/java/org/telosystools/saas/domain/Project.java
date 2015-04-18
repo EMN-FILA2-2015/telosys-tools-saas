@@ -42,6 +42,10 @@ public class Project implements Serializable {
         return owner;
     }
 
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
     public String getDescription() {
         return description;
     }

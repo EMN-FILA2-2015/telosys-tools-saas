@@ -23,7 +23,7 @@ public class UserDao {
     @Autowired
     private MongoTemplate mongoTemplateGeneral;
 
-    public User findByLogin(String login, String password) {
+    public User findAuthenticate(String login, String password) {
         return mongoTemplateGeneral.findOne(new Query(where("_id").is(login).and("password").is(password)), User.class);
     }
 
@@ -31,8 +31,8 @@ public class UserDao {
         mongoTemplateGeneral.save(user);
     }
 
-    public User findById(String userId) {
-        return mongoTemplateGeneral.findById(userId, User.class);
+    public User findByLogin(String login) {
+        return mongoTemplateGeneral.findById(login, User.class);
     }
 
     public List<User> listContributors(String projectId) {
