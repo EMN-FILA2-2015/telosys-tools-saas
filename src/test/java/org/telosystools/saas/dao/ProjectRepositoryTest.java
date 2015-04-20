@@ -36,7 +36,7 @@ public class ProjectRepositoryTest {
     private List<Project> projectList;
 
     @Before
-    public void setUpClass() {
+    public void setUp() {
         Project p1 = new Project();
         Project p2 = new Project();
         p1.setName("P1");
@@ -52,7 +52,7 @@ public class ProjectRepositoryTest {
     }
 
     @After
-    public void tearDownClass() {
+    public void tearDown() {
         projectRepository.delete(projectList);
     }
 
@@ -72,7 +72,7 @@ public class ProjectRepositoryTest {
         Iterator<Project> it = res.iterator();
         int i = 0;
         while (it.hasNext()) {
-            assertEquals(projectList.get(i++), it.next());
+            assertEquals(projectList.get(i++).getId(), it.next().getId());
         }
     }
 }

@@ -1,10 +1,10 @@
 package org.telosystools.saas.domain;
 
 
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -58,6 +58,7 @@ public class User {
     }
 
     public void addContribution(String projectId) {
+        if (contributions == null) contributions = new HashSet<>();
         contributions.add(projectId);
     }
 

@@ -1,7 +1,6 @@
 package org.telosystools.saas.dao;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 import org.telosystools.saas.domain.User;
 
 import java.util.List;
@@ -9,12 +8,16 @@ import java.util.List;
 /**
  * Created by Adrian on 20/04/15.
  */
-@Repository
-public interface UserRepositoryInterface extends MongoRepository<User, String> {
+public interface UserRepository extends MongoRepository<User, String> {
 
     User findByEmailAndPassword(String email, String password);
 
-    // {"contributions":projectId}
+    /**
+     * Retourne tous les utilisateurs contributeurs du projet.
+     *
+     * @param projectId l'id du projet
+     * @return Liste de contributeurs
+     */
     List<User> findByContributions(String projectId);
 
 }
