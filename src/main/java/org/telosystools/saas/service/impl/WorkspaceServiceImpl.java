@@ -15,6 +15,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Created by luchabou on 27/02/2015.
+ *
+ * Service de gestion du workspace contenant
+ * des folders et des fichiers
  */
 @Component
 public class WorkspaceServiceImpl implements WorkspaceService{
@@ -48,11 +51,7 @@ public class WorkspaceServiceImpl implements WorkspaceService{
         return workspaceDao.load(projectId);
     }
 
-    /**
-     * Create a new folder in the folder.
-     * @param absolutePath Absolute path
-     * @param projectId Project id
-     */
+    @Override
     public Folder createFolder(String absolutePath, String projectId) throws FolderNotFoundException {
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(absolutePath);
@@ -105,17 +104,18 @@ public class WorkspaceServiceImpl implements WorkspaceService{
     /**
      * Create a new file in an existing folder.
      * @param absolutePath Absolute path
-     * @param in File content
+     * @param content File content as String
      * @param projectId Project id
      */
-    public File createFile(String absolutePath, InputStream in, String projectId) throws FolderNotFoundException {
+    @Override
+    public File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException {
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(absolutePath);
         File file = new File(path);
         Folder folderParent = getFolderForPath(workspace, path.getParent());
         if (folderParent!=null) {
             folderParent.addFile(file);
-            fileDao.save(file, in, projectId);
+            fileDao.save(file, this.createInputStream(content), projectId);
             workspaceDao.save(workspace, projectId);
             return file;
         } else {
@@ -125,6 +125,7 @@ public class WorkspaceServiceImpl implements WorkspaceService{
 
     /**
      * Update an existing file.
+     *
      * @param file File
      * @param in File content
      * @param projectId Project id

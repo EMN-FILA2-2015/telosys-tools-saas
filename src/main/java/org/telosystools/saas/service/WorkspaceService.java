@@ -1,5 +1,8 @@
 package org.telosystools.saas.service;
 
+import org.telosystools.saas.domain.File;
+import org.telosystools.saas.domain.Folder;
+import org.telosystools.saas.domain.FolderNotFoundException;
 import org.telosystools.saas.domain.Workspace;
 
 /**
@@ -34,6 +37,21 @@ public interface WorkspaceService {
      * @return Workspace
      */
     Workspace getWorkspace(String projectId);
+
+    /**
+     * Create a new folder in the folder.
+     * @param absolutePath Absolute path
+     * @param projectId Project id
+     */
+    Folder createFolder(String absolutePath, String projectId) throws FolderNotFoundException;
+
+    /**
+     * Create a new file in an existing folder.
+     * @param absolutePath Absolute path
+     * @param content File content as String
+     * @param projectId Project id
+     */
+    File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException;
 
     /**
      * Retourne le contenu du fichier stocké en base
