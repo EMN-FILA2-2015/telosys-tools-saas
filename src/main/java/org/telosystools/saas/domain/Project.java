@@ -25,10 +25,6 @@ public class Project implements Serializable {
     public Project() {
     }
 
-    public Project(String id) {
-        this.id = id;
-    }
-
     public String getId() {
         return id.toString();
     }

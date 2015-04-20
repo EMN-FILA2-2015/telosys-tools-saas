@@ -1,14 +1,6 @@
 package org.telosystools.saas.service;
 
 import com.mongodb.MongoException;
-import org.telosystools.saas.Application;
-import org.telosystools.saas.bean.Path;
-import org.telosystools.saas.dao.FileDao;
-import org.telosystools.saas.dao.WorkspaceDao;
-import org.telosystools.saas.domain.Folder;
-import org.telosystools.saas.domain.RootFolder;
-import org.telosystools.saas.domain.Workspace;
-import org.telosystools.saas.domain.File;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +8,15 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.telosystools.saas.Application;
+import org.telosystools.saas.bean.Path;
+import org.telosystools.saas.dao.FileDao;
+import org.telosystools.saas.dao.WorkspaceDao;
+import org.telosystools.saas.domain.File;
+import org.telosystools.saas.domain.Folder;
+import org.telosystools.saas.domain.RootFolder;
+import org.telosystools.saas.domain.Workspace;
+import org.telosystools.saas.service.impl.WorkspaceServiceImpl;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -49,7 +50,7 @@ public class WorkspaceServiceIT {
     private static final String MODIFIED_RESOURCE_CONTENT = "Fichier modifié";
 
     @Autowired
-    WorkspaceService workspaceService;
+    WorkspaceServiceImpl workspaceService;
 
     WorkspaceDao workspaceDao;
 
@@ -57,11 +58,11 @@ public class WorkspaceServiceIT {
 
     @Before
     public void setUp() throws Exception {
-        Field wsDaoField = WorkspaceService.class.getDeclaredField("workspaceDao");
+        Field wsDaoField = WorkspaceServiceImpl.class.getDeclaredField("workspaceDao");
         wsDaoField.setAccessible(true);
         workspaceDao = (WorkspaceDao) wsDaoField.get(workspaceService);
 
-        Field fileDaoField = WorkspaceService.class.getDeclaredField("fileDao");
+        Field fileDaoField = WorkspaceServiceImpl.class.getDeclaredField("fileDao");
         fileDaoField.setAccessible(true);
         fileDao = (FileDao) fileDaoField.get(workspaceService);
     }
@@ -156,7 +157,7 @@ public class WorkspaceServiceIT {
         assertNotNull(actualFile);
         assertEquals(expectedFile, actualFile);
 
-        workspaceService.setFileContent(PROJECT, actualFile.getGridFSId(), "fichier modifié");
+        workspaceService.updateFileContent(PROJECT, actualFile.getGridFSId(), "fichier modifié");
 
         String actualIn = workspaceService.getFileContent(PROJECT, actualFile.getGridFSId());
         assertNotNull(actualIn);

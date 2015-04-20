@@ -29,6 +29,8 @@ import static org.junit.Assert.assertNotNull;
 public class ProjectRepositoryTest {
 
     public static final String OWNER = "Tester";
+    public static final String P_1 = "P1";
+    public static final String P_2 = "P2";
 
     @Autowired
     private ProjectRepository projectRepository;
@@ -39,8 +41,8 @@ public class ProjectRepositoryTest {
     public void setUp() {
         Project p1 = new Project();
         Project p2 = new Project();
-        p1.setName("P1");
-        p2.setName("P2");
+        p1.setName(P_1);
+        p2.setName(P_2);
         p1.setOwner(OWNER);
         p2.setOwner(OWNER);
 
@@ -74,5 +76,10 @@ public class ProjectRepositoryTest {
         while (it.hasNext()) {
             assertEquals(projectList.get(i++).getId(), it.next().getId());
         }
+    }
+
+    @Test
+    public void testFindByOwnerAndName() {
+        assertEquals(projectList.get(0).getId(), projectRepository.findByOwnerAndName(OWNER, P_1).get(0).getId());
     }
 }

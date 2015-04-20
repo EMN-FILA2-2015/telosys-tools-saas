@@ -5,6 +5,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * TODO : Tester les levées d'exception
+ */
 public class ProjectServiceImplTest {
 
 

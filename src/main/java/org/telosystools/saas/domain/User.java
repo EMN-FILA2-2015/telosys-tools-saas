@@ -54,12 +54,12 @@ public class User {
     }
 
     public Set<String> getContributions() {
+        if (contributions == null) contributions = new HashSet<>();
         return contributions;
     }
 
     public void addContribution(String projectId) {
-        if (contributions == null) contributions = new HashSet<>();
-        contributions.add(projectId);
+        this.getContributions().add(projectId);
     }
 
 }

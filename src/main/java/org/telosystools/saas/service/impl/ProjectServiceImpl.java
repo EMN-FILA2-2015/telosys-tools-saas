@@ -1,19 +1,20 @@
 package org.telosystools.saas.service.impl;
 
-import com.mongodb.MongoException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.telosystools.saas.dao.ProjectDao;
-import org.telosystools.saas.dao.UserDao;
+import org.telosystools.saas.dao.ProjectRepository;
+import org.telosystools.saas.dao.UserRepository;
 import org.telosystools.saas.domain.Project;
 import org.telosystools.saas.domain.ProjectConfiguration;
 import org.telosystools.saas.domain.User;
 import org.telosystools.saas.service.ProjectService;
 import org.telosystools.saas.service.WorkspaceService;
-import org.telosystools.saas.service.exceptions.BadRequestException;
-import org.telosystools.saas.web.SecurityUtils;
 
 import java.util.List;
+
+import static org.telosystools.saas.web.SecurityUtils.getCurrentLogin;
 
 /**
  * Created by Adrian on 29/01/15.
@@ -22,64 +23,67 @@ import java.util.List;
 public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
-    private ProjectDao projectDao;
-
-    @Autowired
     private WorkspaceService workspaceService;
 
     @Autowired
-    private UserDao userDao;
+    private ProjectRepository projectRepository;
 
+    @Autowired
+    private UserRepository userRepository;
 
-    @Override
-    public List<Project> list() {
-
-        return projectDao.findAll();
-    }
+    private final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
     @Override
-    public List<Project> listByUser() {
-        return projectDao.findByUser(SecurityUtils.getCurrentLogin());
-    }
+    public List<Project> findAllByUser() {
+        User currentUser = userRepository.findOne(getCurrentLogin());
+        List<Project> projects = projectRepository.findByOwner(getCurrentLogin());
 
+        if (!currentUser.getContributions().isEmpty()) {
+            // Récupération des contributions
+            final Iterable<Project> contributions = projectRepository.findAll(currentUser.getContributions());
+            contributions.forEach(e -> projects.add(e));
+        }
+
+        return projects;
+    }
 
     @Override
     public Project loadProject(String projectId) {
-        return projectDao.load(projectId);
+        return projectRepository.findOne(projectId);
     }
 
     @Override
-    public void delete(String id) {
-        projectDao.remove(new Project(id));
-        workspaceService.deleteWorkspace(id);
+    public void deleteProject(String projectId) {
+        workspaceService.deleteWorkspace(projectId);
+        // TODO : Delete all users contributions
+        projectRepository.delete(projectId);
     }
 
     @Override
     public Project createProject(Project project) {
-        // Vérification unicité du nom vis à vis du projet fait par la base
-        project.setOwner(SecurityUtils.getCurrentLogin());
-        try {
-            projectDao.save(project);
-        } catch (MongoException e) {
-            // Sont ou les logs ?
-            throw new BadRequestException("Le nom de projet : " + project.getName() + " est déjà utilisé");
+        // Vérification unicité du nom
+        if (!projectRepository.findByOwnerAndName(getCurrentLogin(), project.getName()).isEmpty()) {
+            logger.warn("Duplicate project name");
+            // TODO : Throw ProjectDuplicateNameException
+            return null;
         }
-        // Création du workspace
+        project.setOwner(getCurrentLogin());
+
+        // Création du projet et du workspace
+        projectRepository.save(project);
         workspaceService.createWorkspace(project.getId());
+
         return project;
     }
 
     @Override
     public void updateProjectConfig(String projectId, ProjectConfiguration projectConfig) {
-        Project project = projectDao.load(projectId);
+        Project project = projectRepository.findOne(projectId);
+        // TODO : Throw ProjectNotFound
         if (project != null) {
             project.setProjectConfiguration(projectConfig);
-            projectDao.save(project);
+            projectRepository.save(project);
         }
-    }
-
-    public User loadUser(String email, String password) {
-        return userDao.findAuthenticate(email, password);
     }
 
 }

@@ -26,7 +26,6 @@ import static org.junit.Assert.assertNotNull;
 @Import(MongodbConfiguration.class)
 public class UserRepositoryTest {
 
-    public static final String owner = "Tester";
     public static final String USER_1 = "user1";
     public static final String EMAIL_1 = "email1";
     public static final String PASSWORD_1 = "password1";
