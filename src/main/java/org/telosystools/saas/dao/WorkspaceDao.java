@@ -1,9 +1,9 @@
 package org.telosystools.saas.dao;
 
-import org.telosystools.saas.domain.RootFolder;
-import org.telosystools.saas.domain.Workspace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.telosystools.saas.domain.RootFolder;
+import org.telosystools.saas.domain.Workspace;
 
 /**
  * Created by luchabou on 27/02/2015.
@@ -43,7 +43,7 @@ public class WorkspaceDao {
     }
 
     public void delete(String database) {
-        rootFolderDao.mongoTemplate(database).getDb().dropDatabase();
+        rootFolderDao.mongoTemplateDatabase(database).getDb().dropDatabase();
     }
 
 }
