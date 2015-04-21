@@ -1,5 +1,6 @@
 package org.telosystools.saas.domain;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -12,6 +13,9 @@ public class ProjectConfiguration {
     private Map<String, String> variables;
 
     public ProjectConfiguration() {
+        packages = new HashMap<>();
+        folders = new HashMap<>();
+        variables = new HashMap<>();
     }
 
     public Map<String, String> getPackages() {

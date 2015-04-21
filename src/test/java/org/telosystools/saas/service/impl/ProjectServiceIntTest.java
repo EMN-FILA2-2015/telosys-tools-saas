@@ -13,6 +13,7 @@ import org.telosystools.saas.MongodbConfiguration;
 import org.telosystools.saas.dao.ProjectRepository;
 import org.telosystools.saas.dao.UserRepository;
 import org.telosystools.saas.domain.Project;
+import org.telosystools.saas.domain.ProjectConfiguration;
 import org.telosystools.saas.domain.User;
 import org.telosystools.saas.service.WorkspaceService;
 
@@ -35,6 +36,12 @@ public class ProjectServiceIntTest {
     public static final String USER_DEFAULT = "user_default";
     public static final String PROJECT_NAME = "project-test";
     public static final String OTHER_OWNER = "other_owner";
+    public static final String CONFIG_FOLDER_ITEM = "folder_1";
+    public static final String CONFIG_PACKAGE_ITEM = "packages_1";
+    public static final String CONFIG_VARIABLES_ITEM = "variables_1";
+    public static final String CONFIG_FOLDER_VALUE = "folder_test";
+    public static final String CONFIG_PACKAGES_VALUE = "packages_test";
+    public static final String CONFIG_VARIABLES_VALUE = "variables_test";
 
     @Autowired
     private ProjectServiceImpl projectService;
@@ -73,16 +80,35 @@ public class ProjectServiceIntTest {
     }
 
     @Test
+    public void testLoadProject() {
+        Project expected = new Project();
+        expected.setName(PROJECT_NAME);
+        expected.setOwner(USER_DEFAULT);
+        expected.setDescription("description");
+
+        expected.setProjectConfiguration(new ProjectConfiguration());
+        expected = repProject.save(expected);
+        IDS.add(expected.getId());
+
+        Project actual = projectService.loadProject(expected.getId());
+        assertEquals(expected.getName(), actual.getName());
+        assertEquals(expected.getDescription(), actual.getDescription());
+        assertNotNull(actual.getProjectConfiguration().getFolders());
+        assertNotNull(actual.getProjectConfiguration().getPackages());
+        assertNotNull(actual.getProjectConfiguration().getVariables());
+    }
+
+    @Test
     public void testCreateProject() {
         Project project = new Project();
         project.setName(PROJECT_NAME);
         project = projectService.createProject(project);
+        IDS.add(project.getId());
 
         assertNotNull(project.getId());
         assertEquals(project.getOwner(), USER_DEFAULT);
         assertNotNull(projectService.findAllByUser());
 
-        IDS.add(project.getId());
 
         project = new Project();
         project.setName(PROJECT_NAME);
@@ -93,7 +119,8 @@ public class ProjectServiceIntTest {
     public void testDeleteProject() {
         Project project = new Project();
         project.setName(PROJECT_NAME);
-        project = projectService.createProject(project);
+        project.setOwner(USER_DEFAULT);
+        project = repProject.save(project);
 
         projectService.deleteProject(project.getId());
         assertNull(repProject.findOne(project.getId()));
@@ -104,9 +131,9 @@ public class ProjectServiceIntTest {
     public void testFindAllByUser() {
         Project project = new Project();
         project.setName(PROJECT_NAME);
-        project = projectService.createProject(project);
+        project.setOwner(USER_DEFAULT);
+        project = repProject.save(project);
         IDS.add(project.getId());
-
 
         Project otherProject = new Project();
         otherProject.setOwner(OTHER_OWNER);
@@ -124,5 +151,27 @@ public class ProjectServiceIntTest {
         assertEquals(project.getOwner(), res.get(0).getOwner());
         assertEquals(otherProject.getId(), res.get(1).getId());
         assertEquals(otherProject.getOwner(), OTHER_OWNER);
+    }
+
+    @Test
+    public void testUpdateProjectConfig() {
+        ProjectConfiguration config = new ProjectConfiguration();
+        config.getFolders().put(CONFIG_FOLDER_ITEM, CONFIG_FOLDER_VALUE);
+        config.getPackages().put(CONFIG_PACKAGE_ITEM, CONFIG_PACKAGES_VALUE);
+        config.getVariables().put(CONFIG_VARIABLES_ITEM, CONFIG_VARIABLES_VALUE);
+
+        Project expected = new Project();
+        expected.setName(PROJECT_NAME);
+        expected.setOwner(USER_DEFAULT);
+        expected = repProject.save(expected);
+        IDS.add(expected.getId());
+
+        projectService.updateProjectConfig(expected.getId(), config);
+
+        Project actual = repProject.findOne(expected.getId());
+        assertNotNull(actual);
+        assertEquals(CONFIG_FOLDER_VALUE, actual.getProjectConfiguration().getFolders().get(CONFIG_FOLDER_ITEM));
+        assertEquals(CONFIG_PACKAGES_VALUE, actual.getProjectConfiguration().getPackages().get(CONFIG_PACKAGE_ITEM));
+        assertEquals(CONFIG_VARIABLES_VALUE, actual.getProjectConfiguration().getVariables().get(CONFIG_VARIABLES_ITEM));
     }
 }
