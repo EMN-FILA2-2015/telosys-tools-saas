@@ -77,6 +77,9 @@ public class ProjectServiceIntTest {
     @After
     public void tearDown() {
         IDS.forEach(repProject::delete);
+        User user = repUser.findOne(USER_DEFAULT);
+        user.getContributions().clear();
+        repUser.save(user);
     }
 
     @Test
@@ -100,19 +103,21 @@ public class ProjectServiceIntTest {
 
     @Test
     public void testCreateProject() {
-        Project project = new Project();
-        project.setName(PROJECT_NAME);
-        project = projectService.createProject(project);
-        IDS.add(project.getId());
+        Project expected = new Project();
+        expected.setName(PROJECT_NAME);
+        expected = projectService.createProject(expected);
+        IDS.add(expected.getId());
 
-        assertNotNull(project.getId());
-        assertEquals(project.getOwner(), USER_DEFAULT);
+        assertNotNull(expected.getId());
+        assertEquals(expected.getOwner(), USER_DEFAULT);
         assertNotNull(projectService.findAllByUser());
+        assertNotNull(workService.getWorkspace(expected.getId()));
+        workService.deleteWorkspace(expected.getId());
 
+        expected = new Project();
+        expected.setName(PROJECT_NAME);
+        assertNull(projectService.createProject(expected));
 
-        project = new Project();
-        project.setName(PROJECT_NAME);
-        assertNull(projectService.createProject(project));
     }
 
     @Test
