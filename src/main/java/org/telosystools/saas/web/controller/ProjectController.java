@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.telosystools.saas.domain.*;
 import org.telosystools.saas.service.ProjectService;
-import org.telosystools.saas.service.impl.WorkspaceServiceImpl;
+import org.telosystools.saas.service.WorkspaceService;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -22,7 +22,7 @@ public class ProjectController {
     private ProjectService projectService;
 
     @Inject
-    private WorkspaceServiceImpl workspaceService;
+    private WorkspaceService workspaceService;
 
     /**
      * Load a project
@@ -121,6 +121,7 @@ public class ProjectController {
         workspaceService.updateFileContent(projectId, fileId, fileContent);
     }
 
+    @RequestMapping(value = "/{id}/config/telosystoolscfg", method = RequestMethod.POST)
     /**
      * Update the project's configuration.
      *
@@ -133,6 +134,7 @@ public class ProjectController {
         projectService.updateProjectConfig(projectId, projectConfig);
     }
 
+    @RequestMapping(value = "/{id}/config/telosystoolscfg", method = RequestMethod.GET)
     /**
      * Get the project's configuration.
      *
