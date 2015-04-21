@@ -23,11 +23,13 @@ import static org.junit.Assert.*;
 
 /**
  * Created by Adrian on 29/01/15.
+ *
+ * Integration tests of ProjectService
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @Import(MongodbConfiguration.class)
-public class ProjectServiceImplIntegrationTest {
+public class ProjectServiceIntTest {
 
     public static final String USER_DEFAULT = "user_default";
     public static final String PROJECT_NAME = "project-test";
@@ -59,7 +61,7 @@ public class ProjectServiceImplIntegrationTest {
 
     @After
     public void tearDown() {
-        IDS.forEach(e -> repProject.delete(e));
+        IDS.forEach(repProject::delete);
     }
 
     @Test
@@ -77,5 +79,10 @@ public class ProjectServiceImplIntegrationTest {
         project = new Project();
         project.setName(PROJECT_NAME);
         assertNull(projectService.createProject(project));
+    }
+
+    @Test
+    public void testDeleteProject() {
+
     }
 }

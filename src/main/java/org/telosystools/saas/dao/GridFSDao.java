@@ -14,6 +14,9 @@ import java.io.InputStream;
 
 /**
  * Created by luchabou on 27/02/2015.
+ *
+ * File management with GridFS. One database is set per workspace.
+ * See POC project Mongodb2 for details
  */
 @Repository
 class GridFSDao {
@@ -42,9 +45,16 @@ class GridFSDao {
         return gridFSInputFile.getId().toString();
     }
 
-    public void update(String gridFSId, InputStream in, String database) {
-        GridFSInputFile gridFSInputFile = gridFS(database).createFile(in);
-        gridFSInputFile.save();
+    public String update(String gridFSId, InputStream in, String database) {
+        // Récupération de l'ancien fichier et suppression
+        final GridFSDBFile oldFile = gridFS(database).findOne(new ObjectId(gridFSId));
+        if (oldFile != null) {
+            GridFSInputFile updatedFile = gridFS(database).createFile(in, oldFile.getFilename());
+            updatedFile.save();
+            return updatedFile.getId().toString();
+        }
+        // TODO : Throw FileContentUpdateFailure
+        return null;
     }
 
     public void remove(String gridFSId, String database) {

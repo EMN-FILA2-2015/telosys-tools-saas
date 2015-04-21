@@ -18,6 +18,9 @@ import static org.telosystools.saas.web.SecurityUtils.getCurrentLogin;
 
 /**
  * Created by Adrian on 29/01/15.
+ *
+ * Project management service.
+ * Uses the workspace services as a workspace is always attached to a project
  */
 @Component
 public class ProjectServiceImpl implements ProjectService {
@@ -35,13 +38,14 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<Project> findAllByUser() {
+        // TODO : Exception UserNotFound
         User currentUser = userRepository.findOne(getCurrentLogin());
         List<Project> projects = projectRepository.findByOwner(getCurrentLogin());
 
         if (!currentUser.getContributions().isEmpty()) {
             // Récupération des contributions
             final Iterable<Project> contributions = projectRepository.findAll(currentUser.getContributions());
-            contributions.forEach(e -> projects.add(e));
+            contributions.forEach(projects::add);
         }
 
         return projects;

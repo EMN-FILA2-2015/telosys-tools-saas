@@ -7,6 +7,8 @@ import org.telosystools.saas.domain.Workspace;
 
 /**
  * Created by Adrian on 20/04/15.
+ *
+ * Workspace management service interface.
  */
 public interface WorkspaceService {
 
@@ -69,6 +71,6 @@ public interface WorkspaceService {
      * @param fileId GridFS id du fichier
      * @param content Contenu a sauvegarder
      */
-    void updateFileContent(String projectId, String fileId, String content);
+    String updateFileContent(String projectId, String fileId, String content);
 
 }

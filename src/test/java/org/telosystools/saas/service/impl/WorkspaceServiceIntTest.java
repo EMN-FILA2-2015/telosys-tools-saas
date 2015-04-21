@@ -1,4 +1,4 @@
-package org.telosystools.saas.service;
+package org.telosystools.saas.service.impl;
 
 import com.mongodb.MongoException;
 import org.junit.After;
@@ -13,10 +13,7 @@ import org.telosystools.saas.bean.Path;
 import org.telosystools.saas.dao.FileDao;
 import org.telosystools.saas.dao.WorkspaceDao;
 import org.telosystools.saas.domain.File;
-import org.telosystools.saas.domain.Folder;
-import org.telosystools.saas.domain.RootFolder;
-import org.telosystools.saas.domain.Workspace;
-import org.telosystools.saas.service.impl.WorkspaceServiceImpl;
+import org.telosystools.saas.domain.*;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -29,9 +26,10 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
-public class WorkspaceServiceIT {
+public class WorkspaceServiceIntTest {
 
     private static final String PROJECT = "PROJECT_ID1";
+    private static final String PROJECT2 = "PROJECT_ID2";
     private static final String FOLDER_NAME = "MY_FOLDER";
     private static final String SUBFOLDER_NAME = "MY_SUBFOLDER";
     private static final String FOLDER_PATH = Workspace.GENERATEDS+"/"+ FOLDER_NAME;
@@ -40,14 +38,14 @@ public class WorkspaceServiceIT {
     private static final String MODIFIED_SUBFOLDER_NAME = "RENAME_SUBFOLDER";
     private static final String MODIFIED_FOLDER_PATH = Workspace.GENERATEDS+"/"+ MODIFIED_FOLDER_NAME;
     private static final String MODIFIED_SUBFOLDER_PATH = FOLDER_PATH+"/"+MODIFIED_SUBFOLDER_NAME;
-    private static final String FILE_NAME = "MY_FILE";
+    private static final String FILE_NAME = "MY_FILE.java";
     private static final String FILE_PATH = Workspace.MODELS+ "/"+ FILE_NAME;
+    private static final String FILE_EXT = "java";
     private static final String MODIFIED_FILE_NAME = "RENAMED_FILE";
     private static final String MODIFIED_FILE_PATH = Workspace.MODELS+"/"+ MODIFIED_FILE_NAME;
-    private static final String RESOURCE_FILE = "file.txt";
     private static final String MODIFIED_RESOURCE_FILE = "modified_file.txt";
-    private static final String RESOURCE_FILE_CONTENT = "Fichier example";
-    private static final String MODIFIED_RESOURCE_CONTENT = "Fichier modifié";
+    public static final String FILE_CONTENT = "Fichier example";
+    public static final String MODIFIED_FILE_CONTENT = "fichier modifié";
 
     @Autowired
     WorkspaceServiceImpl workspaceService;
@@ -65,19 +63,22 @@ public class WorkspaceServiceIT {
         Field fileDaoField = WorkspaceServiceImpl.class.getDeclaredField("fileDao");
         fileDaoField.setAccessible(true);
         fileDao = (FileDao) fileDaoField.get(workspaceService);
+
+        workspaceDao.save(buildWorkspace(), PROJECT);
     }
 
     @After
     public void tearDown() throws Exception {
-
+        workspaceDao.delete(PROJECT);
     }
 
     @Test
     public void testCreateWorkspace() throws Exception {
-        Workspace expected = workspaceService.createWorkspace(PROJECT);
-        Workspace actual = workspaceDao.load(PROJECT);
+        Workspace expected = workspaceService.createWorkspace(PROJECT2);
+        Workspace actual = workspaceDao.load(PROJECT2);
         assertNotNull(actual);
         assertEquals(expected,actual);
+        workspaceDao.delete(PROJECT2);
     }
 
     @Test
@@ -130,8 +131,7 @@ public class WorkspaceServiceIT {
 
     @Test
     public void testCreateFile() throws Exception {
-        InputStream expectedIn = getInputStream(RESOURCE_FILE);
-        File expectedFile = workspaceService.createFile(FILE_PATH, expectedIn, PROJECT);
+        File expectedFile = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
         Workspace workspace = workspaceDao.load(PROJECT);
 
         File actualFile = workspaceService.getFileForPath(workspace, Path.valueOf(FILE_PATH));
@@ -140,34 +140,29 @@ public class WorkspaceServiceIT {
 
         InputStream actualIn = fileDao.loadContent(actualFile.getGridFSId(), PROJECT);
         assertNotNull(actualIn);
-        expectedIn = getInputStream(RESOURCE_FILE);
-        assertEqualsInputStream(expectedIn, actualIn);
+        assertEqualsInputStream(createInputStream(FILE_CONTENT), actualIn);
     }
 
 
     @Test
     public void testSaveFile_modify() throws Exception {
-        File expectedFile = workspaceService.createFile(FILE_PATH, getInputStream(RESOURCE_FILE), PROJECT);
-        InputStream expectedIn = getInputStream(MODIFIED_RESOURCE_FILE);
-
-        workspaceService.saveFile(expectedFile, expectedIn, PROJECT);
+        File expectedFile = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
 
         Workspace workspace = workspaceDao.load(PROJECT);
         File actualFile = workspaceService.getFileForPath(workspace, Path.valueOf(FILE_PATH));
         assertNotNull(actualFile);
         assertEquals(expectedFile, actualFile);
 
-        workspaceService.updateFileContent(PROJECT, actualFile.getGridFSId(), "fichier modifié");
+        String newFileId = workspaceService.updateFileContent(PROJECT, expectedFile.getGridFSId(), MODIFIED_FILE_CONTENT);
 
-        String actualIn = workspaceService.getFileContent(PROJECT, actualFile.getGridFSId());
+        String actualIn = workspaceService.getFileContent(PROJECT, newFileId);
         assertNotNull(actualIn);
-        assertEquals(MODIFIED_RESOURCE_CONTENT, actualIn.trim());
+        assertEquals(MODIFIED_FILE_CONTENT, actualIn.trim());
     }
 
     @Test
     public void testRenameFile() throws Exception {
-        InputStream expectedIn = getInputStream(RESOURCE_FILE);
-        File expectedFile = workspaceService.createFile(FILE_PATH, expectedIn, PROJECT);
+        File expectedFile = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
         workspaceService.renameFile(expectedFile, MODIFIED_FILE_NAME, PROJECT);
 
         Workspace workspace = workspaceDao.load(PROJECT);
@@ -178,9 +173,33 @@ public class WorkspaceServiceIT {
 
     @Test(expected = MongoException.class)
     public void testRemoveFile() throws Exception {
-        File file = workspaceService.createFile(FILE_PATH, getInputStream(RESOURCE_FILE), PROJECT);
+        File file = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
         workspaceService.removeFile(FILE_PATH,PROJECT);
         workspaceService.getFileContent(PROJECT, file.getGridFSId());
+    }
+
+    @Test
+    public void testExists() {
+        File file = null;
+        try {
+            file = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
+        } catch (FolderNotFoundException e) {
+            fail(e.getMessage());
+        }
+
+        workspaceService.removeFile(FILE_PATH,PROJECT);
+        assertFalse(workspaceService.exists(workspaceService.getWorkspace(PROJECT), file.getAbsolutePath()));
+    }
+
+    @Test
+    public void testGetFileExtension() {
+        File file = null;
+        try {
+            file = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
+        } catch (FolderNotFoundException e) {
+            fail(e.getMessage());
+        }
+        assertEquals(FILE_EXT, workspaceService.getFileExtension(file.getName()));
     }
 
     @Test
@@ -219,9 +238,8 @@ public class WorkspaceServiceIT {
     @Test
     public void testCreateFileInSubFolder() throws Exception {
         workspaceService.createFolder(FOLDER_PATH,PROJECT);
-        InputStream expectedIn = getInputStream(RESOURCE_FILE);
         String filePath = FOLDER_PATH+"/"+FILE_NAME;
-        File expectedFile = workspaceService.createFile(filePath, expectedIn, PROJECT);
+        File expectedFile = workspaceService.createFile(filePath, FILE_CONTENT, PROJECT);
         Workspace workspace = workspaceDao.load(PROJECT);
 
         File actualFile = workspaceService.getFileForPath(workspace, Path.valueOf(filePath));
@@ -230,14 +248,14 @@ public class WorkspaceServiceIT {
 
         String actualIn = workspaceService.getFileContent(PROJECT, actualFile.getGridFSId());
         assertNotNull(actualIn);
-        assertEquals(RESOURCE_FILE_CONTENT, actualIn.trim());
+        assertEquals(FILE_CONTENT, actualIn.trim());
     }
 
     @Test
     public void testSaveFileInSubFolder() throws Exception {
         workspaceService.createFolder(FOLDER_PATH,PROJECT);
         String filePath = FOLDER_PATH+"/"+FILE_NAME;
-        File expectedFile = workspaceService.createFile(filePath, getInputStream(RESOURCE_FILE), PROJECT);
+        File expectedFile = workspaceService.createFile(filePath, FILE_CONTENT, PROJECT);
         InputStream expectedIn = getInputStream(MODIFIED_RESOURCE_FILE);
 
         workspaceService.saveFile(expectedFile, expectedIn, PROJECT);
@@ -249,15 +267,14 @@ public class WorkspaceServiceIT {
 
         String actualIn = workspaceService.getFileContent(PROJECT, actualFile.getGridFSId());
         assertNotNull(actualIn);
-        assertEquals(RESOURCE_FILE_CONTENT, actualIn.trim());
+        assertEquals(FILE_CONTENT, actualIn.trim());
     }
 
     @Test
     public void testRenameFileInSubFolder() throws Exception {
         workspaceService.createFolder(FOLDER_PATH,PROJECT);
-        InputStream expectedIn = getInputStream(RESOURCE_FILE);
         String filePath = FOLDER_PATH+"/"+FILE_NAME;
-        File expectedFile = workspaceService.createFile(filePath, expectedIn, PROJECT);
+        File expectedFile = workspaceService.createFile(filePath, FILE_CONTENT, PROJECT);
         workspaceService.renameFile(expectedFile, MODIFIED_FILE_NAME, PROJECT);
 
         Workspace workspace = workspaceDao.load(PROJECT);
@@ -269,7 +286,7 @@ public class WorkspaceServiceIT {
 
     @Test(expected = MongoException.class)
     public void testRemoveFileInSubFolder() throws Exception {
-        File file = workspaceService.createFile(FILE_PATH, getInputStream(RESOURCE_FILE), PROJECT);
+        File file = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
         workspaceService.removeFile(FILE_PATH,PROJECT);
         workspaceService.getFileContent(PROJECT, file.getGridFSId());
     }
@@ -287,6 +304,10 @@ public class WorkspaceServiceIT {
     private InputStream getInputStream(String fileName) throws FileNotFoundException {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         return classLoader.getResourceAsStream(fileName);
+    }
+
+    private InputStream createInputStream(String string) {
+        return new ByteArrayInputStream(string.getBytes());
     }
 
     private void assertEqualsInputStream(InputStream expectedIn, InputStream actualIn) {

@@ -113,7 +113,7 @@ public class WorkspaceServiceImpl implements WorkspaceService{
         Path path = Path.valueOf(absolutePath);
         File file = new File(path);
         Folder folderParent = getFolderForPath(workspace, path.getParent());
-        if (folderParent!=null) {
+        if (folderParent != null) {
             folderParent.addFile(file);
             fileDao.save(file, this.createInputStream(content), projectId);
             workspaceDao.save(workspace, projectId);
@@ -176,7 +176,7 @@ public class WorkspaceServiceImpl implements WorkspaceService{
         if(filename == null) {
             return null;
         }
-        int posDot = filename.lastIndexOf(".");
+        int posDot = filename.lastIndexOf("*");
         if(posDot != -1) {
             return filename.substring(posDot+1);
         }
@@ -191,7 +191,7 @@ public class WorkspaceServiceImpl implements WorkspaceService{
      * @return boolean
      */
     public boolean exists(Workspace workspace, String path) {
-        return getFolderForPath(workspace, Path.valueOf(path)) != null && getFolderForPath(workspace, Path.valueOf(path)) != null;
+        return getFolderForPath(workspace, Path.valueOf(path)) != null && getFileForPath(workspace, Path.valueOf(path)) != null;
     }
 
     /**
@@ -246,9 +246,10 @@ public class WorkspaceServiceImpl implements WorkspaceService{
     }
 
     @Override
-    public void updateFileContent(String projectId, String fileId, String content) {
-        fileDao.saveContent(fileId, createInputStream(content), projectId);
+    public String updateFileContent(String projectId, String fileId, String content) {
+        return fileDao.updateContent(fileId, createInputStream(content), projectId);
     }
+
     @Override
     public void deleteWorkspace(String projectId) {
         workspaceDao.delete(projectId);

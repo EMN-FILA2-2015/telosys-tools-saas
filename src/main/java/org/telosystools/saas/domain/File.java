@@ -40,6 +40,8 @@ public class File implements Serializable {
     }
 
     public File(String absolutePath) {
+        // TODO : Better handling of the '.' character (mongo exception)
+        absolutePath = absolutePath.replace('.', '*');
         this.absolutePath = absolutePath;
         Path path = Path.valueOf(absolutePath);
         this.path = path.getBasename();
@@ -54,24 +56,17 @@ public class File implements Serializable {
         this.ext = getFileExtension(name);
     }
 
-    /**
-     * Indicate if the file is already saved in database.
-     * @return exists
-     */
-    public boolean isStored() {
-        return this.getGridFSId() != null;
-    }
 
     /**
      * Return the file extension from the file name.
      * @param filename file name
      * @return file extension
      */
-    public static final String getFileExtension(String filename) {
+    public static String getFileExtension(String filename) {
         if(filename == null) {
             return null;
         }
-        int posDot = filename.lastIndexOf(".");
+        int posDot = filename.lastIndexOf("*");
         if(posDot != -1) {
             return filename.substring(posDot+1);
         }
@@ -86,8 +81,8 @@ public class File implements Serializable {
         return name;
     }
 
-    public String getExt() {
-        return ext;
+    public String getAbsolutePath() {
+        return absolutePath;
     }
 
     public String getGridFSId() {

@@ -2,6 +2,7 @@ package org.telosystools.saas.bean;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -10,6 +11,8 @@ import java.util.List;
 public class Path implements Serializable {
 
     public static final String SEPARATOR = "/";
+    public static final char DOT = '.';
+    public static final char DOT_REPLACEMENT = '*';
 
     /**
      * Elements of the path : folders names and file name.
@@ -43,7 +46,7 @@ public class Path implements Serializable {
      * @return full path
      */
     public String toString() {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         boolean isFirst = true;
         for(String item : items) {
             if(isFirst) {
@@ -65,10 +68,9 @@ public class Path implements Serializable {
         Path pathResult = new Path();
         if(paths != null) {
             for(String path : paths) {
+                path = path.replace(DOT, DOT_REPLACEMENT);
                 String[] items = path.split(SEPARATOR);
-                for (String item : items) {
-                    pathResult.items.add(item);
-                }
+                Collections.addAll(pathResult.items, items);
             }
         }
         return pathResult;
@@ -122,8 +124,7 @@ public class Path implements Serializable {
         for(int i=0; i<this.items.size()-1; i++) {
             baseItems.add(this.items.get(i));
         }
-        Path basePath = new Path(baseItems);
-        return basePath;
+        return new Path(baseItems);
     }
 
     /**

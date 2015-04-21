@@ -1,13 +1,15 @@
 package org.telosystools.saas.dao;
 
-import org.telosystools.saas.domain.File;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.telosystools.saas.domain.File;
 
 import java.io.InputStream;
 
 /**
  * Created by luchabou on 27/02/2015.
+ *
+ * Service delegate to GridFSDao
  */
 @Repository
 public class FileDao {
@@ -19,8 +21,7 @@ public class FileDao {
         if(fileId == null) {
             return null;
         }
-        InputStream in = gridFSDao.load(fileId, database);
-        return in;
+        return gridFSDao.load(fileId, database);
     }
 
     public void save(File file, InputStream in, String database) {
@@ -32,8 +33,8 @@ public class FileDao {
         }
     }
     
-    public void saveContent(String fileId, InputStream in, String database) {
-        gridFSDao.update(fileId, in, database);
+    public String updateContent(String fileId, InputStream in, String database) {
+        return gridFSDao.update(fileId, in, database);
     }
     
     public void remove(File file, String database) {
