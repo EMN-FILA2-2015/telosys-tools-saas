@@ -121,7 +121,6 @@ public class ProjectController {
         workspaceService.updateFileContent(projectId, fileId, fileContent);
     }
 
-    @RequestMapping(value = "/{id}/config/telosystoolscfg", method = RequestMethod.POST)
     /**
      * Update the project's configuration.
      *
@@ -134,7 +133,6 @@ public class ProjectController {
         projectService.updateProjectConfig(projectId, projectConfig);
     }
 
-    @RequestMapping(value = "/{id}/config/telosystoolscfg", method = RequestMethod.GET)
     /**
      * Get the project's configuration.
      *
