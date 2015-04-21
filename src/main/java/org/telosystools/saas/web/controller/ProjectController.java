@@ -127,7 +127,7 @@ public class ProjectController {
      * @param projectId Project ID
      * @param projectConfig Project configuration
      */
-    @RequestMapping(value = "/projects/{id}/config/telosystoolscfg", method = RequestMethod.POST)
+    @RequestMapping(value = "/{id}/config/telosystoolscfg", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public void setProjectConfig(@PathVariable("id") String projectId, @RequestBody ProjectConfiguration projectConfig) {
         projectService.updateProjectConfig(projectId, projectConfig);
@@ -139,7 +139,7 @@ public class ProjectController {
      * @param projectId Project ID
      * @return the Project configuration
      */
-    @RequestMapping(value = "/projects/{id}/config/telosystoolscfg", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}/config/telosystoolscfg", method = RequestMethod.GET)
     public  @ResponseBody ProjectConfiguration getProjectConfiguration(@PathVariable("id") String projectId) {
         return projectService.loadProject(projectId).getProjectConfiguration();
     }
