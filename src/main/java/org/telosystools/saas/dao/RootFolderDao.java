@@ -21,6 +21,10 @@ public class RootFolderDao {
         return new MongoTemplate(mongo, database);
     }
 
+    public boolean workspaceExists(String database) {
+        return mongo.getDatabaseNames().contains(database);
+    }
+
     public RootFolder findById(String folderId, String database) {
         return mongoTemplateDatabase(database)
                 .findById(folderId, RootFolder.class, COLLECTION_FOLDERS);

@@ -15,9 +15,12 @@ public class WorkspaceDao {
     private RootFolderDao rootFolderDao;
 
     public Workspace load(String database) {
-        Workspace workspace = new Workspace();
-        refresh(workspace, database);
-        return workspace;
+        if (rootFolderDao.workspaceExists(database)) {
+            Workspace workspace = new Workspace();
+            refresh(workspace, database);
+            return workspace;
+        }
+        return null;
     }
 
     public void refresh(Workspace workspace, String database) {
