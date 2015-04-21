@@ -9,7 +9,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.telosystools.saas.Application;
-import org.telosystools.saas.MongodbConfiguration;
+import org.telosystools.saas.config.MongoConfiguration;
 import org.telosystools.saas.domain.User;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ import static org.junit.Assert.assertNotNull;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
-@Import(MongodbConfiguration.class)
+@Import(MongoConfiguration.class)
 public class UserRepositoryTest {
 
     public static final String USER_1 = "user1";

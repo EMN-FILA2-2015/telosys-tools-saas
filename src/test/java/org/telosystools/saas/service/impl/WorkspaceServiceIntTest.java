@@ -7,9 +7,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.telosystools.saas.Application;
 import org.telosystools.saas.bean.Path;
+import org.telosystools.saas.config.MongoConfiguration;
 import org.telosystools.saas.dao.FileDao;
 import org.telosystools.saas.dao.WorkspaceDao;
 import org.telosystools.saas.domain.File;
@@ -26,6 +28,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
+@Import(MongoConfiguration.class)
 public class WorkspaceServiceIntTest {
 
     private static final String PROJECT = "PROJECT_ID1";

@@ -9,7 +9,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.telosystools.saas.Application;
-import org.telosystools.saas.MongodbConfiguration;
+import org.telosystools.saas.config.MongoConfiguration;
 import org.telosystools.saas.dao.ProjectRepository;
 import org.telosystools.saas.dao.UserRepository;
 import org.telosystools.saas.domain.Project;
@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
-@Import(MongodbConfiguration.class)
+@Import(MongoConfiguration.class)
 public class ProjectServiceIntTest {
 
     public static final String USER_DEFAULT = "user_default";
