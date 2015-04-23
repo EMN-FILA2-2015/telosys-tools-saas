@@ -72,7 +72,7 @@ public class ProjectServiceImpl implements ProjectService {
             return null;
         }
         project.setOwner(getCurrentLogin());
-
+        project.setProjectConfiguration(new ProjectConfiguration());
         // Création du projet et du workspace
         projectRepository.save(project);
         workspaceService.createWorkspace(project.getId());
