@@ -3,7 +3,7 @@
  */
 db.adminCommand("listDatabases").databases.forEach(
     function(d) { if (d.name !="local" && d.name != "admin") {
-        console.log("Dropping database : " + d.name);
+        print("Dropping database : " + d.name);
         db.getSiblingDB(d.name).dropDatabase();
     }
 })
