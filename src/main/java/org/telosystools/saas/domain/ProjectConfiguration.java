@@ -8,29 +8,29 @@ import java.util.Map;
  */
 public class ProjectConfiguration {
 
-    private Map<String, String> packages;
-    private Map<String, String> folders;
+    private ProjectConfigPkg packages;
+    private ProjectConfigFolders folders;
     private Map<String, String> variables;
 
     public ProjectConfiguration() {
-        packages = new HashMap<>();
-        folders = new HashMap<>();
+        packages = new ProjectConfigPkg();
+        folders = new ProjectConfigFolders();
         variables = new HashMap<>();
     }
 
-    public Map<String, String> getPackages() {
+    public ProjectConfigPkg getPackages() {
         return packages;
     }
 
-    public void setPackages(Map<String, String> packages) {
+    public void setPackages(ProjectConfigPkg packages) {
         this.packages = packages;
     }
 
-    public Map<String, String> getFolders() {
+    public ProjectConfigFolders getFolders() {
         return folders;
     }
 
-    public void setFolders(Map<String, String> folders) {
+    public void setFolders(ProjectConfigFolders folders) {
         this.folders = folders;
     }
 

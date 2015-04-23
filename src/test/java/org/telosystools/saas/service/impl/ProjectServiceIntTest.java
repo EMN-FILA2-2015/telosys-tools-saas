@@ -161,8 +161,8 @@ public class ProjectServiceIntTest {
     @Test
     public void testUpdateProjectConfig() {
         ProjectConfiguration config = new ProjectConfiguration();
-        config.getFolders().put(CONFIG_FOLDER_ITEM, CONFIG_FOLDER_VALUE);
-        config.getPackages().put(CONFIG_PACKAGE_ITEM, CONFIG_PACKAGES_VALUE);
+        config.getFolders().setSrc(CONFIG_FOLDER_VALUE);
+        config.getPackages().setEntityPkg(CONFIG_PACKAGES_VALUE);
         config.getVariables().put(CONFIG_VARIABLES_ITEM, CONFIG_VARIABLES_VALUE);
 
         Project expected = new Project();
@@ -175,8 +175,10 @@ public class ProjectServiceIntTest {
 
         Project actual = repProject.findOne(expected.getId());
         assertNotNull(actual);
-        assertEquals(CONFIG_FOLDER_VALUE, actual.getProjectConfiguration().getFolders().get(CONFIG_FOLDER_ITEM));
-        assertEquals(CONFIG_PACKAGES_VALUE, actual.getProjectConfiguration().getPackages().get(CONFIG_PACKAGE_ITEM));
+        assertEquals(CONFIG_FOLDER_VALUE, actual.getProjectConfiguration().getFolders().getSrc());
+        assertEquals(CONFIG_PACKAGES_VALUE, actual.getProjectConfiguration().getPackages().getEntityPkg());
+        assertEquals("", actual.getProjectConfiguration().getFolders().getDoc());
+        assertEquals("", actual.getProjectConfiguration().getPackages().getRootPkg());
         assertEquals(CONFIG_VARIABLES_VALUE, actual.getProjectConfiguration().getVariables().get(CONFIG_VARIABLES_ITEM));
     }
 }
