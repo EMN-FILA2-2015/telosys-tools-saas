@@ -18,6 +18,7 @@ import org.telosystools.saas.Application;
 import org.telosystools.saas.config.MongoConfiguration;
 import org.telosystools.saas.domain.File;
 import org.telosystools.saas.domain.Project;
+import org.telosystools.saas.domain.ProjectConfiguration;
 import org.telosystools.saas.domain.Workspace;
 import org.telosystools.saas.service.ProjectService;
 import org.telosystools.saas.service.WorkspaceService;
@@ -109,9 +110,13 @@ public class ProjectControllerTest {
         projectService.createProject(project2);
 
         // When
-        MvcResult mvcResult = this.mockMvc.perform(get("/projects/")).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8")).andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(get("/projects/"))
 
         // Then
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andReturn();
+
         String jsonContent = mvcResult.getResponse().getContentAsString();
         List projects = mapper.readValue(jsonContent, List.class);
         assertEquals(2,projects.size());
@@ -127,9 +132,10 @@ public class ProjectControllerTest {
 
         // When
         MvcResult mvcResult = this.mockMvc.perform(post("/projects/").contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"" + projectName + "\"}"))
-                .andExpect(status().isCreated()).andReturn();
-
         // Then
+                .andExpect(status().isCreated())
+                .andReturn();
+
         String jsonContent = mvcResult.getResponse().getContentAsString();
         Project createdProject = mapper.readValue(jsonContent, Project.class);
         assertEquals(projectName,createdProject.getName());
@@ -147,9 +153,11 @@ public class ProjectControllerTest {
         String projectID = expectedProject.getId();
 
         // When
-        MvcResult mvcResult = this.mockMvc.perform(delete("/projects/" + projectID)).andExpect(status().isOk()).andReturn();
-
+        MvcResult mvcResult = this.mockMvc.perform(delete("/projects/" + projectID))
         // Then
+                .andExpect(status().isOk())
+                .andReturn();
+
         Project nullProject = projectService.loadProject(projectID);
         assertNull(nullProject);
     }
@@ -166,9 +174,13 @@ public class ProjectControllerTest {
         String projectID = projectService.createProject(project).getId();
 
         // When
-        MvcResult mvcResult = this.mockMvc.perform(get("/projects/" + projectID + "/workspace")).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8")).andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(get("/projects/" + projectID + "/workspace"))
 
         // Then
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andReturn();
+
         String jsonContent = mvcResult.getResponse().getContentAsString();
         Workspace workspace = mapper.readValue(jsonContent, Workspace.class);
         assertNotNull(workspace);
@@ -188,9 +200,11 @@ public class ProjectControllerTest {
 
         // When
         MvcResult mvcResult = this.mockMvc.perform(post("/projects/"+projectID+"/workspace/files").contentType(MediaType.APPLICATION_JSON).content(fileData))
-                .andExpect(status().isCreated()).andReturn();
 
         // Then
+                .andExpect(status().isCreated())
+                .andReturn();
+
         String jsonContent = mvcResult.getResponse().getContentAsString();
         File file = mapper.readValue(jsonContent, File.class);
         assertNotNull(file);
@@ -210,16 +224,19 @@ public class ProjectControllerTest {
         String fileID = workspaceService.createFile("models/model_2.xml", expectedContent, projectID).getGridFSId();
 
         // When
-        MvcResult mvcResult = this.mockMvc.perform(get("/projects/" + projectID + "/workspace/files/" + fileID)).andExpect(status().isOk()).andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(get("/projects/" + projectID + "/workspace/files/" + fileID))
 
         // Then
+                .andExpect(status().isOk())
+                .andReturn();
+
         String actualContent = mvcResult.getResponse().getContentAsString();
         assertEquals(expectedContent, actualContent);
     }
+
     /*
     updateFileContent : change le contenu d'un fichier -> status ok
     */
-
     @Test
     public void testUpdateFileContent() throws Exception {
         // Given
@@ -230,27 +247,47 @@ public class ProjectControllerTest {
         String fileContent = "Contenu du fichier";
 
         // When
-        MvcResult mvcResult = this.mockMvc.perform(put("/projects/" + projectID + "/workspace/files/" + fileID).content(fileContent))
+        this.mockMvc.perform(put("/projects/" + projectID + "/workspace/files/" + fileID).content(fileContent))
         // Then
-                .andExpect(status().isOk()).andReturn();
+                .andExpect(status().isOk());
 
     }
 
     /*
     setProjectConfig : change la config du projet -> status created
     */
-    @Ignore("Not yet implemented")
     @Test
     public void testSetProjectConfig() throws Exception {
+        // Given
+        Project project = new Project();
+        project.setName("New Project");
+        String projectID = projectService.createProject(project).getId();
+        String config = "{\"packages\":{\"rootPkg\":\"\",\"entityPkg\":\"\"},\"folders\":{\"src\":\"\",\"res\":\"\",\"web\":\"\",\"test_src\":\"\",\"test_res\":\"\",\"doc\":\"\",\"tmp\":\"\"},\"variables\":{}}";
 
+        // When
+        this.mockMvc.perform(post("/projects/"+projectID+ "/config/telosystoolscfg").contentType(MediaType.APPLICATION_JSON).content(config))
+        // Then
+                .andExpect(status().isCreated());
     }
 
     /*
-    getProjectConfiguration : récupère la configuration d'un projet -> ???
+    getProjectConfiguration : récupère la configuration d'un projet -> status Ok
     */
-    @Ignore("Not yet implemented")
     @Test
     public void testGetProjectConfiguration() throws Exception {
+        // Given
+        Project project = new Project();
+        project.setName("New Project");
+        String projectID = projectService.createProject(project).getId();
 
+        // When
+        MvcResult mvcResult = this.mockMvc.perform(get("/projects/" + projectID + "/config/telosystoolscfg"))
+
+        // Then
+                .andExpect(status().isOk())
+                .andReturn();
+        String jsonContent = mvcResult.getResponse().getContentAsString();
+        ProjectConfiguration projectConfiguration = mapper.readValue(jsonContent, ProjectConfiguration.class);
+        assertNotNull(projectConfiguration);
     }
 }
