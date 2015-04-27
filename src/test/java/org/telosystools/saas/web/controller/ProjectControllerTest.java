@@ -165,7 +165,6 @@ public class ProjectControllerTest {
     /*
     getWorkspace : récupère l'arborescence d'un projet -> contenu json
     */
-    @Ignore("Test fail : Jackson can't instantiate RootFolder because this class does not have a default constructor")
     @Test
     public void testGetWorkspace() throws Exception {
         // Given

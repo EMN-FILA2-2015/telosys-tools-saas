@@ -10,11 +10,18 @@ public class RootFolder extends Folder {
     public static final String ID_PREFIX = "rootFolder:";
 
     @Id
-    private final String id;
+    private String id;
 
     public RootFolder(String name) {
         super(name);
         this.id = ID_PREFIX + this.getName();
+    }
+
+    public RootFolder() {
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getId() {
