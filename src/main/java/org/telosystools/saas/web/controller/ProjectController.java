@@ -104,7 +104,7 @@ public class ProjectController {
      */
     @RequestMapping(value = "/{id}/workspace/files/{fileId}", method = RequestMethod.GET)
     public @ResponseBody String getFileContent(@PathVariable("id") String projectId, @PathVariable String fileId) {
-        return workspaceService.getFileContent(fileId, projectId);
+        return workspaceService.getFileContent(projectId, fileId);
     }
 
 

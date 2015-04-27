@@ -213,7 +213,6 @@ public class ProjectControllerTest {
     /*
     getFileContent : récupère le contenu d'un fichier -> retourne une chaîne de caractère status ok
     */
-    @Ignore("Test fail : file is not stored in gridFS")
     @Test
     public void testGetFileContent() throws Exception {
         // Given
