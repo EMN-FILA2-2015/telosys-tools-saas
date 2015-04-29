@@ -51,6 +51,7 @@ class GridFSDao {
         if (oldFile != null) {
             GridFSInputFile updatedFile = gridFS(database).createFile(in, oldFile.getFilename());
             updatedFile.save();
+            gridFS(database).remove(oldFile);
             return updatedFile.getId().toString();
         }
         // TODO : Throw FileContentUpdateFailure
