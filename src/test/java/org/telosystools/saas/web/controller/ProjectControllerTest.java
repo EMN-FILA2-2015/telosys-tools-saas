@@ -150,8 +150,8 @@ public class ProjectControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        Project nullProject = projectService.loadProject(projectID);
-        assertNull(nullProject);
+        // Expect an exception
+        projectService.loadProject(projectID);
     }
 
     /*
