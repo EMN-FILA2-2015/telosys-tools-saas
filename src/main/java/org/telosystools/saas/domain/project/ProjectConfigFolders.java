@@ -1,5 +1,6 @@
-package org.telosystools.saas.domain;
+package org.telosystools.saas.domain.project;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
@@ -10,32 +11,39 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class ProjectConfigFolders {
 
     @Field("SRC")
+    @JsonProperty("SRC")
     private String src;
 
     @Field("RES")
+    @JsonProperty("RES")
     private String res;
 
     @Field("WEB")
+    @JsonProperty("WEB")
     private String web;
 
     @Field("TEST_SRC")
-    private String test_src;
+    @JsonProperty("TEST_SRC")
+    private String testSrc;
 
     @Field("TEST_RES")
-    private String test_res;
+    @JsonProperty("TEST_RES")
+    private String testRes;
 
     @Field("DOC")
+    @JsonProperty("DOC")
     private String doc;
 
     @Field("TMP")
+    @JsonProperty("TMP")
     private String tmp;
 
     public ProjectConfigFolders() {
         src = "";
         res = "";
         web = "";
-        test_src = "";
-        test_res = "";
+        testSrc = "";
+        testRes = "";
         doc = "";
         tmp = "";
     }
@@ -64,20 +72,20 @@ public class ProjectConfigFolders {
         this.web = web;
     }
 
-    public String getTest_src() {
-        return test_src;
+    public String getTestSrc() {
+        return testSrc;
     }
 
-    public void setTest_src(String test_src) {
-        this.test_src = test_src;
+    public void setTestSrc(String testSrc) {
+        this.testSrc = testSrc;
     }
 
-    public String getTest_res() {
-        return test_res;
+    public String getTestRes() {
+        return testRes;
     }
 
-    public void setTest_res(String test_res) {
-        this.test_res = test_res;
+    public void setTestRes(String testRes) {
+        this.testRes = testRes;
     }
 
     public String getDoc() {

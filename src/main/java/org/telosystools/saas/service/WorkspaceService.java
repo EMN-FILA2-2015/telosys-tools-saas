@@ -1,9 +1,9 @@
 package org.telosystools.saas.service;
 
-import org.telosystools.saas.domain.File;
-import org.telosystools.saas.domain.Folder;
+import org.telosystools.saas.domain.filesystem.File;
+import org.telosystools.saas.domain.filesystem.Folder;
+import org.telosystools.saas.domain.filesystem.Workspace;
 import org.telosystools.saas.exception.FolderNotFoundException;
-import org.telosystools.saas.domain.Workspace;
 import org.telosystools.saas.exception.GridFSFileNotFoundException;
 
 /**

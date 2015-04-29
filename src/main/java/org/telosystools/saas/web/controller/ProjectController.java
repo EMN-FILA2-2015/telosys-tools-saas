@@ -3,14 +3,14 @@ package org.telosystools.saas.web.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.telosystools.saas.domain.*;
-import org.telosystools.saas.exception.DuplicateProjectNameException;
-import org.telosystools.saas.exception.FolderNotFoundException;
-import org.telosystools.saas.exception.GridFSFileNotFoundException;
-import org.telosystools.saas.exception.UserNotFoundException;
+import org.telosystools.saas.domain.filesystem.File;
+import org.telosystools.saas.domain.filesystem.FileData;
+import org.telosystools.saas.domain.filesystem.Workspace;
+import org.telosystools.saas.domain.project.Project;
+import org.telosystools.saas.domain.project.ProjectConfiguration;
+import org.telosystools.saas.exception.*;
 import org.telosystools.saas.service.ProjectService;
 import org.telosystools.saas.service.WorkspaceService;
-import org.telosystools.saas.exception.ProjectNotFoundException;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -91,7 +91,8 @@ public class ProjectController {
      * @return the workspace
      */
     @RequestMapping(value = "/{id}/workspace", method = RequestMethod.GET)
-    public @ResponseBody Workspace getWorkspace(@PathVariable("id") String projectId) {
+    public @ResponseBody
+    Workspace getWorkspace(@PathVariable("id") String projectId) {
         return workspaceService.getWorkspace(projectId);
     }
 

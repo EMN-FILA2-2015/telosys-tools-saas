@@ -1,4 +1,4 @@
-package org.telosystools.saas.domain;
+package org.telosystools.saas.domain.project;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,4 +41,5 @@ public class ProjectConfiguration {
     public void setVariables(Map<String, String> variables) {
         this.variables = variables;
     }
+
 }

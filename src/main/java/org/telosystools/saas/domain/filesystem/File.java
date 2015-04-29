@@ -1,4 +1,4 @@
-package org.telosystools.saas.domain;
+package org.telosystools.saas.domain.filesystem;
 
 import org.telosystools.saas.bean.Path;
 

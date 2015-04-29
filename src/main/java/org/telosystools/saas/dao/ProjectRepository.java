@@ -1,7 +1,7 @@
 package org.telosystools.saas.dao;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.telosystools.saas.domain.Project;
+import org.telosystools.saas.domain.project.Project;
 
 import java.util.List;
 

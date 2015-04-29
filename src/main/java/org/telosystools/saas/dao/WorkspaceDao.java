@@ -2,8 +2,8 @@ package org.telosystools.saas.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.telosystools.saas.domain.RootFolder;
-import org.telosystools.saas.domain.Workspace;
+import org.telosystools.saas.domain.filesystem.RootFolder;
+import org.telosystools.saas.domain.filesystem.Workspace;
 
 /**
  * Created by luchabou on 27/02/2015.

@@ -6,14 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telosystools.saas.dao.ProjectRepository;
 import org.telosystools.saas.dao.UserRepository;
-import org.telosystools.saas.domain.Project;
-import org.telosystools.saas.domain.ProjectConfiguration;
 import org.telosystools.saas.domain.User;
+import org.telosystools.saas.domain.project.Project;
+import org.telosystools.saas.domain.project.ProjectConfiguration;
 import org.telosystools.saas.exception.DuplicateProjectNameException;
+import org.telosystools.saas.exception.ProjectNotFoundException;
 import org.telosystools.saas.exception.UserNotFoundException;
 import org.telosystools.saas.service.ProjectService;
 import org.telosystools.saas.service.WorkspaceService;
-import org.telosystools.saas.exception.ProjectNotFoundException;
 
 import java.util.List;
 

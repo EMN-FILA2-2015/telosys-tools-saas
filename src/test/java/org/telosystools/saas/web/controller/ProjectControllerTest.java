@@ -15,10 +15,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.telosystools.saas.Application;
 import org.telosystools.saas.config.MongoConfiguration;
-import org.telosystools.saas.domain.File;
-import org.telosystools.saas.domain.Project;
-import org.telosystools.saas.domain.ProjectConfiguration;
-import org.telosystools.saas.domain.Workspace;
+import org.telosystools.saas.domain.filesystem.File;
+import org.telosystools.saas.domain.filesystem.Workspace;
+import org.telosystools.saas.domain.project.Project;
+import org.telosystools.saas.domain.project.ProjectConfiguration;
+import org.telosystools.saas.exception.ProjectNotFoundException;
 import org.telosystools.saas.exception.UserNotFoundException;
 import org.telosystools.saas.service.ProjectService;
 import org.telosystools.saas.service.WorkspaceService;
@@ -26,9 +27,7 @@ import org.telosystools.saas.service.WorkspaceService;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -137,7 +136,7 @@ public class ProjectControllerTest {
     /*
     deleteProject : supprime un projet -> status OK
     */
-    @Test
+    @Test(expected = ProjectNotFoundException.class)
     public void testDeleteProject() throws Exception {
         // Given
         Project project = new Project();
@@ -253,12 +252,20 @@ public class ProjectControllerTest {
         Project project = new Project();
         project.setName("New Project");
         String projectID = projectService.createProject(project).getId();
-        String config = "{\"packages\":{\"rootPkg\":\"\",\"entityPkg\":\"\"},\"folders\":{\"src\":\"\",\"res\":\"\",\"web\":\"\",\"test_src\":\"\",\"test_res\":\"\",\"doc\":\"\",\"tmp\":\"\"},\"variables\":{}}";
+        String config = "{\"packages\":{\"ROOT_PKG\":\"rootPkgVal\",\"ENTITY_PKG\":\"entityPkgVal\"},\"folders\":{\"SRC\":\"srcVal\",\"RES\":\"resVal\",\"WEB\":\"webVal\",\"TEST_SRC\":\"test_srcVal\",\"TEST_RES\":\"test_resVal\",\"DOC\":\"docVal\",\"TMP\":\"tmpVal\"},\"variables\":{\"VAR1\":\"val1\"}}";
 
+
+        ProjectConfiguration p = mapper.readValue(config, ProjectConfiguration.class);
         // When
         this.mockMvc.perform(post("/projects/"+projectID+ "/config/telosystoolscfg").contentType(MediaType.APPLICATION_JSON).content(config))
         // Then
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk());
+
+
+        project = projectService.loadProject(projectID);
+        assertEquals("rootPkgVal", project.getProjectConfiguration().getPackages().getRootPkg());
+        assertEquals("entityPkgVal", project.getProjectConfiguration().getPackages().getEntityPkg());
+        assertEquals("val1", project.getProjectConfiguration().getVariables().get("VAR1"));
     }
 
     /*

@@ -10,7 +10,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.telosystools.saas.Application;
 import org.telosystools.saas.config.MongoConfiguration;
-import org.telosystools.saas.domain.Project;
+import org.telosystools.saas.domain.project.DefaultVariables;
+import org.telosystools.saas.domain.project.Project;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -63,6 +64,10 @@ public class ProjectRepositoryTest {
         List<Project> res = projectRepository.findByOwner(OWNER);
         assertNotNull(res);
         assertEquals(projectList.size(), res.size());
+        Project project = res.get(0);
+        assertEquals(project.getDefaultVariables().downloadsFolder, (new DefaultVariables()).downloadsFolder);
+        assertEquals(project.getDefaultVariables().repositoriesFolder, (new DefaultVariables()).repositoriesFolder);
+        assertEquals(project.getDefaultVariables().templatesFolder, (new DefaultVariables()).templatesFolder);
     }
 
     @Test
@@ -82,4 +87,5 @@ public class ProjectRepositoryTest {
     public void testFindByOwnerAndName() {
         assertEquals(projectList.get(0).getId(), projectRepository.findByOwnerAndName(OWNER, P_1).get(0).getId());
     }
+
 }

@@ -12,9 +12,9 @@ import org.telosystools.saas.Application;
 import org.telosystools.saas.config.MongoConfiguration;
 import org.telosystools.saas.dao.ProjectRepository;
 import org.telosystools.saas.dao.UserRepository;
-import org.telosystools.saas.domain.Project;
-import org.telosystools.saas.domain.ProjectConfiguration;
 import org.telosystools.saas.domain.User;
+import org.telosystools.saas.domain.project.Project;
+import org.telosystools.saas.domain.project.ProjectConfiguration;
 import org.telosystools.saas.service.WorkspaceService;
 
 import java.lang.reflect.Field;

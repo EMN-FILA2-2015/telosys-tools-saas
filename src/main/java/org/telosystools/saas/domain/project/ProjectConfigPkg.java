@@ -1,5 +1,6 @@
-package org.telosystools.saas.domain;
+package org.telosystools.saas.domain.project;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
@@ -10,9 +11,11 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class ProjectConfigPkg {
 
     @Field("ROOT_PKG")
+    @JsonProperty("ROOT_PKG")
     private String rootPkg;
 
     @Field("ENTITY_PKG")
+    @JsonProperty("ENTITY_PKG")
     private String entityPkg;
 
     public ProjectConfigPkg() {

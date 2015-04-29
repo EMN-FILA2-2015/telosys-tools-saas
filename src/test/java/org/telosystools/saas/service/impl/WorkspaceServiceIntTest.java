@@ -14,8 +14,10 @@ import org.telosystools.saas.bean.Path;
 import org.telosystools.saas.config.MongoConfiguration;
 import org.telosystools.saas.dao.FileDao;
 import org.telosystools.saas.dao.WorkspaceDao;
-import org.telosystools.saas.domain.File;
-import org.telosystools.saas.domain.*;
+import org.telosystools.saas.domain.filesystem.File;
+import org.telosystools.saas.domain.filesystem.Folder;
+import org.telosystools.saas.domain.filesystem.RootFolder;
+import org.telosystools.saas.domain.filesystem.Workspace;
 import org.telosystools.saas.exception.FolderNotFoundException;
 import org.telosystools.saas.exception.GridFSFileNotFoundException;
 

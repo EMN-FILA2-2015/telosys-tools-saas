@@ -1,7 +1,9 @@
-package org.telosystools.saas.domain;
+package org.telosystools.saas.domain.project;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.io.Serializable;
 
@@ -20,9 +22,15 @@ public class Project implements Serializable {
 
     private String owner;
 
+    @Field("config")
+    @JsonIgnore
     private ProjectConfiguration projectConfiguration;
 
+    @JsonIgnore
+    private DefaultVariables defaultVariables;
+
     public Project() {
+        defaultVariables = new DefaultVariables();
     }
 
     public String getId() {
@@ -31,6 +39,10 @@ public class Project implements Serializable {
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getOwner() {
@@ -45,10 +57,6 @@ public class Project implements Serializable {
         return description;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public void setDescription(String description) {
         this.description = description;
     }
@@ -61,8 +69,13 @@ public class Project implements Serializable {
         this.projectConfiguration = projectConfiguration;
     }
 
+    public DefaultVariables getDefaultVariables() {
+        return defaultVariables;
+    }
+
     @Override
     public String toString() {
         return String.format("Project[id=%s, name='%s']", id, name);
     }
+
 }
