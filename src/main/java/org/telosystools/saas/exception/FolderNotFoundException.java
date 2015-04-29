@@ -1,4 +1,4 @@
-package org.telosystools.saas.domain;
+package org.telosystools.saas.exception;
 
 /**
  * @author Marion Bechennec

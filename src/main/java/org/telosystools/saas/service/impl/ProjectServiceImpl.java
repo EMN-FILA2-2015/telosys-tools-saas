@@ -9,8 +9,11 @@ import org.telosystools.saas.dao.UserRepository;
 import org.telosystools.saas.domain.Project;
 import org.telosystools.saas.domain.ProjectConfiguration;
 import org.telosystools.saas.domain.User;
+import org.telosystools.saas.exception.DuplicateProjectNameException;
+import org.telosystools.saas.exception.UserNotFoundException;
 import org.telosystools.saas.service.ProjectService;
 import org.telosystools.saas.service.WorkspaceService;
+import org.telosystools.saas.exception.ProjectNotFoundException;
 
 import java.util.List;
 
@@ -37,23 +40,32 @@ public class ProjectServiceImpl implements ProjectService {
     private final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
     @Override
-    public List<Project> findAllByUser() {
-        // TODO : Exception UserNotFound
-        User currentUser = userRepository.findOne(getCurrentLogin());
-        List<Project> projects = projectRepository.findByOwner(getCurrentLogin());
+    public List<Project> findAllByUser() throws UserNotFoundException {
+        String login = getCurrentLogin();
+        User currentUser = userRepository.findOne(login);
+        if (currentUser != null) {
+            List<Project> projects = projectRepository.findByOwner(login);
 
-        if (!currentUser.getContributions().isEmpty()) {
-            // Récupération des contributions
-            final Iterable<Project> contributions = projectRepository.findAll(currentUser.getContributions());
-            contributions.forEach(projects::add);
+            if (!currentUser.getContributions().isEmpty()) {
+                // Récupération des contributions
+                final Iterable<Project> contributions = projectRepository.findAll(currentUser.getContributions());
+                contributions.forEach(projects::add);
+            }
+
+            return projects;
+        } else {
+            throw new UserNotFoundException(login);
         }
-
-        return projects;
     }
 
     @Override
-    public Project loadProject(String projectId) {
-        return projectRepository.findOne(projectId);
+    public Project loadProject(String projectId) throws ProjectNotFoundException {
+        Project project = projectRepository.findOne(projectId);
+        if (project != null) {
+            return project;
+        } else {
+            throw new ProjectNotFoundException(projectId);
+        }
     }
 
     @Override
@@ -64,12 +76,11 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project createProject(Project project) {
+    public Project createProject(Project project) throws DuplicateProjectNameException {
         // Vérification unicité du nom
         if (!projectRepository.findByOwnerAndName(getCurrentLogin(), project.getName()).isEmpty()) {
             logger.warn("Duplicate project name");
-            // TODO : Throw ProjectDuplicateNameException
-            return null;
+            throw new DuplicateProjectNameException(project.getName());
         }
         project.setOwner(getCurrentLogin());
         project.setProjectConfiguration(new ProjectConfiguration());
@@ -81,12 +92,13 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void updateProjectConfig(String projectId, ProjectConfiguration projectConfig) {
+    public void updateProjectConfig(String projectId, ProjectConfiguration projectConfig) throws ProjectNotFoundException {
         Project project = projectRepository.findOne(projectId);
-        // TODO : Throw ProjectNotFound
         if (project != null) {
             project.setProjectConfiguration(projectConfig);
             projectRepository.save(project);
+        } else {
+            throw new ProjectNotFoundException(projectId);
         }
     }
 

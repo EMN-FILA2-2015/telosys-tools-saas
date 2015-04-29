@@ -3,7 +3,6 @@ package org.telosystools.saas.web.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +19,7 @@ import org.telosystools.saas.domain.File;
 import org.telosystools.saas.domain.Project;
 import org.telosystools.saas.domain.ProjectConfiguration;
 import org.telosystools.saas.domain.Workspace;
+import org.telosystools.saas.exception.UserNotFoundException;
 import org.telosystools.saas.service.ProjectService;
 import org.telosystools.saas.service.WorkspaceService;
 
@@ -62,16 +62,9 @@ public class ProjectControllerTest {
     }
 
     @After
-    public void tearDown() throws NoSuchFieldException, IllegalAccessException {
+    public void tearDown() throws NoSuchFieldException, IllegalAccessException, UserNotFoundException {
         List<Project> projects = projectService.findAllByUser();
         projects.forEach(e -> projectService.deleteProject(e.getId()));
-    }
-
-    @Test
-    public void testProject() throws Exception {
-        final MvcResult mvcResultCreate = this.mockMvc.perform(post("/projects/").contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"telosys\"}"))
-                .andExpect(status().isCreated()).andReturn();
-        this.mockMvc.perform(get("/projects/")).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8"));
     }
 
     /*
@@ -153,7 +146,7 @@ public class ProjectControllerTest {
         String projectID = expectedProject.getId();
 
         // When
-        MvcResult mvcResult = this.mockMvc.perform(delete("/projects/" + projectID))
+        this.mockMvc.perform(delete("/projects/" + projectID))
         // Then
                 .andExpect(status().isOk())
                 .andReturn();

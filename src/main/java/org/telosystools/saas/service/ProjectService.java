@@ -3,6 +3,9 @@ package org.telosystools.saas.service;
 
 import org.telosystools.saas.domain.Project;
 import org.telosystools.saas.domain.ProjectConfiguration;
+import org.telosystools.saas.exception.DuplicateProjectNameException;
+import org.telosystools.saas.exception.UserNotFoundException;
+import org.telosystools.saas.exception.ProjectNotFoundException;
 
 import java.util.List;
 
@@ -17,7 +20,7 @@ public interface ProjectService {
      *
      * @return a list of projects
      */
-    List<Project> findAllByUser();
+    List<Project> findAllByUser() throws UserNotFoundException;
 
     /**
      * Return the project with the specified id
@@ -25,7 +28,7 @@ public interface ProjectService {
      * @param id project's mongo id
      * @return Project if exists, null otherwise
      */
-    Project loadProject(String id);
+    Project loadProject(String id) throws ProjectNotFoundException;
 
     /**
      * Delete the project and its workspace.
@@ -40,7 +43,7 @@ public interface ProjectService {
      * @param project the new Project
      * @return a Project instance with its unique id.
      */
-    Project createProject(Project project);
+    Project createProject(Project project) throws DuplicateProjectNameException;
 
     /**
      * Set the project configuration.
@@ -48,5 +51,5 @@ public interface ProjectService {
      * @param projectId projectid
      * @param projectConfig the new configuration
      */
-    void updateProjectConfig(String projectId, ProjectConfiguration projectConfig);
+    void updateProjectConfig(String projectId, ProjectConfiguration projectConfig) throws ProjectNotFoundException;
 }

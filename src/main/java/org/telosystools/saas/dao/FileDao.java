@@ -3,6 +3,7 @@ package org.telosystools.saas.dao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.telosystools.saas.domain.File;
+import org.telosystools.saas.exception.GridFSFileNotFoundException;
 
 import java.io.InputStream;
 
@@ -24,7 +25,7 @@ public class FileDao {
         return gridFSDao.load(fileId, database);
     }
 
-    public void save(File file, InputStream in, String database) {
+    public void save(File file, InputStream in, String database) throws GridFSFileNotFoundException {
         if(file.getGridFSId() == null) {
             String gridFSId = gridFSDao.create(in, database);
             file.setGridFSId(gridFSId);
@@ -33,7 +34,7 @@ public class FileDao {
         }
     }
     
-    public String updateContent(String fileId, InputStream in, String database) {
+    public String updateContent(String fileId, InputStream in, String database) throws GridFSFileNotFoundException {
         return gridFSDao.update(fileId, in, database);
     }
     

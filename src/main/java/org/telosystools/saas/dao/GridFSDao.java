@@ -9,6 +9,7 @@ import com.mongodb.gridfs.GridFSInputFile;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.telosystools.saas.exception.GridFSFileNotFoundException;
 
 import java.io.InputStream;
 
@@ -45,7 +46,7 @@ class GridFSDao {
         return gridFSInputFile.getId().toString();
     }
 
-    public String update(String gridFSId, InputStream in, String database) {
+    public String update(String gridFSId, InputStream in, String database) throws GridFSFileNotFoundException {
         // Récupération de l'ancien fichier et suppression
         final GridFSDBFile oldFile = gridFS(database).findOne(new ObjectId(gridFSId));
         if (oldFile != null) {
@@ -53,9 +54,9 @@ class GridFSDao {
             updatedFile.save();
             gridFS(database).remove(oldFile);
             return updatedFile.getId().toString();
+        } else {
+            throw new GridFSFileNotFoundException(gridFSId);
         }
-        // TODO : Throw FileContentUpdateFailure
-        return null;
     }
 
     public void remove(String gridFSId, String database) {

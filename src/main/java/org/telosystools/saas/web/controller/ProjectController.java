@@ -4,8 +4,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.telosystools.saas.domain.*;
+import org.telosystools.saas.exception.DuplicateProjectNameException;
+import org.telosystools.saas.exception.FolderNotFoundException;
+import org.telosystools.saas.exception.GridFSFileNotFoundException;
+import org.telosystools.saas.exception.UserNotFoundException;
 import org.telosystools.saas.service.ProjectService;
 import org.telosystools.saas.service.WorkspaceService;
+import org.telosystools.saas.exception.ProjectNotFoundException;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -31,9 +36,12 @@ public class ProjectController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<Project> getProject(@PathVariable("id") String id) {
-        // TODO : Try - Catch ProjectNotFoundException
-        Project result = projectService.loadProject(id);
-        return new ResponseEntity<>(result, null, result == null ? HttpStatus.NOT_FOUND : HttpStatus.OK);
+        try {
+            Project project = projectService.loadProject(id);
+            return new ResponseEntity<>(project,HttpStatus.OK);
+        } catch (ProjectNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     /**
@@ -42,7 +50,13 @@ public class ProjectController {
      * @return the project list
      */
     @RequestMapping(method = RequestMethod.GET)
-    public List<Project> getAllProjects() { return projectService.findAllByUser(); }
+    public ResponseEntity<List<Project>> getAllProjects() {
+        try {
+            return new ResponseEntity<>(projectService.findAllByUser(),HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 
     /**
      * Create a project
@@ -51,9 +65,12 @@ public class ProjectController {
      */
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public @ResponseBody Project createProject(@RequestBody Project project) {
-        // TODO : Exception handling
-        return projectService.createProject(project);
+    public @ResponseBody ResponseEntity<Project> createProject(@RequestBody Project project) {
+        try {
+            return new ResponseEntity<>(projectService.createProject(project), HttpStatus.CREATED);
+        } catch (DuplicateProjectNameException e) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
     }
 
     /**
@@ -92,6 +109,8 @@ public class ProjectController {
                     HttpStatus.CREATED);
         } catch (FolderNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (GridFSFileNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -110,27 +129,35 @@ public class ProjectController {
 
     /**
      * Update the content of the given file.
-     *
-     * @param projectId Project ID
+     *  @param projectId Project ID
      * @param fileId GridFS File ID
      * @param fileContent The file content as a String
      */
     @RequestMapping(value = "/{projectId}/workspace/files/{fileId}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
-    public void updateFileContent(@PathVariable("projectId") String projectId, @PathVariable("fileId") String fileId, @RequestBody String fileContent) {
-        workspaceService.updateFileContent(projectId, fileId, fileContent);
+    public ResponseEntity<Object> updateFileContent(@PathVariable("projectId") String projectId, @PathVariable("fileId") String fileId, @RequestBody String fileContent) {
+        try {
+            workspaceService.updateFileContent(projectId, fileId, fileContent);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (GridFSFileNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     /**
      * Update the project's configuration.
-     *
-     * @param projectId Project ID
+     *  @param projectId Project ID
      * @param projectConfig Project configuration
      */
     @RequestMapping(value = "/{id}/config/telosystoolscfg", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.CREATED)
-    public void setProjectConfig(@PathVariable("id") String projectId, @RequestBody ProjectConfiguration projectConfig) {
-        projectService.updateProjectConfig(projectId, projectConfig);
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> setProjectConfig(@PathVariable("id") String projectId, @RequestBody ProjectConfiguration projectConfig) {
+        try {
+            projectService.updateProjectConfig(projectId, projectConfig);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (ProjectNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     /**
@@ -140,8 +167,13 @@ public class ProjectController {
      * @return the Project configuration
      */
     @RequestMapping(value = "/{id}/config/telosystoolscfg", method = RequestMethod.GET)
-    public  @ResponseBody ProjectConfiguration getProjectConfiguration(@PathVariable("id") String projectId) {
-        return projectService.loadProject(projectId).getProjectConfiguration();
+    public  @ResponseBody
+    ResponseEntity<ProjectConfiguration> getProjectConfiguration(@PathVariable("id") String projectId) {
+        try {
+            return new ResponseEntity<>(projectService.loadProject(projectId).getProjectConfiguration(), HttpStatus.OK);
+        } catch (ProjectNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }
 

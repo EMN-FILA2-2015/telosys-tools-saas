@@ -16,6 +16,8 @@ import org.telosystools.saas.dao.FileDao;
 import org.telosystools.saas.dao.WorkspaceDao;
 import org.telosystools.saas.domain.File;
 import org.telosystools.saas.domain.*;
+import org.telosystools.saas.exception.FolderNotFoundException;
+import org.telosystools.saas.exception.GridFSFileNotFoundException;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -186,7 +188,7 @@ public class WorkspaceServiceIntTest {
         File file = null;
         try {
             file = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
-        } catch (FolderNotFoundException e) {
+        } catch (FolderNotFoundException | GridFSFileNotFoundException e) {
             fail(e.getMessage());
         }
 
@@ -199,7 +201,7 @@ public class WorkspaceServiceIntTest {
         File file = null;
         try {
             file = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
-        } catch (FolderNotFoundException e) {
+        } catch (FolderNotFoundException | GridFSFileNotFoundException e) {
             fail(e.getMessage());
         }
         assertEquals(FILE_EXT, workspaceService.getFileExtension(file.getName()));

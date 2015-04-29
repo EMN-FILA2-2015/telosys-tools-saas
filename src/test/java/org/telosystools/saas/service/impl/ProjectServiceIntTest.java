@@ -83,7 +83,7 @@ public class ProjectServiceIntTest {
     }
 
     @Test
-    public void testLoadProject() {
+    public void testLoadProject() throws Exception {
         Project expected = new Project();
         expected.setName(PROJECT_NAME);
         expected.setOwner(USER_DEFAULT);
@@ -102,7 +102,7 @@ public class ProjectServiceIntTest {
     }
 
     @Test
-    public void testCreateProject() {
+    public void testCreateProject() throws Exception {
         Project expected = new Project();
         expected.setName(PROJECT_NAME);
         expected = projectService.createProject(expected);
@@ -133,7 +133,7 @@ public class ProjectServiceIntTest {
     }
 
     @Test
-    public void testFindAllByUser() {
+    public void testFindAllByUser() throws Exception {
         Project project = new Project();
         project.setName(PROJECT_NAME);
         project.setOwner(USER_DEFAULT);
@@ -159,7 +159,7 @@ public class ProjectServiceIntTest {
     }
 
     @Test
-    public void testUpdateProjectConfig() {
+    public void testUpdateProjectConfig() throws Exception {
         ProjectConfiguration config = new ProjectConfiguration();
         config.getFolders().setSrc(CONFIG_FOLDER_VALUE);
         config.getPackages().setEntityPkg(CONFIG_PACKAGES_VALUE);

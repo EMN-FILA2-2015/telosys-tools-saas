@@ -2,8 +2,9 @@ package org.telosystools.saas.service;
 
 import org.telosystools.saas.domain.File;
 import org.telosystools.saas.domain.Folder;
-import org.telosystools.saas.domain.FolderNotFoundException;
+import org.telosystools.saas.exception.FolderNotFoundException;
 import org.telosystools.saas.domain.Workspace;
+import org.telosystools.saas.exception.GridFSFileNotFoundException;
 
 /**
  * Created by Adrian on 20/04/15.
@@ -53,7 +54,7 @@ public interface WorkspaceService {
      * @param content File content as String
      * @param projectId Project id
      */
-    File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException;
+    File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, GridFSFileNotFoundException;
 
     /**
      * Retourne le contenu du fichier stocké en base
@@ -71,6 +72,6 @@ public interface WorkspaceService {
      * @param fileId GridFS id du fichier
      * @param content Contenu a sauvegarder
      */
-    String updateFileContent(String projectId, String fileId, String content);
+    String updateFileContent(String projectId, String fileId, String content) throws GridFSFileNotFoundException;
 
 }

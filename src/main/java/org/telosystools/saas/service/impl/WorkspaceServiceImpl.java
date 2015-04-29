@@ -7,6 +7,8 @@ import org.telosystools.saas.dao.FileDao;
 import org.telosystools.saas.dao.WorkspaceDao;
 import org.telosystools.saas.domain.File;
 import org.telosystools.saas.domain.*;
+import org.telosystools.saas.exception.FolderNotFoundException;
+import org.telosystools.saas.exception.GridFSFileNotFoundException;
 import org.telosystools.saas.service.WorkspaceService;
 
 import java.io.*;
@@ -48,6 +50,7 @@ public class WorkspaceServiceImpl implements WorkspaceService{
 
     @Override
     public Workspace getWorkspace(String projectId) {
+        //TODO: handle null case
         return workspaceDao.load(projectId);
     }
 
@@ -108,7 +111,7 @@ public class WorkspaceServiceImpl implements WorkspaceService{
      * @param projectId Project id
      */
     @Override
-    public File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException {
+    public File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, GridFSFileNotFoundException {
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(absolutePath);
         File file = new File(path);
@@ -130,7 +133,7 @@ public class WorkspaceServiceImpl implements WorkspaceService{
      * @param in File content
      * @param projectId Project id
      */
-    public void saveFile(File file, InputStream in, String projectId) {
+    public void saveFile(File file, InputStream in, String projectId) throws GridFSFileNotFoundException {
         fileDao.save(file, in, projectId);
     }
 
@@ -246,7 +249,7 @@ public class WorkspaceServiceImpl implements WorkspaceService{
     }
 
     @Override
-    public String updateFileContent(String projectId, String fileId, String content) {
+    public String updateFileContent(String projectId, String fileId, String content) throws GridFSFileNotFoundException {
         return fileDao.updateContent(fileId, createInputStream(content), projectId);
     }
 
