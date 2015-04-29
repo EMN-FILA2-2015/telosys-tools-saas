@@ -266,6 +266,7 @@ public class ProjectControllerTest {
         assertEquals("rootPkgVal", project.getProjectConfiguration().getPackages().getRootPkg());
         assertEquals("entityPkgVal", project.getProjectConfiguration().getPackages().getEntityPkg());
         assertEquals("val1", project.getProjectConfiguration().getVariables().get("VAR1"));
+        assertEquals("test_resVal", project.getProjectConfiguration().getFolders().getTestRes());
     }
 
     /*
@@ -278,6 +279,12 @@ public class ProjectControllerTest {
         project.setName("New Project");
         String projectID = projectService.createProject(project).getId();
 
+        ProjectConfiguration cfg = new ProjectConfiguration();
+        cfg.getFolders().setDoc("docVal");
+        cfg.getPackages().setEntityPkg("entityVal");
+        cfg.getVariables().put("var", "val");
+        projectService.updateProjectConfig(projectID, cfg);
+
         // When
         MvcResult mvcResult = this.mockMvc.perform(get("/projects/" + projectID + "/config/telosystoolscfg"))
 
@@ -286,6 +293,11 @@ public class ProjectControllerTest {
                 .andReturn();
         String jsonContent = mvcResult.getResponse().getContentAsString();
         ProjectConfiguration projectConfiguration = mapper.readValue(jsonContent, ProjectConfiguration.class);
+
+        // Asserts
         assertNotNull(projectConfiguration);
+        assertEquals(projectConfiguration.getFolders().getDoc(), cfg.getFolders().getDoc());
+        assertEquals(projectConfiguration.getPackages().getEntityPkg(), cfg.getPackages().getEntityPkg());
+        assertEquals(projectConfiguration.getVariables().get("var"), cfg.getVariables().get("var"));
     }
 }
