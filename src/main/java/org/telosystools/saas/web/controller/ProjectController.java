@@ -1,5 +1,6 @@
 package org.telosystools.saas.web.controller;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -92,8 +93,14 @@ public class ProjectController {
      */
     @RequestMapping(value = "/{id}/workspace", method = RequestMethod.GET)
     public @ResponseBody
-    Workspace getWorkspace(@PathVariable("id") String projectId) {
-        return workspaceService.getWorkspace(projectId);
+    ResponseEntity<Workspace> getWorkspace(@PathVariable("id") String projectId) {
+        try {
+            return new ResponseEntity<>(workspaceService.getWorkspace(projectId),HttpStatus.OK);
+        } catch (ProjectNotFoundException e) {
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.set("error_message", e.getMessage());
+            return new ResponseEntity<>(responseHeaders,HttpStatus.NOT_FOUND);
+        }
     }
 
     /**
@@ -108,10 +115,10 @@ public class ProjectController {
         try {
             return new ResponseEntity<>(workspaceService.createFile(fileData.getPath(), fileData.getContent(), projectId),
                     HttpStatus.CREATED);
-        } catch (FolderNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (GridFSFileNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (FolderNotFoundException | GridFSFileNotFoundException | ProjectNotFoundException e) {
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.set("error_message", e.getMessage());
+            return new ResponseEntity<>(responseHeaders,HttpStatus.NOT_FOUND);
         }
     }
 

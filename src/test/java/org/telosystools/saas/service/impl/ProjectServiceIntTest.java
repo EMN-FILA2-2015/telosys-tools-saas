@@ -121,7 +121,7 @@ public class ProjectServiceIntTest {
     }
 
     @Test
-    public void testDeleteProject() {
+    public void testDeleteProject() throws Exception {
         Project project = new Project();
         project.setName(PROJECT_NAME);
         project.setOwner(USER_DEFAULT);
