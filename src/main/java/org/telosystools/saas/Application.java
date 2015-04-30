@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.SimpleCommandLinePropertySource;
@@ -15,8 +16,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Arrays;
 
-@EnableAutoConfiguration
-@ComponentScan
+@SpringBootApplication
 public class Application {
 
   private final Logger log = LoggerFactory.getLogger(Application.class);

@@ -1,4 +1,8 @@
 spring:
     data:
         mongodb:
-            database: telosystoolssaas
+            database: db_general
+
+mongeez:
+    migrate:
+        true

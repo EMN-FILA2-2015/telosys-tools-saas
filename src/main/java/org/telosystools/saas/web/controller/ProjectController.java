@@ -59,7 +59,7 @@ public class ProjectController {
         } catch (UserNotFoundException e) {
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set("error_message", e.getMessage());
-            return new ResponseEntity<>(responseHeaders,HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(responseHeaders,HttpStatus.UNAUTHORIZED);
         }
     }
 

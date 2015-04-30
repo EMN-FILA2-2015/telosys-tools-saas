@@ -1,4 +1,4 @@
-package org.telosystools.saas;
+package org.telosystools.saas.config;
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
