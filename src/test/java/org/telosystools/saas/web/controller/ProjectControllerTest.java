@@ -1,6 +1,7 @@
 package org.telosystools.saas.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.bson.types.ObjectId;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -88,6 +89,18 @@ public class ProjectControllerTest {
         assertEquals(expectedProject.getName(),actualProject.getName());
     }
 
+    @Test
+    public void testGetProject_NotFound() throws Exception {
+        // Given
+        String projectID = ObjectId.get().toString();
+
+        // When
+        this.mockMvc.perform(get("/projects/" + projectID))
+
+        // Then
+                .andExpect(status().isNotFound());
+    }
+
     /*
     getAllProjects : récupère tous les projets pour un utilisateur donné -> bon nb de projets,
     */
@@ -133,6 +146,21 @@ public class ProjectControllerTest {
         assertEquals(projectName,createdProject.getName());
     }
 
+    @Test
+    public void testCreateProject_Conflict() throws Exception {
+        // Given
+        Project project = new Project();
+        String projectName = "Mon projet";
+        project.setName(projectName);
+        projectService.createProject(project);
+
+        // When
+        this.mockMvc.perform(post("/projects/").contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"" + projectName + "\"}"))
+
+        // Then
+            .andExpect(status().isConflict());
+    }
+
     /*
     deleteProject : supprime un projet -> status OK
     */
@@ -150,8 +178,8 @@ public class ProjectControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        Project nullProject = projectService.loadProject(projectID);
-        assertNull(nullProject);
+        // Expect an exception
+        projectService.loadProject(projectID);
     }
 
     /*
@@ -175,6 +203,18 @@ public class ProjectControllerTest {
         String jsonContent = mvcResult.getResponse().getContentAsString();
         Workspace workspace = mapper.readValue(jsonContent, Workspace.class);
         assertNotNull(workspace);
+    }
+
+    @Test
+    public void testGetWorkspace_NotFound() throws Exception {
+        // Given
+        String projectID = ObjectId.get().toString();
+
+        // When
+        this.mockMvc.perform(get("/projects/" + projectID + "/workspace"))
+
+        // Then
+                .andExpect(status().isNotFound());
     }
 
     /*
@@ -201,6 +241,22 @@ public class ProjectControllerTest {
         assertNotNull(file);
         assertEquals(filePath,file.getAbsolutePath().replace('*','.'));
     }
+
+    @Test
+    public void testCreateFile_ProjectNotFound() throws Exception {
+        // Given
+        String projectID = ObjectId.get().toString();
+
+        String filePath = "models/model_1.xml";
+        String fileData = "{\"path\":\"" + filePath + "\", \"content\":\"Contenu du fichier\"}";
+
+        // When
+        this.mockMvc.perform(post("/projects/"+projectID+"/workspace/files").contentType(MediaType.APPLICATION_JSON).content(fileData))
+
+        // Then
+                .andExpect(status().isNotFound());
+    }
+
     /*
     getFileContent : récupère le contenu d'un fichier -> retourne une chaîne de caractère status ok
     */

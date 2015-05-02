@@ -11,6 +11,7 @@ import org.telosystools.saas.domain.filesystem.RootFolder;
 import org.telosystools.saas.domain.filesystem.Workspace;
 import org.telosystools.saas.exception.FolderNotFoundException;
 import org.telosystools.saas.exception.GridFSFileNotFoundException;
+import org.telosystools.saas.exception.ProjectNotFoundException;
 import org.telosystools.saas.service.WorkspaceService;
 
 import java.io.*;
@@ -51,13 +52,17 @@ public class WorkspaceServiceImpl implements WorkspaceService{
     }
 
     @Override
-    public Workspace getWorkspace(String projectId) {
-        //TODO: handle null case
-        return workspaceDao.load(projectId);
+    public Workspace getWorkspace(String projectId) throws ProjectNotFoundException {
+        Workspace workspace = workspaceDao.load(projectId);
+        if (workspace != null) {
+            return workspace;
+        } else {
+            throw new ProjectNotFoundException(projectId);
+        }
     }
 
     @Override
-    public Folder createFolder(String absolutePath, String projectId) throws FolderNotFoundException {
+    public Folder createFolder(String absolutePath, String projectId) throws FolderNotFoundException, ProjectNotFoundException {
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(absolutePath);
         Folder folder = new Folder(path);
@@ -77,7 +82,7 @@ public class WorkspaceServiceImpl implements WorkspaceService{
      * @param folderName the new name of the folder
      * @param projectId project unique identifier
      */
-    public void renameFolder(Folder folder, String folderName, String projectId) {
+    public void renameFolder(Folder folder, String folderName, String projectId) throws ProjectNotFoundException {
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(folder.getPath(), folder.getName());
         Folder folderParent = getFolderForPath(workspace, path.getParent());
@@ -94,7 +99,7 @@ public class WorkspaceServiceImpl implements WorkspaceService{
      * @param absolutePath the path of the folder
      * @param projectId project unique identifier
      */
-    public void removeFolder(String absolutePath, String projectId) {
+    public void removeFolder(String absolutePath, String projectId) throws ProjectNotFoundException {
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(absolutePath);
         Folder folder = getFolderForPath(workspace, path);
@@ -113,7 +118,7 @@ public class WorkspaceServiceImpl implements WorkspaceService{
      * @param projectId Project id
      */
     @Override
-    public File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, GridFSFileNotFoundException {
+    public File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, GridFSFileNotFoundException, ProjectNotFoundException {
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(absolutePath);
         File file = new File(path);
@@ -145,7 +150,7 @@ public class WorkspaceServiceImpl implements WorkspaceService{
      * @param fileName the new name of the file
      * @param projectId project unique identifier
      */
-    public void renameFile(File file, String fileName, String projectId) {
+    public void renameFile(File file, String fileName, String projectId) throws ProjectNotFoundException {
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(file.getPath(), file.getName());
         Folder folderParent = getFolderForPath(workspace, path.getParent());
@@ -162,7 +167,7 @@ public class WorkspaceServiceImpl implements WorkspaceService{
      * @param absolutePath Absolute path
      * @param projectId Project id
      */
-    public void removeFile(String absolutePath, String projectId) {
+    public void removeFile(String absolutePath, String projectId) throws ProjectNotFoundException {
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(absolutePath);
         File file = getFileForPath(workspace, path);

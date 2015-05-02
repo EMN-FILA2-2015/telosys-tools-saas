@@ -83,7 +83,8 @@
     <dependency>
     	<groupId>org.mongodb</groupId>
     	<artifactId>mongo-java-driver</artifactId>
-    	<version>3.0.0</version>
+    	<!--version>3.0.0</version-->
+    	<version>2.13.1</version>
     </dependency>
 
     <!-- TESTS -->
@@ -111,6 +112,14 @@
       <artifactId>json-path</artifactId>
       <version>${json-path.version}</version>
       <scope>test</scope>
+    </dependency>
+
+    <!-- manage changes of your mongo documents and propagate these changes in sync with your code changes when you perform deployments -->
+    <!-- docs : https://github.com/secondmarket/mongeez/wiki/How-to-use-mongeez -->
+    <dependency>
+      <groupId>org.mongeez</groupId>
+      <artifactId>mongeez</artifactId>
+      <version>0.9.4</version>
     </dependency>
 
   </dependencies>

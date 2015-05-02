@@ -20,6 +20,7 @@ import org.telosystools.saas.domain.filesystem.RootFolder;
 import org.telosystools.saas.domain.filesystem.Workspace;
 import org.telosystools.saas.exception.FolderNotFoundException;
 import org.telosystools.saas.exception.GridFSFileNotFoundException;
+import org.telosystools.saas.exception.ProjectNotFoundException;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -186,11 +187,11 @@ public class WorkspaceServiceIntTest {
     }
 
     @Test
-    public void testExists() {
+    public void testExists() throws Exception {
         File file = null;
         try {
             file = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
-        } catch (FolderNotFoundException | GridFSFileNotFoundException e) {
+        } catch (FolderNotFoundException | GridFSFileNotFoundException | ProjectNotFoundException e) {
             fail(e.getMessage());
         }
 
@@ -203,7 +204,7 @@ public class WorkspaceServiceIntTest {
         File file = null;
         try {
             file = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
-        } catch (FolderNotFoundException | GridFSFileNotFoundException e) {
+        } catch (FolderNotFoundException | GridFSFileNotFoundException | ProjectNotFoundException e) {
             fail(e.getMessage());
         }
         assertEquals(FILE_EXT, workspaceService.getFileExtension(file.getName()));
