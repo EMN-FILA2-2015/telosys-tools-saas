@@ -168,8 +168,7 @@ public class ProjectController {
      * @return the Project configuration
      */
     @RequestMapping(value = "/{id}/config/telosystoolscfg", method = RequestMethod.GET)
-    public  @ResponseBody
-    ResponseEntity<ProjectConfiguration> getProjectConfiguration(@PathVariable("id") String projectId) {
+    public  @ResponseBody ResponseEntity<ProjectConfiguration> getProjectConfiguration(@PathVariable("id") String projectId) {
         try {
             return new ResponseEntity<>(projectService.loadProject(projectId).getProjectConfiguration(), HttpStatus.OK);
         } catch (ProjectNotFoundException e) {
