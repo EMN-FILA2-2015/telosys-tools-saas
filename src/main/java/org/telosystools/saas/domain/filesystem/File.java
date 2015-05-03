@@ -18,7 +18,7 @@ public class File implements Serializable {
     /**
      * Path to the file
      */
-    private final String path;
+    private String path;
     /**
      * Name of the file (contains the file extension)
      */
@@ -32,16 +32,9 @@ public class File implements Serializable {
      */
     private String gridFSId;
 
-    File() {
-        this.absolutePath = null;
-        this.path = null;
-        this.name = null;
-        this.ext = null;
-    }
+    File() {}
 
     public File(String absolutePath) {
-        // TODO : Better handling of the '.' character (mongo exception)
-        absolutePath = absolutePath.replace('.', '*');
         this.absolutePath = absolutePath;
         Path path = Path.valueOf(absolutePath);
         this.path = path.getBasename();
@@ -66,9 +59,10 @@ public class File implements Serializable {
         if(filename == null) {
             return null;
         }
-        int posDot = filename.lastIndexOf("*");
+        int posDot = filename.lastIndexOf(".");
         if(posDot != -1) {
             return filename.substring(posDot+1);
+
         }
         return File.FILE_EXTENSION_UNKNOWN;
     }
@@ -89,6 +83,14 @@ public class File implements Serializable {
         return gridFSId;
     }
 
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public void setGridFSId(String gridFSId) {
         this.gridFSId = gridFSId;
     }
@@ -104,9 +106,8 @@ public class File implements Serializable {
         if (!ext.equals(file.ext)) return false;
         if (!gridFSId.equals(file.gridFSId)) return false;
         if (!name.equals(file.name)) return false;
-        if (!path.equals(file.path)) return false;
+        return path.equals(file.path);
 
-        return true;
     }
 
     @Override

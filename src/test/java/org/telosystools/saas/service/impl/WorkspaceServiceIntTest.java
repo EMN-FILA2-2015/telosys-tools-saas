@@ -5,7 +5,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -22,9 +21,11 @@ import org.telosystools.saas.exception.FolderNotFoundException;
 import org.telosystools.saas.exception.GridFSFileNotFoundException;
 import org.telosystools.saas.exception.ProjectNotFoundException;
 
+import javax.inject.Inject;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.InvalidPathException;
 
 import static org.junit.Assert.*;
 
@@ -51,11 +52,10 @@ public class WorkspaceServiceIntTest {
     private static final String FILE_EXT = "java";
     private static final String MODIFIED_FILE_NAME = "RENAMED_FILE";
     private static final String MODIFIED_FILE_PATH = Workspace.MODELS+"/"+ MODIFIED_FILE_NAME;
-    private static final String MODIFIED_RESOURCE_FILE = "modified_file.txt";
     public static final String FILE_CONTENT = "Fichier example";
     public static final String MODIFIED_FILE_CONTENT = "fichier modifié";
 
-    @Autowired
+    @Inject
     WorkspaceServiceImpl workspaceService;
 
     WorkspaceDao workspaceDao;
@@ -95,7 +95,7 @@ public class WorkspaceServiceIntTest {
         workspaceService.saveWorkspace(expected, PROJECT);
         Workspace actual = workspaceDao.load(PROJECT);
         assertNotNull(actual);
-        assertEquals(expected,actual);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -144,16 +144,21 @@ public class WorkspaceServiceIntTest {
 
         File actualFile = workspaceService.getFileForPath(workspace, Path.valueOf(FILE_PATH));
         assertNotNull(actualFile);
-        assertEquals(expectedFile,actualFile);
+        assertEquals(expectedFile, actualFile);
 
         InputStream actualIn = fileDao.loadContent(actualFile.getGridFSId(), PROJECT);
         assertNotNull(actualIn);
         assertEqualsInputStream(createInputStream(FILE_CONTENT), actualIn);
     }
 
+    @Test(expected = InvalidPathException.class)
+    public void testCreateInvalidFile() throws Exception {
+        workspaceService.createFile("models/coucou*.tata", "", PROJECT);
+    }
+
 
     @Test
-    public void testSaveFile_modify() throws Exception {
+    public void testUpdateFile() throws Exception {
         File expectedFile = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
 
         Workspace workspace = workspaceDao.load(PROJECT);
@@ -161,11 +166,16 @@ public class WorkspaceServiceIntTest {
         assertNotNull(actualFile);
         assertEquals(expectedFile, actualFile);
 
-        String newFileId = workspaceService.updateFileContent(PROJECT, expectedFile.getGridFSId(), MODIFIED_FILE_CONTENT);
+        // Mise à jour du fichier via son Path
+        File updatedFile = workspaceService.updateFile(PROJECT, actualFile.getAbsolutePath(), MODIFIED_FILE_CONTENT);
 
-        String actualIn = workspaceService.getFileContent(PROJECT, newFileId);
+        String actualIn = workspaceService.getFileContent(PROJECT, updatedFile.getGridFSId());
         assertNotNull(actualIn);
         assertEquals(MODIFIED_FILE_CONTENT, actualIn.trim());
+
+        // Vérification de la mise à jour du workspace
+        actualFile = workspaceService.getFileForPath(workspaceDao.load(PROJECT), Path.valueOf(FILE_PATH));
+        assertEquals(updatedFile.getGridFSId(), actualFile.getGridFSId());
     }
 
     @Test
@@ -207,7 +217,7 @@ public class WorkspaceServiceIntTest {
         } catch (FolderNotFoundException | GridFSFileNotFoundException | ProjectNotFoundException e) {
             fail(e.getMessage());
         }
-        assertEquals(FILE_EXT, workspaceService.getFileExtension(file.getName()));
+        assertEquals(FILE_EXT, File.getFileExtension(file.getName()));
     }
 
     @Test
@@ -261,17 +271,16 @@ public class WorkspaceServiceIntTest {
 
     @Test
     public void testSaveFileInSubFolder() throws Exception {
-        workspaceService.createFolder(FOLDER_PATH,PROJECT);
+        workspaceService.createFolder(FOLDER_PATH, PROJECT);
         String filePath = FOLDER_PATH+"/"+FILE_NAME;
-        File expectedFile = workspaceService.createFile(filePath, FILE_CONTENT, PROJECT);
-        InputStream expectedIn = getInputStream(MODIFIED_RESOURCE_FILE);
+        workspaceService.createFile(filePath, MODIFIED_FILE_CONTENT, PROJECT);
 
-        workspaceService.saveFile(expectedFile, expectedIn, PROJECT);
+        File expectedFile = workspaceService.updateFile(PROJECT, filePath, FILE_CONTENT);
 
         Workspace workspace = workspaceDao.load(PROJECT);
         File actualFile = workspaceService.getFileForPath(workspace, Path.valueOf(filePath));
         assertNotNull(actualFile);
-        assertEquals(expectedFile, actualFile);
+        assertEquals(expectedFile.getGridFSId(), actualFile.getGridFSId());
 
         String actualIn = workspaceService.getFileContent(PROJECT, actualFile.getGridFSId());
         assertNotNull(actualIn);
@@ -307,11 +316,6 @@ public class WorkspaceServiceIntTest {
         workspace.setGenerateds(new RootFolder(Workspace.GENERATEDS));
         workspace.setSettings(new RootFolder(Workspace.SETTINGS));
         return workspace;
-    }
-
-    private InputStream getInputStream(String fileName) throws FileNotFoundException {
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        return classLoader.getResourceAsStream(fileName);
     }
 
     private InputStream createInputStream(String string) {

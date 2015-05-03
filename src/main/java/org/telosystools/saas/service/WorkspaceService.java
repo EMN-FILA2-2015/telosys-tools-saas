@@ -46,6 +46,7 @@ public interface WorkspaceService {
      * Create a new folder in the folder.
      * @param absolutePath Absolute path
      * @param projectId Project id
+     * @return Folder créé
      */
     Folder createFolder(String absolutePath, String projectId) throws FolderNotFoundException, ProjectNotFoundException;
 
@@ -54,6 +55,7 @@ public interface WorkspaceService {
      * @param absolutePath Absolute path
      * @param content File content as String
      * @param projectId Project id
+     * @return File créé
      */
     File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, GridFSFileNotFoundException, ProjectNotFoundException;
 
@@ -70,9 +72,10 @@ public interface WorkspaceService {
      * Ecrase le contenu du fichier
      *
      * @param projectId Id du projet
-     * @param fileId GridFS id du fichier
+     * @param path path du fichier
      * @param content Contenu a sauvegarder
+     * @return File mis à jour
      */
-    String updateFileContent(String projectId, String fileId, String content) throws GridFSFileNotFoundException;
+    File updateFile(String projectId, String path, String content) throws ProjectNotFoundException, GridFSFileNotFoundException;
 
 }

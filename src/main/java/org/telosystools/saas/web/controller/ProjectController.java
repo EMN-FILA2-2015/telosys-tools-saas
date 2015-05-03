@@ -17,7 +17,9 @@ import javax.inject.Inject;
 import java.util.List;
 
 /**
- * Created by Adrian on 29/01/15.
+ * @author Adrian
+ *
+ * Controlleur principal
  */
 
 @RestController
@@ -143,20 +145,18 @@ public class ProjectController {
 
     /**
      * Update the content of the given file.
-     *  @param projectId Project ID
-     * @param fileId GridFS File ID
-     * @param fileContent The file content as a String
+     * @param projectId Project ID
+     * @param fileData The file path and content as a Json object
      */
-    @RequestMapping(value = "/{projectId}/workspace/files/{fileId}", method = RequestMethod.PUT)
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> updateFileContent(@PathVariable("projectId") String projectId, @PathVariable("fileId") String fileId, @RequestBody String fileContent) {
+    @RequestMapping(value = "/{projectId}/workspace/files/", method = RequestMethod.PUT)
+    public ResponseEntity<File> updateFileContent(@PathVariable("projectId") String projectId, @RequestBody FileData fileData) {
         try {
-            workspaceService.updateFileContent(projectId, fileId, fileContent);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (GridFSFileNotFoundException e) {
+            if (fileData.getContent() == null || fileData.getPath() == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(workspaceService.updateFile(projectId, fileData.getPath(), fileData.getContent()), HttpStatus.OK);
+        } catch (GridFSFileNotFoundException | ProjectNotFoundException e) {
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set("error_message", e.getMessage());
-            return new ResponseEntity<>(responseHeaders,HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(responseHeaders, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -166,7 +166,6 @@ public class ProjectController {
      * @param projectConfig Project configuration
      */
     @RequestMapping(value = "/{id}/config/telosystoolscfg", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> setProjectConfig(@PathVariable("id") String projectId, @RequestBody ProjectConfiguration projectConfig) {
         try {
             projectService.updateProjectConfig(projectId, projectConfig);
@@ -185,7 +184,7 @@ public class ProjectController {
      * @return the Project configuration
      */
     @RequestMapping(value = "/{id}/config/telosystoolscfg", method = RequestMethod.GET)
-    public  @ResponseBody ResponseEntity<ProjectConfiguration> getProjectConfiguration(@PathVariable("id") String projectId) {
+    public ResponseEntity<ProjectConfiguration> getProjectConfiguration(@PathVariable("id") String projectId) {
         try {
             return new ResponseEntity<>(projectService.loadProject(projectId).getProjectConfiguration(), HttpStatus.OK);
         } catch (ProjectNotFoundException e) {

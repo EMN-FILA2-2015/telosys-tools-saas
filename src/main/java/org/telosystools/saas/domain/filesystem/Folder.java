@@ -13,6 +13,7 @@ import java.util.TreeMap;
  */
 public class Folder implements Serializable {
 
+    public static final char DOT_REPLACEMENT = '+';
     private String absolutePath;
     private final String path;
     private String name;
@@ -43,7 +44,8 @@ public class Folder implements Serializable {
     }
 
     public void addFile(File file) {
-        this.files.put(file.getName(), file);
+        // TODO : Solution alternative pour gérer le '.', charactère interdit dans un field mongo
+        this.files.put(file.getName().replace('.', DOT_REPLACEMENT), file);
     }
 
     public String getAbsolutePath() {

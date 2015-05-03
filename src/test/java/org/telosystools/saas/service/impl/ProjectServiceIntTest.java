@@ -4,7 +4,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -15,13 +14,17 @@ import org.telosystools.saas.dao.UserRepository;
 import org.telosystools.saas.domain.User;
 import org.telosystools.saas.domain.project.Project;
 import org.telosystools.saas.domain.project.ProjectConfiguration;
+import org.telosystools.saas.exception.DuplicateProjectNameException;
+import org.telosystools.saas.exception.ProjectNotFoundException;
 import org.telosystools.saas.service.WorkspaceService;
 
+import javax.inject.Inject;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by Adrian on 29/01/15.
@@ -36,14 +39,12 @@ public class ProjectServiceIntTest {
     public static final String USER_DEFAULT = "user_default";
     public static final String PROJECT_NAME = "project-test";
     public static final String OTHER_OWNER = "other_owner";
-    public static final String CONFIG_FOLDER_ITEM = "folder_1";
-    public static final String CONFIG_PACKAGE_ITEM = "packages_1";
     public static final String CONFIG_VARIABLES_ITEM = "variables_1";
     public static final String CONFIG_FOLDER_VALUE = "folder_test";
     public static final String CONFIG_PACKAGES_VALUE = "packages_test";
     public static final String CONFIG_VARIABLES_VALUE = "variables_test";
 
-    @Autowired
+    @Inject
     private ProjectServiceImpl projectService;
 
     private WorkspaceService workService;
@@ -101,7 +102,7 @@ public class ProjectServiceIntTest {
         assertNotNull(actual.getProjectConfiguration().getVariables());
     }
 
-    @Test
+    @Test(expected = DuplicateProjectNameException.class)
     public void testCreateProject() throws Exception {
         Project expected = new Project();
         expected.setName(PROJECT_NAME);
@@ -116,11 +117,11 @@ public class ProjectServiceIntTest {
 
         expected = new Project();
         expected.setName(PROJECT_NAME);
-        assertNull(projectService.createProject(expected));
+        projectService.createProject(expected);
 
     }
 
-    @Test
+    @Test(expected = ProjectNotFoundException.class)
     public void testDeleteProject() throws Exception {
         Project project = new Project();
         project.setName(PROJECT_NAME);
@@ -128,8 +129,8 @@ public class ProjectServiceIntTest {
         project = repProject.save(project);
 
         projectService.deleteProject(project.getId());
-        assertNull(repProject.findOne(project.getId()));
-        assertNull(workService.getWorkspace(project.getId()));
+        repProject.findOne(project.getId());
+        workService.getWorkspace(project.getId());
     }
 
     @Test

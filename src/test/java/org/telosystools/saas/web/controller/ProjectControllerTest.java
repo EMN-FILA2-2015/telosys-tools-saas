@@ -281,21 +281,32 @@ public class ProjectControllerTest {
     }
 
     /*
-    updateFileContent : change le contenu d'un fichier -> status ok
+    updateFile : change le contenu d'un fichier -> status ok
     */
     @Test
-    public void testUpdateFileContent() throws Exception {
+    public void testUpdateFile() throws Exception {
         // Given
         Project project = new Project();
         project.setName("New Project");
         String projectID = projectService.createProject(project).getId();
-        String fileID = workspaceService.createFile("models/model_2.xml", "", projectID).getGridFSId();
-        String fileContent = "Contenu du fichier";
+
+        String filePath = "models/model_2.xml";
+
+        File oldFile = workspaceService.createFile(filePath, "", projectID);
+
+        String fileContent = "content";
+        String fileData = "{\"path\":\"" + filePath + "\", \"content\":\"" + fileContent + "\"}";
 
         // When
-        this.mockMvc.perform(put("/projects/" + projectID + "/workspace/files/" + fileID).content(fileContent))
+        final String url = "/projects/" + projectID + "/workspace/files/";
+        String jsonContent =  this.mockMvc.perform(put(url).contentType(MediaType.APPLICATION_JSON).content(fileData))
         // Then
-                .andExpect(status().isOk());
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        File file = mapper.readValue(jsonContent, File.class);
+
+        assertEquals(file.getAbsolutePath(), oldFile.getAbsolutePath());
+        assertNotEquals(file.getGridFSId(), oldFile.getGridFSId());
+        assertEquals(fileContent, workspaceService.getFileContent(projectID, file.getGridFSId()));
 
     }
 
@@ -310,8 +321,6 @@ public class ProjectControllerTest {
         String projectID = projectService.createProject(project).getId();
         String config = "{\"packages\":{\"ROOT_PKG\":\"rootPkgVal\",\"ENTITY_PKG\":\"entityPkgVal\"},\"folders\":{\"SRC\":\"srcVal\",\"RES\":\"resVal\",\"WEB\":\"webVal\",\"TEST_SRC\":\"test_srcVal\",\"TEST_RES\":\"test_resVal\",\"DOC\":\"docVal\",\"TMP\":\"tmpVal\"},\"variables\":{\"VAR1\":\"val1\"}}";
 
-
-        ProjectConfiguration p = mapper.readValue(config, ProjectConfiguration.class);
         // When
         this.mockMvc.perform(post("/projects/"+projectID+ "/config/telosystoolscfg").contentType(MediaType.APPLICATION_JSON).content(config))
         // Then

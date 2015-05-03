@@ -11,8 +11,6 @@ import java.util.List;
 public class Path implements Serializable {
 
     public static final String SEPARATOR = "/";
-    public static final char DOT = '.';
-    public static final char DOT_REPLACEMENT = '*';
 
     /**
      * Elements of the path : folders names and file name.
@@ -68,7 +66,6 @@ public class Path implements Serializable {
         Path pathResult = new Path();
         if(paths != null) {
             for(String path : paths) {
-                path = path.replace(DOT, DOT_REPLACEMENT);
                 String[] items = path.split(SEPARATOR);
                 Collections.addAll(pathResult.items, items);
             }

@@ -30,14 +30,10 @@ public class FileDao {
             String gridFSId = gridFSDao.create(in, database);
             file.setGridFSId(gridFSId);
         } else {
-            gridFSDao.update(file.getGridFSId(), in, database);
+            file.setGridFSId(gridFSDao.update(file.getGridFSId(), in, database));
         }
     }
-    
-    public String updateContent(String fileId, InputStream in, String database) throws GridFSFileNotFoundException {
-        return gridFSDao.update(fileId, in, database);
-    }
-    
+
     public void remove(File file, String database) {
         if(file.getGridFSId() != null) {
             gridFSDao.remove(file.getGridFSId(), database);
