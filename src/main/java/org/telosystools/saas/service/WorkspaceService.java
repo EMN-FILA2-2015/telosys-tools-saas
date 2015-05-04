@@ -6,6 +6,7 @@ import org.telosystools.saas.domain.filesystem.Folder;
 import org.telosystools.saas.domain.filesystem.Workspace;
 import org.telosystools.saas.exception.FileNotFoundException;
 import org.telosystools.saas.exception.FolderNotFoundException;
+import org.telosystools.saas.exception.InvalidPathException;
 import org.telosystools.saas.exception.ProjectNotFoundException;
 
 /**
@@ -49,7 +50,7 @@ public interface WorkspaceService {
      * @param projectId Project id
      * @return Folder créé
      */
-    Folder createFolder(String absolutePath, String projectId) throws FolderNotFoundException, ProjectNotFoundException;
+    Folder createFolder(String absolutePath, String projectId) throws FolderNotFoundException, ProjectNotFoundException, InvalidPathException;
 
     /**
      * Create a new file in an existing folder.
@@ -58,7 +59,7 @@ public interface WorkspaceService {
      * @param projectId Project id
      * @return File créé
      */
-    File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, FileNotFoundException, ProjectNotFoundException;
+    File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, FileNotFoundException, ProjectNotFoundException, InvalidPathException;
 
     /**
      * Retourne le contenu du fichier stocké en base

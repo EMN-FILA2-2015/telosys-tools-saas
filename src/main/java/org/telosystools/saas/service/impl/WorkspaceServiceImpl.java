@@ -10,11 +10,11 @@ import org.telosystools.saas.domain.filesystem.File;
 import org.telosystools.saas.domain.filesystem.*;
 import org.telosystools.saas.exception.FileNotFoundException;
 import org.telosystools.saas.exception.FolderNotFoundException;
+import org.telosystools.saas.exception.InvalidPathException;
 import org.telosystools.saas.exception.ProjectNotFoundException;
 import org.telosystools.saas.service.WorkspaceService;
 
 import java.io.*;
-import java.nio.file.InvalidPathException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -64,8 +64,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public Folder createFolder(String absolutePath, String projectId) throws FolderNotFoundException, ProjectNotFoundException {
-        if (absolutePath.matches("[^A-Za-z0-9/-]")) throw new InvalidPathException(absolutePath, "Invalid characters in the path");
+    public Folder createFolder(String absolutePath, String projectId) throws FolderNotFoundException, ProjectNotFoundException, org.telosystools.saas.exception.InvalidPathException {
+        if (absolutePath.matches("[^A-Za-z0-9/-]")) throw new InvalidPathException(absolutePath);
 
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(absolutePath);
@@ -87,8 +87,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @param folderName the new name of the folder
      * @param projectId  project unique identifier
      */
-    public void renameFolder(Folder folder, String folderName, String projectId) throws ProjectNotFoundException {
-        if (folderName.matches("[^A-Za-z0-9/-]")) throw new InvalidPathException(folderName, "Invalid characters in the path");
+    public void renameFolder(Folder folder, String folderName, String projectId) throws ProjectNotFoundException, InvalidPathException {
+        if (folderName.matches("[^A-Za-z0-9/-]")) throw new InvalidPathException(folderName);
 
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(folder.getPath(), folder.getName());
@@ -127,18 +127,18 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @param projectId    Project id
      */
     @Override
-    public File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, FileNotFoundException, ProjectNotFoundException {
+    public File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, FileNotFoundException, ProjectNotFoundException, InvalidPathException {
         Path path = Path.valueOf(absolutePath);
 
-        if (path.getBasename().matches("[^_A-Za-z0-9/\\-]*")) throw new InvalidPathException(absolutePath, "Invalid characters in the path");
-        if (!path.getFilename().matches("^([_A-Za-z0-9\\-]+\\.[A-Za-z0-9\\-]+)$")) throw new InvalidPathException(path.getFilename(), "Invalid file name");
+        if (path.getBasename().matches("[^_A-Za-z0-9/\\-]*")) throw new InvalidPathException(absolutePath);
+        if (!path.getFilename().matches("^([_A-Za-z0-9\\-]+\\.[A-Za-z0-9\\-]+)$")) throw new InvalidPathException(path.getFilename());
 
         Workspace workspace = getWorkspace(projectId);
         File file = new File(path);
         Folder folderParent = getFolderForPath(workspace, path.getParent());
         if (folderParent != null) {
             folderParent.addFile(file);
-            fileDao.save(file, this.createInputStream(content), projectId);
+            fileDao.save(file, this.createInputStream(content == null ? "" : content), projectId);
             workspaceDao.save(workspace, projectId);
             return file;
         } else {

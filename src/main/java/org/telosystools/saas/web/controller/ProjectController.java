@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.telosystools.saas.domain.filesystem.File;
 import org.telosystools.saas.domain.filesystem.FileData;
+import org.telosystools.saas.domain.filesystem.Folder;
 import org.telosystools.saas.domain.filesystem.Workspace;
 import org.telosystools.saas.domain.project.Project;
 import org.telosystools.saas.domain.project.ProjectConfiguration;
@@ -43,9 +44,7 @@ public class ProjectController {
             Project project = projectService.loadProject(id);
             return new ResponseEntity<>(project,HttpStatus.OK);
         } catch (ProjectNotFoundException e) {
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("error_message", e.getMessage());
-            return new ResponseEntity<>(responseHeaders,HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -59,9 +58,7 @@ public class ProjectController {
         try {
             return new ResponseEntity<>(projectService.findAllByUser(),HttpStatus.OK);
         } catch (UserNotFoundException e) {
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("error_message", e.getMessage());
-            return new ResponseEntity<>(responseHeaders,HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(getErrorHttpHeaders(e), HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -76,9 +73,7 @@ public class ProjectController {
         try {
             return new ResponseEntity<>(projectService.createProject(project), HttpStatus.CREATED);
         } catch (DuplicateProjectNameException e) {
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("error_message", e.getMessage());
-            return new ResponseEntity<>(responseHeaders,HttpStatus.CONFLICT);
+            return new ResponseEntity<>(getErrorHttpHeaders(e), HttpStatus.CONFLICT);
         }
     }
 
@@ -104,9 +99,7 @@ public class ProjectController {
         try {
             return new ResponseEntity<>(workspaceService.getWorkspace(projectId),HttpStatus.OK);
         } catch (ProjectNotFoundException e) {
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("error_message", e.getMessage());
-            return new ResponseEntity<>(responseHeaders,HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -120,12 +113,31 @@ public class ProjectController {
     @RequestMapping(value = "/{id}/workspace/files", method = RequestMethod.POST)
     public ResponseEntity<File> createFile(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
         try {
+            if (fileData.getPath() == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             return new ResponseEntity<>(workspaceService.createFile(fileData.getPath(), fileData.getContent(), projectId),
                     HttpStatus.CREATED);
         } catch (FolderNotFoundException | FileNotFoundException | ProjectNotFoundException e) {
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("error_message", e.getMessage());
-            return new ResponseEntity<>(responseHeaders,HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(getErrorHttpHeaders(e),HttpStatus.NOT_FOUND);
+        } catch (InvalidPathException e) {
+            return new ResponseEntity<>(getErrorHttpHeaders(e),HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * Create a new folder at the specified path
+     * @param projectId Project ID
+     * @param fileData folder path as json object
+     * @return new Folder
+     */
+    @RequestMapping(value = "/{id}/workspace/folders", method = RequestMethod.POST)
+    public ResponseEntity<Folder> createFolder(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
+        if (fileData.getPath() == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        try {
+            return new ResponseEntity<>(workspaceService.createFolder(fileData.getPath(), projectId), HttpStatus.CREATED);
+        } catch (FolderNotFoundException | ProjectNotFoundException e) {
+            return new ResponseEntity<>(getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
+        } catch (InvalidPathException e) {
+            return new ResponseEntity<>(getErrorHttpHeaders(e), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -142,9 +154,7 @@ public class ProjectController {
         try {
             return new ResponseEntity<>(workspaceService.getFileContent(projectId, fileData.getPath()), HttpStatus.OK);
         } catch (FileNotFoundException | ProjectNotFoundException e) {
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("error_message", e.getMessage());
-            return new ResponseEntity<>(responseHeaders, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -161,9 +171,7 @@ public class ProjectController {
             workspaceService.updateFile(projectId, fileData.getPath(), fileData.getContent());
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (FileNotFoundException | ProjectNotFoundException e) {
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("error_message", e.getMessage());
-            return new ResponseEntity<>(responseHeaders, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -178,9 +186,7 @@ public class ProjectController {
             projectService.updateProjectConfig(projectId, projectConfig);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (ProjectNotFoundException e) {
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("error_message", e.getMessage());
-            return new ResponseEntity<>(responseHeaders,HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(getErrorHttpHeaders(e),HttpStatus.NOT_FOUND);
         }
     }
 
@@ -195,10 +201,14 @@ public class ProjectController {
         try {
             return new ResponseEntity<>(projectService.loadProject(projectId).getProjectConfiguration(), HttpStatus.OK);
         } catch (ProjectNotFoundException e) {
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("error_message", e.getMessage());
-            return new ResponseEntity<>(responseHeaders,HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
         }
+    }
+
+    private HttpHeaders getErrorHttpHeaders(Exception e) {
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("error_message", e.getMessage());
+        return responseHeaders;
     }
 }
 

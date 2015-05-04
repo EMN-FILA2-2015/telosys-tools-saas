@@ -16,13 +16,13 @@ import org.telosystools.saas.domain.filesystem.File;
 import org.telosystools.saas.domain.filesystem.*;
 import org.telosystools.saas.exception.FileNotFoundException;
 import org.telosystools.saas.exception.FolderNotFoundException;
+import org.telosystools.saas.exception.InvalidPathException;
 import org.telosystools.saas.exception.ProjectNotFoundException;
 
 import javax.inject.Inject;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.InvalidPathException;
 
 import static org.junit.Assert.*;
 
@@ -204,7 +204,7 @@ public class WorkspaceServiceIntTest {
     }
 
     @Test
-    public void testGetFileExtension() {
+    public void testGetFileExtension() throws Exception {
         File file = null;
         try {
             file = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);

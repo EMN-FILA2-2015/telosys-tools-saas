@@ -18,6 +18,7 @@ import org.telosystools.saas.Application;
 import org.telosystools.saas.config.MongoConfiguration;
 import org.telosystools.saas.domain.filesystem.File;
 import org.telosystools.saas.domain.filesystem.FileData;
+import org.telosystools.saas.domain.filesystem.Folder;
 import org.telosystools.saas.domain.filesystem.Workspace;
 import org.telosystools.saas.domain.project.Project;
 import org.telosystools.saas.domain.project.ProjectConfiguration;
@@ -88,7 +89,7 @@ public class ProjectControllerTest {
         Project actualProject = mapper.readValue(jsonContent, Project.class);
 
         assertEquals(expectedProject.getId(),actualProject.getId());
-        assertEquals(expectedProject.getName(),actualProject.getName());
+        assertEquals(expectedProject.getName(), actualProject.getName());
     }
 
     @Test
@@ -126,7 +127,7 @@ public class ProjectControllerTest {
 
         String jsonContent = mvcResult.getResponse().getContentAsString();
         List projects = mapper.readValue(jsonContent, List.class);
-        assertEquals(2,projects.size());
+        assertEquals(2, projects.size());
     }
 
     /*
@@ -241,7 +242,49 @@ public class ProjectControllerTest {
         String jsonContent = mvcResult.getResponse().getContentAsString();
         File file = mapper.readValue(jsonContent, File.class);
         assertNotNull(file);
-        assertEquals(filePath,file.getAbsolutePath().replace('*','.'));
+        assertEquals(filePath, file.getAbsolutePath().replace('*', '.'));
+    }
+
+    /*
+     * createFolder : crée un folder -> Folder créé status created
+     */
+    @Test
+    public void testCreateFolder() throws Exception {
+
+        // Given
+        Project project = new Project();
+        project.setName("new_project");
+        String projectID = projectService.createProject(project).getId();
+
+        String folderPath = "templates/test";
+        String fileData = "{\"path\":\"" + folderPath + "\"}";
+
+        // When
+        MvcResult mvcResult = this.mockMvc.perform(post("/projects/"+projectID+"/workspace/folders").contentType(MediaType.APPLICATION_JSON).content(fileData))
+        // Then
+            .andExpect(status().isCreated())
+            .andReturn();
+
+        // Assert
+        String jsonConent = mvcResult.getResponse().getContentAsString();
+        Folder folder = mapper.readValue(jsonConent, Folder.class);
+        assertNotNull(folder);
+        assertEquals(folderPath, folder.getAbsolutePath());
+
+        // Creation of a sub-folder
+        folderPath = "templates/test/createFolder";
+        fileData = "{\"path\":\"" + folderPath + "\"}";
+
+        mvcResult = this.mockMvc.perform(post("/projects/"+projectID+"/workspace/folders").contentType(MediaType.APPLICATION_JSON).content(fileData))
+                // Then
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        // Assert
+        jsonConent = mvcResult.getResponse().getContentAsString();
+        folder = mapper.readValue(jsonConent, Folder.class);
+        assertNotNull(folder);
+        assertEquals(folderPath, folder.getAbsolutePath());
     }
 
     @Test
