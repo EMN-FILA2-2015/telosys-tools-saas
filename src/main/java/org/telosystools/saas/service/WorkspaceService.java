@@ -66,7 +66,7 @@ public interface WorkspaceService {
      * @param fileId GridFS id du fichier
      * @return contenu du fichier
      */
-    String getFileContent(String projectId, String fileId);
+    String getFileContent(String projectId, String fileId) throws GridFSFileNotFoundException;
 
     /**
      * Ecrase le contenu du fichier

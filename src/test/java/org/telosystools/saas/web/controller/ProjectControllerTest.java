@@ -280,6 +280,21 @@ public class ProjectControllerTest {
         assertEquals(expectedContent, actualContent);
     }
 
+    @Test
+    public void testGetFileContent_NotFound() throws Exception {
+        // Given
+        Project project = new Project();
+        project.setName("New Project");
+        String projectID = projectService.createProject(project).getId();
+        String fileID = ObjectId.get().toString();
+
+        // When
+        this.mockMvc.perform(get("/projects/" + projectID + "/workspace/files/" + fileID))
+
+        // Then
+                .andExpect(status().isNotFound());
+    }
+
     /*
     updateFile : change le contenu d'un fichier -> status ok
     */

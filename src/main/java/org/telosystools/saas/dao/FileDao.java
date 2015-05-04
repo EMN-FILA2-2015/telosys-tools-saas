@@ -18,7 +18,7 @@ public class FileDao {
     @Autowired
     private GridFSDao gridFSDao;
 
-    public InputStream loadContent(String fileId, String database) {
+    public InputStream loadContent(String fileId, String database) throws GridFSFileNotFoundException {
         if(fileId == null) {
             return null;
         }

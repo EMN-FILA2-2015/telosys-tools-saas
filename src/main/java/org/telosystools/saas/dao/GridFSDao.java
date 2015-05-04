@@ -30,11 +30,11 @@ class GridFSDao {
         return new GridFS(db);
     }
 
-    public InputStream load(String gridFSId, String database) {
+    public InputStream load(String gridFSId, String database) throws GridFSFileNotFoundException {
         GridFSDBFile gridFSDBFile =
                 gridFS(database).findOne(new ObjectId(gridFSId));
         if(gridFSDBFile == null) {
-            throw new MongoException("File not found in GridFS : "+gridFSId);
+            throw new GridFSFileNotFoundException(gridFSId);
         }
         return gridFSDBFile.getInputStream();
     }

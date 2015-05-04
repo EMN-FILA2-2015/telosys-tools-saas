@@ -243,7 +243,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public String getFileContent(String projectId, String fileId) {
+    public String getFileContent(String projectId, String fileId) throws GridFSFileNotFoundException {
         return readInputStream(fileDao.loadContent(fileId, projectId));
     }
 

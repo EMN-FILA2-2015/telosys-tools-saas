@@ -100,8 +100,7 @@ public class ProjectController {
      * @return the workspace
      */
     @RequestMapping(value = "/{id}/workspace", method = RequestMethod.GET)
-    public @ResponseBody
-    ResponseEntity<Workspace> getWorkspace(@PathVariable("id") String projectId) {
+    public @ResponseBody ResponseEntity<Workspace> getWorkspace(@PathVariable("id") String projectId) {
         try {
             return new ResponseEntity<>(workspaceService.getWorkspace(projectId),HttpStatus.OK);
         } catch (ProjectNotFoundException e) {
@@ -138,8 +137,14 @@ public class ProjectController {
      * @return The file content as a String
      */
     @RequestMapping(value = "/{id}/workspace/files/{fileId}", method = RequestMethod.GET)
-    public @ResponseBody String getFileContent(@PathVariable("id") String projectId, @PathVariable String fileId) {
-        return workspaceService.getFileContent(projectId, fileId);
+    public @ResponseBody ResponseEntity<String> getFileContent(@PathVariable("id") String projectId, @PathVariable String fileId) {
+        try {
+            return new ResponseEntity<>(workspaceService.getFileContent(projectId, fileId),HttpStatus.OK);
+        } catch (GridFSFileNotFoundException e) {
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.set("error_message", e.getMessage());
+            return new ResponseEntity<>(responseHeaders, HttpStatus.NOT_FOUND);
+        }
     }
 
 
