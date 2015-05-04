@@ -404,6 +404,19 @@ public class ProjectControllerTest {
         assertEquals("test_resVal", project.getProjectConfiguration().getFolders().getTestRes());
     }
 
+    @Test
+    public void testSetProjectConfiguration_ProjectNotFound() throws Exception {
+        // Given
+        String projectID = ObjectId.get().toString();
+        String config = "{\"packages\":{\"ROOT_PKG\":\"rootPkgVal\",\"ENTITY_PKG\":\"entityPkgVal\"},\"folders\":{\"SRC\":\"srcVal\",\"RES\":\"resVal\",\"WEB\":\"webVal\",\"TEST_SRC\":\"test_srcVal\",\"TEST_RES\":\"test_resVal\",\"DOC\":\"docVal\",\"TMP\":\"tmpVal\"},\"variables\":{\"VAR1\":\"val1\"}}";
+
+        // When
+        this.mockMvc.perform(post("/projects/" + projectID + "/config/telosystoolscfg").contentType(MediaType.APPLICATION_JSON).content(config))
+
+        // Then
+                .andExpect(status().isNotFound());
+    }
+
     /*
     getProjectConfiguration : récupère la configuration d'un projet -> status Ok
     */
@@ -434,5 +447,17 @@ public class ProjectControllerTest {
         assertEquals(projectConfiguration.getFolders().getDoc(), cfg.getFolders().getDoc());
         assertEquals(projectConfiguration.getPackages().getEntityPkg(), cfg.getPackages().getEntityPkg());
         assertEquals(projectConfiguration.getVariables().get("var"), cfg.getVariables().get("var"));
+    }
+
+    @Test
+    public void testGetProjectConfiguration_ProjectNotFound() throws Exception {
+        // Given
+        String projectID = ObjectId.get().toString();
+
+        // When
+        this.mockMvc.perform(get("/projects/" + projectID + "/config/telosystoolscfg"))
+
+                // Then
+                .andExpect(status().isNotFound());
     }
 }
