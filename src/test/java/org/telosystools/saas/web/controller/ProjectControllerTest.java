@@ -257,6 +257,22 @@ public class ProjectControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    public void testCreateFile_FolderNotFound() throws Exception {
+        // Given
+        Project project = new Project();
+        project.setName("New Project");
+        String projectID = projectService.createProject(project).getId();
+        String filePath = "models/folder1/model_1.xml";
+        String fileData = "{\"path\":\"" + filePath + "\", \"content\":\"Contenu du fichier\"}";
+
+        // When
+        this.mockMvc.perform(post("/projects/"+projectID+"/workspace/files").contentType(MediaType.APPLICATION_JSON).content(fileData))
+
+        // Then
+                .andExpect(status().isNotFound());
+    }
+
     /*
     getFileContent : récupère le contenu d'un fichier -> retourne une chaîne de caractère status ok
     */
