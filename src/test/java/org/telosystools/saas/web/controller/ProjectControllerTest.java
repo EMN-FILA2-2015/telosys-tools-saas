@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.telosystools.saas.Application;
 import org.telosystools.saas.config.MongoConfiguration;
 import org.telosystools.saas.domain.filesystem.File;
+import org.telosystools.saas.domain.filesystem.FileData;
 import org.telosystools.saas.domain.filesystem.Workspace;
 import org.telosystools.saas.domain.project.Project;
 import org.telosystools.saas.domain.project.ProjectConfiguration;
@@ -28,7 +29,8 @@ import org.telosystools.saas.service.WorkspaceService;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -267,17 +269,20 @@ public class ProjectControllerTest {
         project.setName("New Project");
         String projectID = projectService.createProject(project).getId();
         String expectedContent = "Contenu du fichier";
-        String fileID = workspaceService.createFile("models/model_2.xml", expectedContent, projectID).getGridFSId();
+        File file = workspaceService.createFile("models/model_2.xml", expectedContent, projectID);
+
+        String fileData = "{\"path\":\"" + file.getAbsolutePath() + "\"}";
 
         // When
-        MvcResult mvcResult = this.mockMvc.perform(get("/projects/" + projectID + "/workspace/files/" + fileID))
+        String jsonContent = this.mockMvc.perform(get("/projects/" + projectID + "/workspace/files/")
+                .contentType(MediaType.APPLICATION_JSON).content(fileData))
 
         // Then
                 .andExpect(status().isOk())
-                .andReturn();
+                .andReturn().getResponse().getContentAsString();
 
-        String actualContent = mvcResult.getResponse().getContentAsString();
-        assertEquals(expectedContent, actualContent);
+        FileData data = mapper.readValue(jsonContent, FileData.class);
+        assertEquals(expectedContent, data.getContent());
     }
 
     /*
@@ -299,15 +304,13 @@ public class ProjectControllerTest {
 
         // When
         final String url = "/projects/" + projectID + "/workspace/files/";
-        String jsonContent =  this.mockMvc.perform(put(url).contentType(MediaType.APPLICATION_JSON).content(fileData))
+        this.mockMvc.perform(put(url).contentType(MediaType.APPLICATION_JSON).content(fileData))
         // Then
-                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-        File file = mapper.readValue(jsonContent, File.class);
+                .andExpect(status().isOk());
 
-        assertEquals(file.getAbsolutePath(), oldFile.getAbsolutePath());
-        assertNotEquals(file.getGridFSId(), oldFile.getGridFSId());
-        assertEquals(fileContent, workspaceService.getFileContent(projectID, file.getGridFSId()));
-
+        FileData newFile = workspaceService.getFileContent(projectID, oldFile.getAbsolutePath());
+        assertNotNull(newFile);
+        assertEquals(fileContent, newFile.getContent());
     }
 
     /*

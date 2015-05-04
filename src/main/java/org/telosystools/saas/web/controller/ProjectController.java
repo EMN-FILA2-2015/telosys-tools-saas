@@ -123,7 +123,7 @@ public class ProjectController {
         try {
             return new ResponseEntity<>(workspaceService.createFile(fileData.getPath(), fileData.getContent(), projectId),
                     HttpStatus.CREATED);
-        } catch (FolderNotFoundException | GridFSFileNotFoundException | ProjectNotFoundException e) {
+        } catch (FolderNotFoundException | FileNotFoundException | ProjectNotFoundException e) {
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set("error_message", e.getMessage());
             return new ResponseEntity<>(responseHeaders,HttpStatus.NOT_FOUND);
@@ -134,12 +134,19 @@ public class ProjectController {
      * Return the content of the given file.
      *
      * @param projectId Project ID
-     * @param fileId GridFS File ID
+     * @param fileData the file path as a json object
      * @return The file content as a String
      */
-    @RequestMapping(value = "/{id}/workspace/files/{fileId}", method = RequestMethod.GET)
-    public @ResponseBody String getFileContent(@PathVariable("id") String projectId, @PathVariable String fileId) {
-        return workspaceService.getFileContent(projectId, fileId);
+    @RequestMapping(value = "/{id}/workspace/files/", method = RequestMethod.GET)
+    public ResponseEntity<FileData> getFileContent(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
+        if (fileData.getPath() == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        try {
+            return new ResponseEntity<>(workspaceService.getFileContent(projectId, fileData.getPath()), HttpStatus.OK);
+        } catch (FileNotFoundException | ProjectNotFoundException e) {
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.set("error_message", e.getMessage());
+            return new ResponseEntity<>(responseHeaders, HttpStatus.NOT_FOUND);
+        }
     }
 
 
@@ -149,11 +156,12 @@ public class ProjectController {
      * @param fileData The file path and content as a Json object
      */
     @RequestMapping(value = "/{projectId}/workspace/files/", method = RequestMethod.PUT)
-    public ResponseEntity<File> updateFileContent(@PathVariable("projectId") String projectId, @RequestBody FileData fileData) {
+    public ResponseEntity<Object> updateFileContent(@PathVariable("projectId") String projectId, @RequestBody FileData fileData) {
         try {
             if (fileData.getContent() == null || fileData.getPath() == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            return new ResponseEntity<>(workspaceService.updateFile(projectId, fileData.getPath(), fileData.getContent()), HttpStatus.OK);
-        } catch (GridFSFileNotFoundException | ProjectNotFoundException e) {
+            workspaceService.updateFile(projectId, fileData.getPath(), fileData.getContent());
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (FileNotFoundException | ProjectNotFoundException e) {
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set("error_message", e.getMessage());
             return new ResponseEntity<>(responseHeaders, HttpStatus.NOT_FOUND);

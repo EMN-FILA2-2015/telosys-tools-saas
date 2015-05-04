@@ -1,10 +1,11 @@
 package org.telosystools.saas.service;
 
 import org.telosystools.saas.domain.filesystem.File;
+import org.telosystools.saas.domain.filesystem.FileData;
 import org.telosystools.saas.domain.filesystem.Folder;
 import org.telosystools.saas.domain.filesystem.Workspace;
+import org.telosystools.saas.exception.FileNotFoundException;
 import org.telosystools.saas.exception.FolderNotFoundException;
-import org.telosystools.saas.exception.GridFSFileNotFoundException;
 import org.telosystools.saas.exception.ProjectNotFoundException;
 
 /**
@@ -57,16 +58,16 @@ public interface WorkspaceService {
      * @param projectId Project id
      * @return File créé
      */
-    File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, GridFSFileNotFoundException, ProjectNotFoundException;
+    File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, FileNotFoundException, ProjectNotFoundException;
 
     /**
      * Retourne le contenu du fichier stocké en base
      *
      * @param projectId Id du projet
-     * @param fileId GridFS id du fichier
+     * @param path path du fichier
      * @return contenu du fichier
      */
-    String getFileContent(String projectId, String fileId);
+    FileData getFileContent(String projectId, String path) throws ProjectNotFoundException, FileNotFoundException;
 
     /**
      * Ecrase le contenu du fichier
@@ -74,8 +75,7 @@ public interface WorkspaceService {
      * @param projectId Id du projet
      * @param path path du fichier
      * @param content Contenu a sauvegarder
-     * @return File mis à jour
      */
-    File updateFile(String projectId, String path, String content) throws ProjectNotFoundException, GridFSFileNotFoundException;
+    void updateFile(String projectId, String path, String content) throws ProjectNotFoundException, FileNotFoundException;
 
 }

@@ -7,11 +7,9 @@ import org.telosystools.saas.dao.FileDao;
 import org.telosystools.saas.dao.RootFolderDao;
 import org.telosystools.saas.dao.WorkspaceDao;
 import org.telosystools.saas.domain.filesystem.File;
-import org.telosystools.saas.domain.filesystem.Folder;
-import org.telosystools.saas.domain.filesystem.RootFolder;
-import org.telosystools.saas.domain.filesystem.Workspace;
+import org.telosystools.saas.domain.filesystem.*;
+import org.telosystools.saas.exception.FileNotFoundException;
 import org.telosystools.saas.exception.FolderNotFoundException;
-import org.telosystools.saas.exception.GridFSFileNotFoundException;
 import org.telosystools.saas.exception.ProjectNotFoundException;
 import org.telosystools.saas.service.WorkspaceService;
 
@@ -129,7 +127,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @param projectId    Project id
      */
     @Override
-    public File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, GridFSFileNotFoundException, ProjectNotFoundException {
+    public File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, FileNotFoundException, ProjectNotFoundException {
         Path path = Path.valueOf(absolutePath);
 
         if (path.getBasename().matches("[^_A-Za-z0-9/\\-]*")) throw new InvalidPathException(absolutePath, "Invalid characters in the path");
@@ -243,25 +241,29 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public String getFileContent(String projectId, String fileId) {
-        return readInputStream(fileDao.loadContent(fileId, projectId));
+    public FileData getFileContent(String projectId, String path) throws ProjectNotFoundException, FileNotFoundException {
+        final Workspace workspace = this.getWorkspace(projectId);
+        final File file = this.getFileForPath(workspace, Path.valueOf(path));
+
+        if (file == null) throw new FileNotFoundException("File not found in path");
+        final String content = readInputStream(fileDao.loadContent(file.getGridFSId(), projectId));
+
+        return new FileData(file.getAbsolutePath(), content);
     }
 
     @Override
-    public File updateFile(String projectId, String path, String content) throws ProjectNotFoundException, GridFSFileNotFoundException {
+    public void updateFile(String projectId, String path, String content) throws ProjectNotFoundException, FileNotFoundException {
         final Workspace workspace = this.getWorkspace(projectId);
         final Path parsedPath = Path.valueOf(path);
         final RootFolder rootFolder = getRootFolderForPath(workspace, parsedPath);
         final File file = this.getFileForPath(workspace, parsedPath);
 
-        if (file == null) throw new GridFSFileNotFoundException("File not found in path");
+        if (file == null) throw new FileNotFoundException("File not found in path");
 
         // Sauvegarde dans GridFS. L'id GridFS est mis à jour dans le File
         fileDao.save(file, createInputStream(content), projectId);
         // Mise à jour du workspace
         rootFolderDao.save(rootFolder, projectId);
-
-        return file;
     }
 
     @Override

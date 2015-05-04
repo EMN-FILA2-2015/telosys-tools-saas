@@ -1,6 +1,5 @@
 package org.telosystools.saas.service.impl;
 
-import com.mongodb.MongoException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,11 +13,9 @@ import org.telosystools.saas.config.MongoConfiguration;
 import org.telosystools.saas.dao.FileDao;
 import org.telosystools.saas.dao.WorkspaceDao;
 import org.telosystools.saas.domain.filesystem.File;
-import org.telosystools.saas.domain.filesystem.Folder;
-import org.telosystools.saas.domain.filesystem.RootFolder;
-import org.telosystools.saas.domain.filesystem.Workspace;
+import org.telosystools.saas.domain.filesystem.*;
+import org.telosystools.saas.exception.FileNotFoundException;
 import org.telosystools.saas.exception.FolderNotFoundException;
-import org.telosystools.saas.exception.GridFSFileNotFoundException;
 import org.telosystools.saas.exception.ProjectNotFoundException;
 
 import javax.inject.Inject;
@@ -167,15 +164,12 @@ public class WorkspaceServiceIntTest {
         assertEquals(expectedFile, actualFile);
 
         // Mise à jour du fichier via son Path
-        File updatedFile = workspaceService.updateFile(PROJECT, actualFile.getAbsolutePath(), MODIFIED_FILE_CONTENT);
+        workspaceService.updateFile(PROJECT, actualFile.getAbsolutePath(), MODIFIED_FILE_CONTENT);
 
-        String actualIn = workspaceService.getFileContent(PROJECT, updatedFile.getGridFSId());
-        assertNotNull(actualIn);
-        assertEquals(MODIFIED_FILE_CONTENT, actualIn.trim());
-
+        FileData actualIn = workspaceService.getFileContent(PROJECT, FILE_PATH);
         // Vérification de la mise à jour du workspace
-        actualFile = workspaceService.getFileForPath(workspaceDao.load(PROJECT), Path.valueOf(FILE_PATH));
-        assertEquals(updatedFile.getGridFSId(), actualFile.getGridFSId());
+        assertNotNull(actualIn);
+        assertEquals(MODIFIED_FILE_CONTENT, actualIn.getContent().trim());
     }
 
     @Test
@@ -189,11 +183,11 @@ public class WorkspaceServiceIntTest {
         assertEquals(expectedFile,actualFile);
     }
 
-    @Test(expected = MongoException.class)
+    @Test(expected = FileNotFoundException.class)
     public void testRemoveFile() throws Exception {
         File file = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
         workspaceService.removeFile(FILE_PATH,PROJECT);
-        workspaceService.getFileContent(PROJECT, file.getGridFSId());
+        workspaceService.getFileContent(PROJECT, file.getAbsolutePath());
     }
 
     @Test
@@ -201,7 +195,7 @@ public class WorkspaceServiceIntTest {
         File file = null;
         try {
             file = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
-        } catch (FolderNotFoundException | GridFSFileNotFoundException | ProjectNotFoundException e) {
+        } catch (FolderNotFoundException | FileNotFoundException | ProjectNotFoundException e) {
             fail(e.getMessage());
         }
 
@@ -214,7 +208,7 @@ public class WorkspaceServiceIntTest {
         File file = null;
         try {
             file = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
-        } catch (FolderNotFoundException | GridFSFileNotFoundException | ProjectNotFoundException e) {
+        } catch (FolderNotFoundException | FileNotFoundException | ProjectNotFoundException e) {
             fail(e.getMessage());
         }
         assertEquals(FILE_EXT, File.getFileExtension(file.getName()));
@@ -264,9 +258,9 @@ public class WorkspaceServiceIntTest {
         assertNotNull(actualFile);
         assertEquals(expectedFile,actualFile);
 
-        String actualIn = workspaceService.getFileContent(PROJECT, actualFile.getGridFSId());
+        FileData actualIn = workspaceService.getFileContent(PROJECT, actualFile.getAbsolutePath());
         assertNotNull(actualIn);
-        assertEquals(FILE_CONTENT, actualIn.trim());
+        assertEquals(FILE_CONTENT, actualIn.getContent().trim());
     }
 
     @Test
@@ -275,16 +269,15 @@ public class WorkspaceServiceIntTest {
         String filePath = FOLDER_PATH+"/"+FILE_NAME;
         workspaceService.createFile(filePath, MODIFIED_FILE_CONTENT, PROJECT);
 
-        File expectedFile = workspaceService.updateFile(PROJECT, filePath, FILE_CONTENT);
+        workspaceService.updateFile(PROJECT, filePath, FILE_CONTENT);
 
         Workspace workspace = workspaceDao.load(PROJECT);
         File actualFile = workspaceService.getFileForPath(workspace, Path.valueOf(filePath));
         assertNotNull(actualFile);
-        assertEquals(expectedFile.getGridFSId(), actualFile.getGridFSId());
 
-        String actualIn = workspaceService.getFileContent(PROJECT, actualFile.getGridFSId());
+        FileData actualIn = workspaceService.getFileContent(PROJECT, actualFile.getAbsolutePath());
         assertNotNull(actualIn);
-        assertEquals(FILE_CONTENT, actualIn.trim());
+        assertEquals(FILE_CONTENT, actualIn.getContent().trim());
     }
 
     @Test
@@ -301,11 +294,11 @@ public class WorkspaceServiceIntTest {
         assertEquals(expectedFile,actualFile);
     }
 
-    @Test(expected = MongoException.class)
+    @Test(expected = FileNotFoundException.class)
     public void testRemoveFileInSubFolder() throws Exception {
         File file = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
         workspaceService.removeFile(FILE_PATH,PROJECT);
-        workspaceService.getFileContent(PROJECT, file.getGridFSId());
+        workspaceService.getFileContent(PROJECT, file.getAbsolutePath());
     }
 
 

@@ -2,14 +2,13 @@ package org.telosystools.saas.dao;
 
 import com.mongodb.DB;
 import com.mongodb.Mongo;
-import com.mongodb.MongoException;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.telosystools.saas.exception.GridFSFileNotFoundException;
+import org.telosystools.saas.exception.FileNotFoundException;
 
 import java.io.InputStream;
 
@@ -25,16 +24,16 @@ class GridFSDao {
     @Autowired
     private Mongo mongo;
 
-    GridFS gridFS(String database) {
+    private GridFS gridFS(String database) {
         DB db = mongo.getDB(database);
         return new GridFS(db);
     }
 
-    public InputStream load(String gridFSId, String database) {
+    public InputStream load(String gridFSId, String database) throws FileNotFoundException {
         GridFSDBFile gridFSDBFile =
                 gridFS(database).findOne(new ObjectId(gridFSId));
-        if(gridFSDBFile == null) {
-            throw new MongoException("File not found in GridFS : "+gridFSId);
+        if (gridFSDBFile == null) {
+            throw new FileNotFoundException("File not found in GridFS : "+gridFSId);
         }
         return gridFSDBFile.getInputStream();
     }
@@ -46,7 +45,7 @@ class GridFSDao {
         return gridFSInputFile.getId().toString();
     }
 
-    public String update(String gridFSId, InputStream in, String database) throws GridFSFileNotFoundException {
+    public String update(String gridFSId, InputStream in, String database) throws FileNotFoundException {
         // Récupération de l'ancien fichier et suppression
         final GridFSDBFile oldFile = gridFS(database).findOne(new ObjectId(gridFSId));
         if (oldFile != null) {
@@ -55,7 +54,7 @@ class GridFSDao {
             gridFS(database).remove(oldFile);
             return updatedFile.getId().toString();
         } else {
-            throw new GridFSFileNotFoundException(gridFSId);
+            throw new FileNotFoundException(gridFSId);
         }
     }
 

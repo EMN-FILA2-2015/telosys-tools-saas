@@ -3,7 +3,7 @@ package org.telosystools.saas.dao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.telosystools.saas.domain.filesystem.File;
-import org.telosystools.saas.exception.GridFSFileNotFoundException;
+import org.telosystools.saas.exception.FileNotFoundException;
 
 import java.io.InputStream;
 
@@ -18,14 +18,14 @@ public class FileDao {
     @Autowired
     private GridFSDao gridFSDao;
 
-    public InputStream loadContent(String fileId, String database) {
+    public InputStream loadContent(String fileId, String database) throws FileNotFoundException {
         if(fileId == null) {
             return null;
         }
         return gridFSDao.load(fileId, database);
     }
 
-    public void save(File file, InputStream in, String database) throws GridFSFileNotFoundException {
+    public void save(File file, InputStream in, String database) throws FileNotFoundException {
         if(file.getGridFSId() == null) {
             String gridFSId = gridFSDao.create(in, database);
             file.setGridFSId(gridFSId);
