@@ -349,7 +349,25 @@ public class ProjectControllerTest {
 
         String filePath = "models/model_2.xml";
 
-        File oldFile = new File("models/model_2.xml");
+        String fileContent = "content";
+        String fileData = "{\"path\":\"" + filePath + "\", \"content\":\"" + fileContent + "\"}";
+
+        // When
+        final String url = "/projects/" + projectID + "/workspace/files/";
+        this.mockMvc.perform(put(url).contentType(MediaType.APPLICATION_JSON).content(fileData))
+
+        // Then
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testUpdateFile_FileNotFound() throws Exception {
+        // Given
+        Project project = new Project();
+        project.setName("New Project");
+        String projectID = projectService.createProject(project).getId();
+
+        String filePath = "models/model_2.xml";
 
         String fileContent = "content";
         String fileData = "{\"path\":\"" + filePath + "\", \"content\":\"" + fileContent + "\"}";
@@ -360,7 +378,6 @@ public class ProjectControllerTest {
 
         // Then
                 .andExpect(status().isNotFound());
-
     }
 
     /*
