@@ -341,6 +341,28 @@ public class ProjectControllerTest {
 
     }
 
+
+    @Test
+    public void testUpdateFile_ProjectNotFound() throws Exception {
+        // Given
+        String projectID = ObjectId.get().toString();
+
+        String filePath = "models/model_2.xml";
+
+        File oldFile = new File("models/model_2.xml");
+
+        String fileContent = "content";
+        String fileData = "{\"path\":\"" + filePath + "\", \"content\":\"" + fileContent + "\"}";
+
+        // When
+        final String url = "/projects/" + projectID + "/workspace/files/";
+        this.mockMvc.perform(put(url).contentType(MediaType.APPLICATION_JSON).content(fileData))
+
+        // Then
+                .andExpect(status().isNotFound());
+
+    }
+
     /*
     setProjectConfig : change la config du projet -> status created
     */
