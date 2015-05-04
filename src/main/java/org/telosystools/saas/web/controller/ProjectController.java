@@ -100,8 +100,7 @@ public class ProjectController {
      * @return the workspace
      */
     @RequestMapping(value = "/{id}/workspace", method = RequestMethod.GET)
-    public @ResponseBody
-    ResponseEntity<Workspace> getWorkspace(@PathVariable("id") String projectId) {
+    public @ResponseBody ResponseEntity<Workspace> getWorkspace(@PathVariable("id") String projectId) {
         try {
             return new ResponseEntity<>(workspaceService.getWorkspace(projectId),HttpStatus.OK);
         } catch (ProjectNotFoundException e) {

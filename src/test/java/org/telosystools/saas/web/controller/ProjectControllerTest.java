@@ -259,6 +259,22 @@ public class ProjectControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    public void testCreateFile_FolderNotFound() throws Exception {
+        // Given
+        Project project = new Project();
+        project.setName("New Project");
+        String projectID = projectService.createProject(project).getId();
+        String filePath = "models/folder1/model_1.xml";
+        String fileData = "{\"path\":\"" + filePath + "\", \"content\":\"Contenu du fichier\"}";
+
+        // When
+        this.mockMvc.perform(post("/projects/"+projectID+"/workspace/files").contentType(MediaType.APPLICATION_JSON).content(fileData))
+
+        // Then
+                .andExpect(status().isNotFound());
+    }
+
     /*
     getFileContent : récupère le contenu d'un fichier -> retourne une chaîne de caractère status ok
     */
@@ -283,6 +299,21 @@ public class ProjectControllerTest {
 
         FileData data = mapper.readValue(jsonContent, FileData.class);
         assertEquals(expectedContent, data.getContent());
+    }
+
+    @Test
+    public void testGetFileContent_NotFound() throws Exception {
+        // Given
+        Project project = new Project();
+        project.setName("New Project");
+        String projectID = projectService.createProject(project).getId();
+        String fileID = ObjectId.get().toString();
+
+        // When
+        this.mockMvc.perform(get("/projects/" + projectID + "/workspace/files/" + fileID))
+
+        // Then
+                .andExpect(status().isNotFound());
     }
 
     /*
@@ -313,6 +344,45 @@ public class ProjectControllerTest {
         assertEquals(fileContent, newFile.getContent());
     }
 
+
+    @Test
+    public void testUpdateFile_ProjectNotFound() throws Exception {
+        // Given
+        String projectID = ObjectId.get().toString();
+
+        String filePath = "models/model_2.xml";
+
+        String fileContent = "content";
+        String fileData = "{\"path\":\"" + filePath + "\", \"content\":\"" + fileContent + "\"}";
+
+        // When
+        final String url = "/projects/" + projectID + "/workspace/files/";
+        this.mockMvc.perform(put(url).contentType(MediaType.APPLICATION_JSON).content(fileData))
+
+        // Then
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testUpdateFile_FileNotFound() throws Exception {
+        // Given
+        Project project = new Project();
+        project.setName("New Project");
+        String projectID = projectService.createProject(project).getId();
+
+        String filePath = "models/model_2.xml";
+
+        String fileContent = "content";
+        String fileData = "{\"path\":\"" + filePath + "\", \"content\":\"" + fileContent + "\"}";
+
+        // When
+        final String url = "/projects/" + projectID + "/workspace/files/";
+        this.mockMvc.perform(put(url).contentType(MediaType.APPLICATION_JSON).content(fileData))
+
+        // Then
+                .andExpect(status().isNotFound());
+    }
+
     /*
     setProjectConfig : change la config du projet -> status created
     */
@@ -335,6 +405,19 @@ public class ProjectControllerTest {
         assertEquals("entityPkgVal", project.getProjectConfiguration().getPackages().getEntityPkg());
         assertEquals("val1", project.getProjectConfiguration().getVariables().get("VAR1"));
         assertEquals("test_resVal", project.getProjectConfiguration().getFolders().getTestRes());
+    }
+
+    @Test
+    public void testSetProjectConfiguration_ProjectNotFound() throws Exception {
+        // Given
+        String projectID = ObjectId.get().toString();
+        String config = "{\"packages\":{\"ROOT_PKG\":\"rootPkgVal\",\"ENTITY_PKG\":\"entityPkgVal\"},\"folders\":{\"SRC\":\"srcVal\",\"RES\":\"resVal\",\"WEB\":\"webVal\",\"TEST_SRC\":\"test_srcVal\",\"TEST_RES\":\"test_resVal\",\"DOC\":\"docVal\",\"TMP\":\"tmpVal\"},\"variables\":{\"VAR1\":\"val1\"}}";
+
+        // When
+        this.mockMvc.perform(post("/projects/" + projectID + "/config/telosystoolscfg").contentType(MediaType.APPLICATION_JSON).content(config))
+
+        // Then
+                .andExpect(status().isNotFound());
     }
 
     /*
@@ -367,5 +450,17 @@ public class ProjectControllerTest {
         assertEquals(projectConfiguration.getFolders().getDoc(), cfg.getFolders().getDoc());
         assertEquals(projectConfiguration.getPackages().getEntityPkg(), cfg.getPackages().getEntityPkg());
         assertEquals(projectConfiguration.getVariables().get("var"), cfg.getVariables().get("var"));
+    }
+
+    @Test
+    public void testGetProjectConfiguration_ProjectNotFound() throws Exception {
+        // Given
+        String projectID = ObjectId.get().toString();
+
+        // When
+        this.mockMvc.perform(get("/projects/" + projectID + "/config/telosystoolscfg"))
+
+                // Then
+                .andExpect(status().isNotFound());
     }
 }
