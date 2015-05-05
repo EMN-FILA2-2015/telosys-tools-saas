@@ -1,15 +1,12 @@
 package org.telosystools.saas.config;
 
 import com.mongodb.Mongo;
-import com.mongodb.MongoClient;
 import org.mongeez.MongeezRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
-
-import java.io.File;
 
 /**
  * Mongeez : Data change set in MongoDB.
@@ -18,7 +15,7 @@ import java.io.File;
 public class MongeezConfiguration {
 
     @Autowired
-    private MongoClient mongo;
+    private Mongo mongo;
 
     @Value("${mongeez.migrate}")
     private boolean executeEnabled;
