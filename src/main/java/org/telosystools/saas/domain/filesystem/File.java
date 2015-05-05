@@ -49,6 +49,11 @@ public class File implements Serializable {
         this.ext = getFileExtension(name);
     }
 
+    public void updatePath(Path newPath) {
+        this.absolutePath = Path.join(newPath.toString(), this.name);
+        this.path = newPath.getBasename();
+    }
+
 
     /**
      * Return the file extension from the file name.
@@ -102,12 +107,11 @@ public class File implements Serializable {
 
         File file = (File) o;
 
-        if (!absolutePath.equals(file.absolutePath)) return false;
-        if (!ext.equals(file.ext)) return false;
-        if (!gridFSId.equals(file.gridFSId)) return false;
-        if (!name.equals(file.name)) return false;
-        return path.equals(file.path);
-
+        return absolutePath.equals(file.absolutePath)
+                && ext.equals(file.ext)
+                && gridFSId.equals(file.gridFSId)
+                && name.equals(file.name)
+                && path.equals(file.path);
     }
 
     @Override

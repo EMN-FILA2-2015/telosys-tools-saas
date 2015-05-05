@@ -27,6 +27,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Component
 public class WorkspaceServiceImpl implements WorkspaceService {
 
+    public static final String REGEX_FILENAME = "^([_A-Za-z0-9\\-]+\\.[A-Za-z0-9\\-]+)$";
+    public static final String REGEX_FOLDER = "[^_A-Za-z0-9/\\-]";
+    public static final String REGEX_FOLDERS = REGEX_FOLDER + "*";
     @Autowired
     private WorkspaceDao workspaceDao;
     @Autowired
@@ -65,40 +68,40 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     public Folder createFolder(String absolutePath, String projectId) throws FolderNotFoundException, ProjectNotFoundException, org.telosystools.saas.exception.InvalidPathException {
-        if (absolutePath.matches("[^A-Za-z0-9/-]")) throw new InvalidPathException(absolutePath);
+        if (absolutePath.matches(REGEX_FOLDERS)) throw new InvalidPathException(absolutePath);
 
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(absolutePath);
-        Folder folder = new Folder(path);
         Folder folderParent = getFolderForPath(workspace, path.getParent());
-        if (folderParent != null) {
-            folderParent.addFolder(folder);
-            workspaceDao.save(workspace, projectId);
-            return folder;
-        } else {
+        if (folderParent == null)
             throw new FolderNotFoundException(path.getBasename(), projectId);
-        }
+
+        Folder folder = new Folder(path);
+        folderParent.addFolder(folder);
+        workspaceDao.save(workspace, projectId);
+        return folder;
     }
 
     /**
-     * Rename an existing folder.
-     *
-     * @param folder     the folder to be renamed.
-     * @param folderName the new name of the folder
-     * @param projectId  project unique identifier
+     * {@inheritDoc}
      */
-    public void renameFolder(Folder folder, String folderName, String projectId) throws ProjectNotFoundException, InvalidPathException {
-        if (folderName.matches("[^A-Za-z0-9/-]")) throw new InvalidPathException(folderName);
+    @Override
+    public void renameFolder(String absolutePath, String folderName, String projectId) throws ProjectNotFoundException, InvalidPathException, FolderNotFoundException {
+        if (folderName.matches(REGEX_FOLDER)) throw new InvalidPathException(folderName);
+        if (absolutePath.matches(REGEX_FOLDERS)) throw new InvalidPathException(absolutePath);
 
         Workspace workspace = getWorkspace(projectId);
-        Path path = Path.valueOf(folder.getPath(), folder.getName());
+        Path path = Path.valueOf(absolutePath);
+
+        Folder folder = getFolderForPath(workspace, path);
+        if (folder == null) throw new FolderNotFoundException(absolutePath, projectId);
+
         Folder folderParent = getFolderForPath(workspace, path.getParent());
-        if (folderParent != null) {
-            folderParent.getFolders().remove(folder.getName());
-            folder.changeName(folderName);
-            folderParent.getFolders().put(folderName, folder);
-            workspaceDao.save(workspace, projectId);
-        }
+        folderParent.removeFolder(folder);
+        folder.changeName(folderName);
+        folderParent.addFolder(folder);
+
+        workspaceDao.save(workspace, projectId);
     }
 
     /**
@@ -107,11 +110,12 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @param projectId    project unique identifier
      * @param absolutePath the path of the folder
      */
+    @Override
     public void removeFolder(String absolutePath, String projectId) throws ProjectNotFoundException, FolderNotFoundException, InvalidPathException {
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(absolutePath);
 
-        if (path.getBasename().matches("[^_A-Za-z0-9/\\-]*")) throw new InvalidPathException(absolutePath);
+        if (path.getBasename().matches(REGEX_FOLDERS)) throw new InvalidPathException(absolutePath);
 
         Folder folder = getFolderForPath(workspace, path);
 
@@ -137,8 +141,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, FileNotFoundException, ProjectNotFoundException, InvalidPathException {
         Path path = Path.valueOf(absolutePath);
 
-        if (path.getBasename().matches("[^_A-Za-z0-9/\\-]*")) throw new InvalidPathException(absolutePath);
-        if (!path.getFilename().matches("^([_A-Za-z0-9\\-]+\\.[A-Za-z0-9\\-]+)$")) throw new InvalidPathException(path.getFilename());
+        if (path.getBasename().matches(REGEX_FOLDERS)) throw new InvalidPathException(absolutePath);
+        if (!path.getFilename().matches(REGEX_FILENAME)) throw new InvalidPathException(path.getFilename());
 
         Workspace workspace = getWorkspace(projectId);
         Folder folderParent = getFolderForPath(workspace, path.getParent());
@@ -156,20 +160,28 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     /**
      * Rename an existing file
      *
-     * @param file      the file to be renamed
+     * @param absolutePath the path to the file to be renamed
      * @param fileName  the new name of the file
      * @param projectId project unique identifier
      */
-    public void renameFile(File file, String fileName, String projectId) throws ProjectNotFoundException {
+    @Override
+    public void renameFile(String absolutePath, String fileName, String projectId) throws ProjectNotFoundException, InvalidPathException, FileNotFoundException {
         Workspace workspace = getWorkspace(projectId);
-        Path path = Path.valueOf(file.getPath(), file.getName());
+        Path path = Path.valueOf(absolutePath);
+
+        if (path.getBasename().matches(REGEX_FOLDERS)) throw new InvalidPathException(absolutePath);
+        if (!path.getFilename().matches(REGEX_FILENAME)) throw new InvalidPathException(path.getFilename());
+
+        File file = getFileForPath(workspace, path);
+        if (file == null) throw new FileNotFoundException(absolutePath);
+        if (file.getName().equals(fileName)) return;
+
         Folder folderParent = getFolderForPath(workspace, path.getParent());
-        if (folderParent != null) {
-            folderParent.getFiles().remove(file.getName());
-            file.changeName(fileName);
-            folderParent.getFiles().put(fileName, file);
-            workspaceDao.save(workspace, projectId);
-        }
+        folderParent.removeFile(file);
+        file.changeName(fileName);
+        folderParent.addFile(file);
+
+        workspaceDao.save(workspace, projectId);
     }
 
     /**
@@ -178,12 +190,13 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @param absolutePath Absolute path
      * @param projectId    Project id
      */
+    @Override
     public void removeFile(String absolutePath, String projectId) throws ProjectNotFoundException, InvalidPathException, FileNotFoundException {
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(absolutePath);
 
-        if (path.getBasename().matches("[^_A-Za-z0-9/\\-]*")) throw new InvalidPathException(absolutePath);
-        if (!path.getFilename().matches("^([_A-Za-z0-9\\-]+\\.[A-Za-z0-9\\-]+)$")) throw new InvalidPathException(path.getFilename());
+        if (path.getBasename().matches(REGEX_FOLDERS)) throw new InvalidPathException(absolutePath);
+        if (!path.getFilename().matches(REGEX_FILENAME)) throw new InvalidPathException(path.getFilename());
 
         File file = getFileForPath(workspace, path);
         if (file == null) throw new FileNotFoundException(absolutePath);
@@ -255,20 +268,20 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public FileData getFileContent(String path, String projectId) throws ProjectNotFoundException, FileNotFoundException {
+    public FileData getFileContent(String absolutePath, String projectId) throws ProjectNotFoundException, FileNotFoundException {
         final Workspace workspace = this.getWorkspace(projectId);
-        final File file = this.getFileForPath(workspace, Path.valueOf(path));
+        final File file = this.getFileForPath(workspace, Path.valueOf(absolutePath));
 
         if (file == null) throw new FileNotFoundException("File not found in path");
         final String content = readInputStream(fileDao.loadContent(file.getGridFSId(), projectId));
 
-        return new FileData(file.getAbsolutePath(), content);
+        return new FileData(file.getAbsolutePath(), content, file.getName());
     }
 
     @Override
-    public void updateFile(String path, String content, String projectId) throws ProjectNotFoundException, FileNotFoundException {
+    public void updateFile(String absolutePath, String content, String projectId) throws ProjectNotFoundException, FileNotFoundException {
         final Workspace workspace = this.getWorkspace(projectId);
-        final Path parsedPath = Path.valueOf(path);
+        final Path parsedPath = Path.valueOf(absolutePath);
         final RootFolder rootFolder = getRootFolderForPath(workspace, parsedPath);
         final File file = this.getFileForPath(workspace, parsedPath);
 

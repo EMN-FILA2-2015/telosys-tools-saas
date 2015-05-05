@@ -184,6 +184,31 @@ public class WorkspaceControllerTest {
         assertTrue(removeFolder.getFiles().containsKey("test2+txt"));
         assertFalse(removeFolder.getFiles().containsKey("test+txt"));
     }
+
+    @Test
+    public void testRenameFile() throws Exception {
+        // Given
+        Project project = new Project();
+        project.setName("new_project");
+        String projectID = projectService.createProject(project).getId();
+
+        workspaceService.createFolder("templates/rename", projectID);
+        workspaceService.createFolder("templates/rename/test", projectID);
+        final String filePath = "templates/rename/test/test.txt";
+        workspaceService.createFile(filePath, "content", projectID);
+
+        String fileData = "{\"path\":\"" + filePath + "\", \"name\":\"renamedFile.pdf\"}";
+        // When
+        this.mockMvc.perform(patch("/projects/" + projectID + "/workspace/files").contentType(MediaType.APPLICATION_JSON).content(fileData))
+                // Then
+                .andExpect(status().isOk());
+        // Assert
+        final Folder parentFolder = workspaceService.getWorkspace(projectID).getTemplates().getFolders().get("rename").getFolders().get("test");
+        assertTrue(parentFolder.getFiles().containsKey("renamedFile+pdf"));
+        assertEquals("content", workspaceService.getFileContent("templates/rename/test/renamedFile.pdf", projectID).getContent());
+        assertEquals("templates/rename/test/renamedFile.pdf", parentFolder.getFiles().get("renamedFile+pdf").getAbsolutePath());
+    }
+
     /*
      * createFolder : crée un folder -> Folder créé status created
      */
@@ -250,6 +275,34 @@ public class WorkspaceControllerTest {
         RootFolder root = workspaceService.getWorkspace(projectID).getTemplates();
         assertTrue(root.getFolders().get("test").getFiles().containsKey("testParent+txt"));
         assertTrue(root.getFolders().get("test").getFolders().isEmpty());
+    }
+
+    @Test
+    public void testRenameFolder() throws Exception {
+        // Given
+        Project project = new Project();
+        project.setName("new_project");
+        String projectID = projectService.createProject(project).getId();
+
+        workspaceService.createFolder("templates/rename", projectID);
+        final String folderPath = "templates/rename";
+        workspaceService.createFolder("templates/rename/test", projectID);
+        workspaceService.createFile("templates/rename/test/test.txt", "", projectID);
+        workspaceService.createFile("templates/rename/testParent.txt", "", projectID);
+
+        String fileData = "{\"path\":\"" + folderPath + "\", \"name\":\"foo\"}";
+
+        // When
+        final String url = "/projects/" + projectID + "/workspace/folders";
+        this.mockMvc.perform(patch(url).contentType(MediaType.APPLICATION_JSON).content(fileData))
+                // Then
+                .andExpect(status().isOk());
+        // Assert
+        Folder foo = workspaceService.getWorkspace(projectID).getTemplates().getFolders().get("foo");
+        assertNotNull(foo);
+        assertEquals("templates/foo/test", foo.getFolders().get("test").getAbsolutePath());
+        assertTrue(foo.getFiles().containsKey("testParent+txt"));
+        assertEquals("templates/foo/test/test.txt", foo.getFolders().get("test").getFiles().get("test+txt").getAbsolutePath());
     }
 
     /*

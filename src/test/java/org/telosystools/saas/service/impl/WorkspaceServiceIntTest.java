@@ -116,12 +116,20 @@ public class WorkspaceServiceIntTest {
     @Test
     public void testRenameFolder() throws Exception {
         Folder expectedFolder = workspaceService.createFolder(FOLDER_PATH, PROJECT);
-        workspaceService.renameFolder(expectedFolder, MODIFIED_FOLDER_NAME, PROJECT);
+        workspaceService.createFolder(FOLDER_PATH + "/" + "test", PROJECT);
+        workspaceService.createFile(FOLDER_PATH + "/" + "test/test.txt", "", PROJECT);
+        workspaceService.createFile(FOLDER_PATH + "/test.txt", "", PROJECT);
+        workspaceService.renameFolder(expectedFolder.getAbsolutePath(), MODIFIED_FOLDER_NAME, PROJECT);
         Workspace workspace = workspaceDao.load(PROJECT);
 
         Folder actualFolder = workspaceService.getFolderForPath(workspace, Path.valueOf(MODIFIED_FOLDER_PATH));
         assertNotNull(actualFolder);
-        assertEquals(expectedFolder,actualFolder);
+        assertTrue(actualFolder.getFiles().containsKey("test+txt"));
+        assertTrue(actualFolder.getFolders().get("test").getFiles().containsKey("test+txt"));
+        final Folder childrenFolder = workspaceService.getFolderForPath(workspace, Path.valueOf(MODIFIED_FOLDER_PATH + "/" + "test"));
+        assertNotNull(childrenFolder);
+        assertEquals(MODIFIED_FOLDER_PATH + "/test", childrenFolder.getAbsolutePath());
+        assertNotNull(workspaceService.getFileForPath(workspace, Path.valueOf(MODIFIED_FOLDER_PATH + "/test/test.txt")));
     }
 
     @Test
@@ -175,12 +183,11 @@ public class WorkspaceServiceIntTest {
     @Test
     public void testRenameFile() throws Exception {
         File expectedFile = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
-        workspaceService.renameFile(expectedFile, MODIFIED_FILE_NAME, PROJECT);
+        workspaceService.renameFile(expectedFile.getAbsolutePath(), MODIFIED_FILE_NAME, PROJECT);
 
         Workspace workspace = workspaceDao.load(PROJECT);
         File actualFile = workspaceService.getFileForPath(workspace, Path.valueOf(MODIFIED_FILE_PATH));
         assertNotNull(actualFile);
-        assertEquals(expectedFile,actualFile);
     }
 
     @Test(expected = FileNotFoundException.class)
@@ -228,12 +235,11 @@ public class WorkspaceServiceIntTest {
     public void testRenameSubFolder() throws Exception {
         workspaceService.createFolder(FOLDER_PATH,PROJECT);
         Folder expectedFolder = workspaceService.createFolder(SUBFOLDER_PATH, PROJECT);
-        workspaceService.renameFolder(expectedFolder, MODIFIED_SUBFOLDER_NAME, PROJECT);
+        workspaceService.renameFolder(expectedFolder.getAbsolutePath(), MODIFIED_SUBFOLDER_NAME, PROJECT);
         Workspace workspace = workspaceDao.load(PROJECT);
 
         Folder actualFolder = workspaceService.getFolderForPath(workspace, Path.valueOf(MODIFIED_SUBFOLDER_PATH));
         assertNotNull(actualFolder);
-        assertEquals(expectedFolder,actualFolder);
     }
 
     @Test
@@ -285,13 +291,12 @@ public class WorkspaceServiceIntTest {
         workspaceService.createFolder(FOLDER_PATH,PROJECT);
         String filePath = FOLDER_PATH+"/"+FILE_NAME;
         File expectedFile = workspaceService.createFile(filePath, FILE_CONTENT, PROJECT);
-        workspaceService.renameFile(expectedFile, MODIFIED_FILE_NAME, PROJECT);
+        workspaceService.renameFile(expectedFile.getAbsolutePath(), MODIFIED_FILE_NAME, PROJECT);
 
         Workspace workspace = workspaceDao.load(PROJECT);
         String modifiedFilePath = FOLDER_PATH+"/"+MODIFIED_FILE_NAME;
         File actualFile = workspaceService.getFileForPath(workspace, Path.valueOf(modifiedFilePath));
         assertNotNull(actualFile);
-        assertEquals(expectedFile,actualFile);
     }
 
     @Test(expected = FileNotFoundException.class)

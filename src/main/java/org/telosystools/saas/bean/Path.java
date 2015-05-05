@@ -32,7 +32,7 @@ public class Path implements Serializable {
     }
 
     /**
-     * Constructore : path with some path items
+     * Constructor : path with some path items
      * @param items Path items
      */
     Path(List<String> items) {

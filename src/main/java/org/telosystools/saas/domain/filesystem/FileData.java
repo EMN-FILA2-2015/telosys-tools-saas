@@ -13,11 +13,14 @@ public class FileData implements Serializable {
 
     private String content;
 
+    private String name;
+
     public FileData() {}
 
-    public FileData(String path, String content) {
+    public FileData(String path, String content, String name) {
         this.path = path;
         this.content = content;
+        this.name = name;
     }
 
     public String getPath() {
@@ -34,5 +37,13 @@ public class FileData implements Serializable {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

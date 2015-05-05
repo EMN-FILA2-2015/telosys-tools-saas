@@ -17,7 +17,7 @@ public class Folder implements Serializable {
 
     public static final char DOT_REPLACEMENT = '+';
     private String absolutePath;
-    private final String path;
+    private String path;
     private String name;
     private final Map<String, Folder> folders = new TreeMap<>();
     private final Map<String, File> files = new TreeMap<>();
@@ -44,6 +44,8 @@ public class Folder implements Serializable {
     public void addFolder(Folder folder) {
         this.folders.put(folder.getName(), folder);
     }
+
+    public void removeFolder(Folder folder) { this.folders.remove(folder.getName());}
 
     public void addFile(File file) {
         // TODO : Solution alternative pour gérer le '.', charactère interdit dans un field mongo
@@ -74,10 +76,6 @@ public class Folder implements Serializable {
         return files;
     }
 
-    public List<Folder> getFoldersAsList() {
-        return new ArrayList<>(folders.values());
-    }
-
     public List<File> getFilesAsList() {
         return new ArrayList<>(files.values());
     }
@@ -97,6 +95,19 @@ public class Folder implements Serializable {
 
     }
 
+    public void updatePath(Path newPath) {
+        this.absolutePath = newPath.toString();
+        this.path = newPath.getBasename();
+
+        for (File file : getFiles().values())
+            file.updatePath(newPath);
+
+        for (Folder folder : getFolders().values()) {
+            Path childrenPath = Path.valueOf(this.absolutePath, folder.getName());
+            folder.updatePath(childrenPath);
+        }
+    }
+
     @Override
     public int hashCode() {
         int result = absolutePath.hashCode();
@@ -109,6 +120,6 @@ public class Folder implements Serializable {
 
     public void changeName(String folderName) {
         this.name = folderName;
-        this.absolutePath = this.path+"/"+name;
+        this.updatePath(Path.valueOf(this.path + "/" + name));
     }
 }
