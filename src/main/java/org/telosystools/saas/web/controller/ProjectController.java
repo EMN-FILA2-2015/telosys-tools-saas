@@ -4,15 +4,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.telosystools.saas.domain.filesystem.File;
-import org.telosystools.saas.domain.filesystem.FileData;
-import org.telosystools.saas.domain.filesystem.Folder;
-import org.telosystools.saas.domain.filesystem.Workspace;
 import org.telosystools.saas.domain.project.Project;
 import org.telosystools.saas.domain.project.ProjectConfiguration;
-import org.telosystools.saas.exception.*;
+import org.telosystools.saas.exception.DuplicateProjectNameException;
+import org.telosystools.saas.exception.ProjectNotFoundException;
+import org.telosystools.saas.exception.UserNotFoundException;
 import org.telosystools.saas.service.ProjectService;
-import org.telosystools.saas.service.WorkspaceService;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -29,9 +26,6 @@ public class ProjectController {
 
     @Inject
     private ProjectService projectService;
-
-    @Inject
-    private WorkspaceService workspaceService;
 
     /**
      * Load a project
@@ -88,92 +82,6 @@ public class ProjectController {
         projectService.deleteProject(id);
     }
 
-    /**
-     * Get the project's workspace
-     *
-     * @param projectId the project id
-     * @return the workspace
-     */
-    @RequestMapping(value = "/{id}/workspace", method = RequestMethod.GET)
-    public @ResponseBody ResponseEntity<Workspace> getWorkspace(@PathVariable("id") String projectId) {
-        try {
-            return new ResponseEntity<>(workspaceService.getWorkspace(projectId),HttpStatus.OK);
-        } catch (ProjectNotFoundException e) {
-            return new ResponseEntity<>(getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
-        }
-    }
-
-    /**
-     * Create a new file at the specified path.
-     *
-     * @param projectId The project id
-     * @param fileData The file to add
-     * @return a new File if created, error 404 if the parent folder doesn't exist
-     */
-    @RequestMapping(value = "/{id}/workspace/files", method = RequestMethod.POST)
-    public ResponseEntity<File> createFile(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
-        try {
-            if (fileData.getPath() == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            return new ResponseEntity<>(workspaceService.createFile(fileData.getPath(), fileData.getContent(), projectId),
-                    HttpStatus.CREATED);
-        } catch (FolderNotFoundException | FileNotFoundException | ProjectNotFoundException e) {
-            return new ResponseEntity<>(getErrorHttpHeaders(e),HttpStatus.NOT_FOUND);
-        } catch (InvalidPathException e) {
-            return new ResponseEntity<>(getErrorHttpHeaders(e),HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    /**
-     * Create a new folder at the specified path
-     * @param projectId Project ID
-     * @param fileData folder path as json object
-     * @return new Folder
-     */
-    @RequestMapping(value = "/{id}/workspace/folders", method = RequestMethod.POST)
-    public ResponseEntity<Folder> createFolder(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
-        if (fileData.getPath() == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        try {
-            return new ResponseEntity<>(workspaceService.createFolder(fileData.getPath(), projectId), HttpStatus.CREATED);
-        } catch (FolderNotFoundException | ProjectNotFoundException e) {
-            return new ResponseEntity<>(getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
-        } catch (InvalidPathException e) {
-            return new ResponseEntity<>(getErrorHttpHeaders(e), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    /**
-     * Return the content of the given file.
-     *
-     * @param projectId Project ID
-     * @param fileData the file path as a json object
-     * @return The file content as a String
-     */
-    @RequestMapping(value = "/{id}/workspace/files/", method = RequestMethod.GET)
-    public ResponseEntity<FileData> getFileContent(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
-        if (fileData.getPath() == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        try {
-            return new ResponseEntity<>(workspaceService.getFileContent(projectId, fileData.getPath()), HttpStatus.OK);
-        } catch (FileNotFoundException | ProjectNotFoundException e) {
-            return new ResponseEntity<>(getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
-        }
-    }
-
-
-    /**
-     * Update the content of the given file.
-     * @param projectId Project ID
-     * @param fileData The file path and content as a Json object
-     */
-    @RequestMapping(value = "/{projectId}/workspace/files/", method = RequestMethod.PUT)
-    public ResponseEntity<Object> updateFileContent(@PathVariable("projectId") String projectId, @RequestBody FileData fileData) {
-        try {
-            if (fileData.getContent() == null || fileData.getPath() == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            workspaceService.updateFile(projectId, fileData.getPath(), fileData.getContent());
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (FileNotFoundException | ProjectNotFoundException e) {
-            return new ResponseEntity<>(getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
-        }
-    }
 
     /**
      * Update the project's configuration.
