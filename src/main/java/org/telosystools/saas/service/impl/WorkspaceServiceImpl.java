@@ -104,13 +104,20 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     /**
      * Remove an existing folder.
      *
-     * @param absolutePath the path of the folder
      * @param projectId    project unique identifier
+     * @param absolutePath the path of the folder
      */
-    public void removeFolder(String absolutePath, String projectId) throws ProjectNotFoundException {
+    public void removeFolder(String absolutePath, String projectId) throws ProjectNotFoundException, FolderNotFoundException, InvalidPathException {
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(absolutePath);
+
+        if (path.getBasename().matches("[^_A-Za-z0-9/\\-]*")) throw new InvalidPathException(absolutePath);
+
         Folder folder = getFolderForPath(workspace, path);
+
+        if (folder == null)
+            throw new FolderNotFoundException(path.getBasename(), projectId);
+
         for (File file : folder.getFilesAsList()) {
             fileDao.remove(file, projectId);
         }
@@ -134,16 +141,16 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         if (!path.getFilename().matches("^([_A-Za-z0-9\\-]+\\.[A-Za-z0-9\\-]+)$")) throw new InvalidPathException(path.getFilename());
 
         Workspace workspace = getWorkspace(projectId);
-        File file = new File(path);
         Folder folderParent = getFolderForPath(workspace, path.getParent());
-        if (folderParent != null) {
-            folderParent.addFile(file);
-            fileDao.save(file, this.createInputStream(content == null ? "" : content), projectId);
-            workspaceDao.save(workspace, projectId);
-            return file;
-        } else {
+        if (folderParent == null)
             throw new FolderNotFoundException(path.getBasename(), projectId);
-        }
+
+        File file = new File(path);
+        folderParent.addFile(file);
+        fileDao.save(file, this.createInputStream(content == null ? "" : content), projectId);
+        workspaceDao.save(workspace, projectId);
+
+        return file;
     }
 
     /**
@@ -171,13 +178,20 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @param absolutePath Absolute path
      * @param projectId    Project id
      */
-    public void removeFile(String absolutePath, String projectId) throws ProjectNotFoundException {
+    public void removeFile(String absolutePath, String projectId) throws ProjectNotFoundException, InvalidPathException, FileNotFoundException {
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(absolutePath);
+
+        if (path.getBasename().matches("[^_A-Za-z0-9/\\-]*")) throw new InvalidPathException(absolutePath);
+        if (!path.getFilename().matches("^([_A-Za-z0-9\\-]+\\.[A-Za-z0-9\\-]+)$")) throw new InvalidPathException(path.getFilename());
+
         File file = getFileForPath(workspace, path);
+        if (file == null) throw new FileNotFoundException(absolutePath);
         Folder folderParent = getFolderForPath(workspace, path.getParent());
-        if (file != null) fileDao.remove(file, projectId);
-        if (file != null && folderParent != null) folderParent.getFiles().remove(file.getName());
+
+        fileDao.remove(file, projectId);
+        folderParent.removeFile(file);
+
         workspaceDao.save(workspace, projectId);
     }
 
@@ -241,7 +255,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public FileData getFileContent(String projectId, String path) throws ProjectNotFoundException, FileNotFoundException {
+    public FileData getFileContent(String path, String projectId) throws ProjectNotFoundException, FileNotFoundException {
         final Workspace workspace = this.getWorkspace(projectId);
         final File file = this.getFileForPath(workspace, Path.valueOf(path));
 
@@ -252,7 +266,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public void updateFile(String projectId, String path, String content) throws ProjectNotFoundException, FileNotFoundException {
+    public void updateFile(String path, String content, String projectId) throws ProjectNotFoundException, FileNotFoundException {
         final Workspace workspace = this.getWorkspace(projectId);
         final Path parsedPath = Path.valueOf(path);
         final RootFolder rootFolder = getRootFolderForPath(workspace, parsedPath);

@@ -164,9 +164,9 @@ public class WorkspaceServiceIntTest {
         assertEquals(expectedFile, actualFile);
 
         // Mise à jour du fichier via son Path
-        workspaceService.updateFile(PROJECT, actualFile.getAbsolutePath(), MODIFIED_FILE_CONTENT);
+        workspaceService.updateFile(actualFile.getAbsolutePath(), MODIFIED_FILE_CONTENT, PROJECT);
 
-        FileData actualIn = workspaceService.getFileContent(PROJECT, FILE_PATH);
+        FileData actualIn = workspaceService.getFileContent(FILE_PATH, PROJECT);
         // Vérification de la mise à jour du workspace
         assertNotNull(actualIn);
         assertEquals(MODIFIED_FILE_CONTENT, actualIn.getContent().trim());
@@ -187,7 +187,7 @@ public class WorkspaceServiceIntTest {
     public void testRemoveFile() throws Exception {
         File file = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
         workspaceService.removeFile(FILE_PATH,PROJECT);
-        workspaceService.getFileContent(PROJECT, file.getAbsolutePath());
+        workspaceService.getFileContent(file.getAbsolutePath(), PROJECT);
     }
 
     @Test
@@ -258,7 +258,7 @@ public class WorkspaceServiceIntTest {
         assertNotNull(actualFile);
         assertEquals(expectedFile,actualFile);
 
-        FileData actualIn = workspaceService.getFileContent(PROJECT, actualFile.getAbsolutePath());
+        FileData actualIn = workspaceService.getFileContent(actualFile.getAbsolutePath(), PROJECT);
         assertNotNull(actualIn);
         assertEquals(FILE_CONTENT, actualIn.getContent().trim());
     }
@@ -269,13 +269,13 @@ public class WorkspaceServiceIntTest {
         String filePath = FOLDER_PATH+"/"+FILE_NAME;
         workspaceService.createFile(filePath, MODIFIED_FILE_CONTENT, PROJECT);
 
-        workspaceService.updateFile(PROJECT, filePath, FILE_CONTENT);
+        workspaceService.updateFile(filePath, FILE_CONTENT, PROJECT);
 
         Workspace workspace = workspaceDao.load(PROJECT);
         File actualFile = workspaceService.getFileForPath(workspace, Path.valueOf(filePath));
         assertNotNull(actualFile);
 
-        FileData actualIn = workspaceService.getFileContent(PROJECT, actualFile.getAbsolutePath());
+        FileData actualIn = workspaceService.getFileContent(actualFile.getAbsolutePath(), PROJECT);
         assertNotNull(actualIn);
         assertEquals(FILE_CONTENT, actualIn.getContent().trim());
     }
@@ -298,7 +298,7 @@ public class WorkspaceServiceIntTest {
     public void testRemoveFileInSubFolder() throws Exception {
         File file = workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
         workspaceService.removeFile(FILE_PATH,PROJECT);
-        workspaceService.getFileContent(PROJECT, file.getAbsolutePath());
+        workspaceService.getFileContent(file.getAbsolutePath(), PROJECT);
     }
 
 

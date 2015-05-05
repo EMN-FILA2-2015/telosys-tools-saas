@@ -40,6 +40,45 @@ public class WorkspaceController {
         }
     }
 
+    /* *******************************
+       *********** FOLDERS ***********
+       ******************************* */
+    /**
+     * Create a new folder at the specified path
+     *
+     * @param projectId Project ID
+     * @param fileData  folder path as json object
+     * @return new Folder
+     */
+    @RequestMapping(value = "/folders", method = RequestMethod.POST)
+    public ResponseEntity<Folder> createFolder(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
+        if (fileData.getPath() == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        try {
+            return new ResponseEntity<>(workspaceService.createFolder(fileData.getPath(), projectId), HttpStatus.CREATED);
+        } catch (FolderNotFoundException | ProjectNotFoundException e) {
+            return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
+        } catch (InvalidPathException e) {
+            return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @RequestMapping(value = "/folders", method = RequestMethod.DELETE)
+    public ResponseEntity<Object> deleteFolder(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
+        if (fileData.getPath() == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        try {
+            workspaceService.removeFolder(fileData.getPath(), projectId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (ProjectNotFoundException | FolderNotFoundException e) {
+            return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
+        } catch (InvalidPathException e) {
+            return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /* *******************************
+       ************ FILES ************
+       ******************************* */
+
     /**
      * Create a new file at the specified path.
      *
@@ -60,19 +99,13 @@ public class WorkspaceController {
         }
     }
 
-    /**
-     * Create a new folder at the specified path
-     *
-     * @param projectId Project ID
-     * @param fileData  folder path as json object
-     * @return new Folder
-     */
-    @RequestMapping(value = "/folders", method = RequestMethod.POST)
-    public ResponseEntity<Folder> createFolder(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
-        if (fileData.getPath() == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    @RequestMapping(value = "/files", method = RequestMethod.DELETE)
+    public ResponseEntity<Object> deleteFile(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
         try {
-            return new ResponseEntity<>(workspaceService.createFolder(fileData.getPath(), projectId), HttpStatus.CREATED);
-        } catch (FolderNotFoundException | ProjectNotFoundException e) {
+            if (fileData.getPath() == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            workspaceService.removeFile(fileData.getPath(), projectId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (ProjectNotFoundException | FileNotFoundException e) {
             return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
         } catch (InvalidPathException e) {
             return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.BAD_REQUEST);
@@ -90,7 +123,7 @@ public class WorkspaceController {
     public ResponseEntity<FileData> getFileContent(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
         if (fileData.getPath() == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         try {
-            return new ResponseEntity<>(workspaceService.getFileContent(projectId, fileData.getPath()), HttpStatus.OK);
+            return new ResponseEntity<>(workspaceService.getFileContent(fileData.getPath(), projectId), HttpStatus.OK);
         } catch (FileNotFoundException | ProjectNotFoundException e) {
             return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
         }
@@ -107,7 +140,7 @@ public class WorkspaceController {
         try {
             if (fileData.getContent() == null || fileData.getPath() == null)
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            workspaceService.updateFile(projectId, fileData.getPath(), fileData.getContent());
+            workspaceService.updateFile(fileData.getPath(), fileData.getContent(), projectId);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (FileNotFoundException | ProjectNotFoundException e) {
             return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);

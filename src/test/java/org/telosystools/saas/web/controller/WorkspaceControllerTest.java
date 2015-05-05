@@ -15,10 +15,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.telosystools.saas.Application;
 import org.telosystools.saas.config.MongoConfiguration;
-import org.telosystools.saas.domain.filesystem.File;
-import org.telosystools.saas.domain.filesystem.FileData;
-import org.telosystools.saas.domain.filesystem.Folder;
-import org.telosystools.saas.domain.filesystem.Workspace;
+import org.telosystools.saas.domain.filesystem.*;
 import org.telosystools.saas.domain.project.Project;
 import org.telosystools.saas.service.ProjectService;
 import org.telosystools.saas.service.WorkspaceService;
@@ -27,8 +24,7 @@ import javax.inject.Inject;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -161,6 +157,33 @@ public class WorkspaceControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    public void testDeleteFile() throws Exception {
+        // Given
+        Project project = new Project();
+        project.setName("new_project");
+        String projectID = projectService.createProject(project).getId();
+
+        workspaceService.createFolder("templates/test", projectID);
+        workspaceService.createFolder("templates/test/remove", projectID);
+        String filePath = "templates/test/remove/test.txt";
+        workspaceService.createFile(filePath, "", projectID);
+        workspaceService.createFile("templates/test/remove/test2.txt", "", projectID);
+
+        String fileData = "{\"path\":\"" + filePath + "\"}";
+
+        // When
+        this.mockMvc.perform(delete("/projects/" + projectID + "/workspace/files").contentType(MediaType.APPLICATION_JSON).content(fileData))
+                // Then
+                .andExpect(status().isOk());
+
+        // Assert
+        Workspace workspace = workspaceService.getWorkspace(projectID);
+        Folder removeFolder = workspace.getTemplates().getFolders().get("test").getFolders().get("remove");
+        assertNotNull(removeFolder);
+        assertTrue(removeFolder.getFiles().containsKey("test2+txt"));
+        assertFalse(removeFolder.getFiles().containsKey("test+txt"));
+    }
     /*
      * createFolder : crée un folder -> Folder créé status created
      */
@@ -201,6 +224,32 @@ public class WorkspaceControllerTest {
         folder = mapper.readValue(jsonConent, Folder.class);
         assertNotNull(folder);
         assertEquals(folderPath, folder.getAbsolutePath());
+    }
+
+    @Test
+    public void testDeleteFolder() throws Exception {
+        // Given
+        Project project = new Project();
+        project.setName("new_project");
+        String projectID = projectService.createProject(project).getId();
+
+        workspaceService.createFolder("templates/test", projectID);
+        final String folderPath = "templates/test/remove";
+        workspaceService.createFolder(folderPath, projectID);
+        workspaceService.createFile("templates/test/remove/test.txt", "", projectID);
+        workspaceService.createFile("templates/test/testParent.txt", "", projectID);
+
+        String fileData = "{\"path\":\"" + folderPath + "\"}";
+
+        // Delete folder
+        this.mockMvc.perform(delete("/projects/" + projectID + "/workspace/folders").contentType(MediaType.APPLICATION_JSON).content(fileData))
+                // Then
+                .andExpect(status().isOk());
+
+        // Assert
+        RootFolder root = workspaceService.getWorkspace(projectID).getTemplates();
+        assertTrue(root.getFolders().get("test").getFiles().containsKey("testParent+txt"));
+        assertTrue(root.getFolders().get("test").getFolders().isEmpty());
     }
 
     /*
@@ -267,7 +316,7 @@ public class WorkspaceControllerTest {
                 // Then
                 .andExpect(status().isOk());
 
-        FileData newFile = workspaceService.getFileContent(projectID, oldFile.getAbsolutePath());
+        FileData newFile = workspaceService.getFileContent(oldFile.getAbsolutePath(), projectID);
         assertNotNull(newFile);
         assertEquals(fileContent, newFile.getContent());
     }

@@ -10,6 +10,8 @@ import java.util.TreeMap;
 
 /**
  * Created by luchabou on 27/02/2015.
+ *
+ * A folder. Contains folders and files.
  */
 public class Folder implements Serializable {
 
@@ -48,6 +50,10 @@ public class Folder implements Serializable {
         this.files.put(file.getName().replace('.', DOT_REPLACEMENT), file);
     }
 
+    public void removeFile(File file) {
+        this.files.remove(file.getName().replace('.', DOT_REPLACEMENT));
+    }
+
     public String getAbsolutePath() {
         return absolutePath;
     }
@@ -83,13 +89,12 @@ public class Folder implements Serializable {
 
         Folder folder = (Folder) o;
 
-        if (!absolutePath.equals(folder.absolutePath)) return false;
-        if (!files.equals(folder.files)) return false;
-        if (!folders.equals(folder.folders)) return false;
-        if (!name.equals(folder.name)) return false;
-        if (!path.equals(folder.path)) return false;
+        return absolutePath.equals(folder.absolutePath)
+                && files.equals(folder.files)
+                && folders.equals(folder.folders)
+                && name.equals(folder.name)
+                && path.equals(folder.path);
 
-        return true;
     }
 
     @Override
