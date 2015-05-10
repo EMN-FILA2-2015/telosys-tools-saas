@@ -4,6 +4,8 @@ import org.springframework.data.annotation.Id;
 
 /**
  * Created by luchabou on 27/02/2015.
+ *
+ * Updated by adrian : add readOnly parameter.
  */
 public class RootFolder extends Folder {
 
@@ -12,9 +14,17 @@ public class RootFolder extends Folder {
     @Id
     private String id;
 
+    private boolean readOnly;
+
     public RootFolder(String name) {
         super(name);
         this.id = ID_PREFIX + this.getName();
+    }
+
+    public RootFolder(String name, boolean readOnly) {
+        super(name);
+        this.id = ID_PREFIX + this.getName();
+        this.readOnly = readOnly;
     }
 
     public RootFolder() {
@@ -28,6 +38,14 @@ public class RootFolder extends Folder {
         return id;
     }
 
+    public boolean isReadOnly() {
+        return readOnly;
+    }
+
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -35,9 +53,8 @@ public class RootFolder extends Folder {
 
         RootFolder that = (RootFolder) o;
 
-        if (!id.equals(that.id)) return false;
+        return id.equals(that.id);
 
-        return true;
     }
 
     @Override
