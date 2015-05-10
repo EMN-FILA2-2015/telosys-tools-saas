@@ -1,12 +1,14 @@
 package org.telosystools.saas.service.impl;
 
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telosystools.saas.bean.Path;
 import org.telosystools.saas.dao.FileDao;
 import org.telosystools.saas.dao.RootFolderDao;
 import org.telosystools.saas.dao.WorkspaceDao;
-import org.telosystools.saas.domain.filesystem.File;
 import org.telosystools.saas.domain.filesystem.*;
 import org.telosystools.saas.exception.FileNotFoundException;
 import org.telosystools.saas.exception.FolderNotFoundException;
@@ -14,7 +16,9 @@ import org.telosystools.saas.exception.InvalidPathException;
 import org.telosystools.saas.exception.ProjectNotFoundException;
 import org.telosystools.saas.service.WorkspaceService;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -30,6 +34,9 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public static final String REGEX_FILENAME = "^([_A-Za-z0-9\\-]+\\.[A-Za-z0-9\\-]+)$";
     public static final String REGEX_FOLDER = "[^_A-Za-z0-9/\\-]";
     public static final String REGEX_FOLDERS = REGEX_FOLDER + "*";
+
+    private final Logger log = LoggerFactory.getLogger(WorkspaceServiceImpl.class);
+
     @Autowired
     private WorkspaceDao workspaceDao;
     @Autowired
@@ -43,7 +50,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
         workspace.setModels(new RootFolder(Workspace.MODELS));
         workspace.setTemplates(new RootFolder(Workspace.TEMPLATES));
-        workspace.setGenerated(new RootFolder(Workspace.GENERATED));
+        workspace.setGenerated(new RootFolder(Workspace.GENERATED, true));
         workspace.setSettings(new RootFolder(Workspace.SETTINGS));
 
         workspaceDao.save(workspace, projectId);
@@ -151,7 +158,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
         File file = new File(path);
         folderParent.addFile(file);
-        fileDao.save(file, this.createInputStream(content == null ? "" : content), projectId);
+        fileDao.save(file, this.createInputStream(content == null ? "Text sample" : content), projectId);
         workspaceDao.save(workspace, projectId);
 
         return this.getRootFolderForPath(workspace, path);
@@ -273,7 +280,13 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         final File file = this.getFileForPath(workspace, Path.valueOf(absolutePath));
 
         if (file == null) throw new FileNotFoundException("File not found in path");
-        final String content = readInputStream(fileDao.loadContent(file.getGridFSId(), projectId));
+
+        String content = "";
+        try {
+            content = IOUtils.toString(fileDao.loadContent(file.getGridFSId(), projectId), UTF_8);
+        } catch (IOException e) {
+            log.error("Failed to convert from Inputstream while retrieving file content for path : " + absolutePath);
+        }
 
         return new FileData(file.getAbsolutePath(), content, file.getName());
     }
@@ -316,38 +329,6 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      */
     private InputStream createInputStream(String string) {
         return new ByteArrayInputStream(string.getBytes());
-    }
-
-    /**
-     * Read a String from an Inputstream
-     *
-     * @param in the stream
-     * @return content as String
-     */
-    private String readInputStream(InputStream in) {
-        BufferedReader br = null;
-        StringBuilder sb = new StringBuilder();
-
-        String line;
-        try {
-
-            br = new BufferedReader(new InputStreamReader(in, UTF_8));
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return sb.toString();
     }
 
 }
