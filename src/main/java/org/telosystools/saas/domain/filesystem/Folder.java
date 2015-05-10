@@ -3,8 +3,6 @@ package org.telosystools.saas.domain.filesystem;
 import org.telosystools.saas.bean.Path;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -74,10 +72,6 @@ public class Folder implements Serializable {
 
     public Map<String, File> getFiles() {
         return files;
-    }
-
-    public List<File> getFilesAsList() {
-        return new ArrayList<>(files.values());
     }
 
     @Override

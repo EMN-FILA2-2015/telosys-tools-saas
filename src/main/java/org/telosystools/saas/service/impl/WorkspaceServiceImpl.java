@@ -43,7 +43,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
         workspace.setModels(new RootFolder(Workspace.MODELS));
         workspace.setTemplates(new RootFolder(Workspace.TEMPLATES));
-        workspace.setGenerateds(new RootFolder(Workspace.GENERATEDS));
+        workspace.setGenerated(new RootFolder(Workspace.GENERATED));
         workspace.setSettings(new RootFolder(Workspace.SETTINGS));
 
         workspaceDao.save(workspace, projectId);
@@ -67,7 +67,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public Folder createFolder(String absolutePath, String projectId) throws FolderNotFoundException, ProjectNotFoundException, org.telosystools.saas.exception.InvalidPathException {
+    public RootFolder createFolder(String absolutePath, String projectId) throws FolderNotFoundException, ProjectNotFoundException, org.telosystools.saas.exception.InvalidPathException {
         if (absolutePath.matches(REGEX_FOLDERS)) throw new InvalidPathException(absolutePath);
 
         Workspace workspace = getWorkspace(projectId);
@@ -79,7 +79,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         Folder folder = new Folder(path);
         folderParent.addFolder(folder);
         workspaceDao.save(workspace, projectId);
-        return folder;
+        return this.getRootFolderForPath(workspace, path);
     }
 
     /**
@@ -122,7 +122,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         if (folder == null)
             throw new FolderNotFoundException(path.getBasename(), projectId);
 
-        for (File file : folder.getFilesAsList()) {
+        for (File file : folder.getFiles().values()) {
             fileDao.remove(file, projectId);
         }
         Folder folderParent = getFolderForPath(workspace, path.getParent());
@@ -138,7 +138,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @param projectId    Project id
      */
     @Override
-    public File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, FileNotFoundException, ProjectNotFoundException, InvalidPathException {
+    public RootFolder createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, FileNotFoundException, ProjectNotFoundException, InvalidPathException {
         Path path = Path.valueOf(absolutePath);
 
         if (path.getBasename().matches(REGEX_FOLDERS)) throw new InvalidPathException(absolutePath);
@@ -154,7 +154,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         fileDao.save(file, this.createInputStream(content == null ? "" : content), projectId);
         workspaceDao.save(workspace, projectId);
 
-        return file;
+        return this.getRootFolderForPath(workspace, path);
     }
 
     /**

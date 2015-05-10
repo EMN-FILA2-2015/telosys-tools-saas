@@ -138,17 +138,6 @@ public class Path implements Serializable {
      * Return the root folder corresponding to the path
      * @return Root folder name
      */
-    public Path getRoot() {
-        if(this.items.isEmpty()) {
-            return null;
-        }
-        return Path.valueOf(items.get(0));
-    }
-
-    /**
-     * Return the root folder corresponding to the path
-     * @return Root folder name
-     */
     public String getRootName() {
         if(this.items.isEmpty()) {
             return null;

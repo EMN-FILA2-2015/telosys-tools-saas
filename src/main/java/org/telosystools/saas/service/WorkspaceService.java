@@ -1,8 +1,7 @@
 package org.telosystools.saas.service;
 
-import org.telosystools.saas.domain.filesystem.File;
 import org.telosystools.saas.domain.filesystem.FileData;
-import org.telosystools.saas.domain.filesystem.Folder;
+import org.telosystools.saas.domain.filesystem.RootFolder;
 import org.telosystools.saas.domain.filesystem.Workspace;
 import org.telosystools.saas.exception.FileNotFoundException;
 import org.telosystools.saas.exception.FolderNotFoundException;
@@ -50,9 +49,9 @@ public interface WorkspaceService {
      * Creates a new folder in the folder.
      * @param absolutePath Absolute path
      * @param projectId Project id
-     * @return Folder créé
+     * @return updated folder tree
      */
-    Folder createFolder(String absolutePath, String projectId) throws FolderNotFoundException, ProjectNotFoundException, InvalidPathException;
+    RootFolder createFolder(String absolutePath, String projectId) throws FolderNotFoundException, ProjectNotFoundException, InvalidPathException;
 
     /**
      * Removes an existing folder.
@@ -80,9 +79,9 @@ public interface WorkspaceService {
      * @param absolutePath Absolute path
      * @param content File content as String
      * @param projectId Project id
-     * @return File créé
+     * @return Updated folder tree
      */
-    File createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, FileNotFoundException, ProjectNotFoundException, InvalidPathException;
+    RootFolder createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, FileNotFoundException, ProjectNotFoundException, InvalidPathException;
 
     /**
      * Deletes a File.

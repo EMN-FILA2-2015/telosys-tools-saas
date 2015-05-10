@@ -6,12 +6,14 @@ import java.util.TreeMap;
 
 /**
  * Created by luchabou on 27/02/2015.
+ *
+ * The workspace.
  */
 public class Workspace implements Serializable {
 
     public static final String MODELS = "models";
     public static final String TEMPLATES = "templates";
-    public static final String GENERATEDS = "generateds";
+    public static final String GENERATED = "generated";
     public static final String SETTINGS = "settings";
 
     /**
@@ -39,12 +41,12 @@ public class Workspace implements Serializable {
         this.rootFoldersByNames.put(TEMPLATES, templates);
     }
 
-    public RootFolder getGenerateds() {
-        return rootFoldersByNames.get(GENERATEDS);
+    public RootFolder getGenerated() {
+        return rootFoldersByNames.get(GENERATED);
     }
 
-    public void setGenerateds(RootFolder generateds) {
-        this.rootFoldersByNames.put(GENERATEDS, generateds);
+    public void setGenerated(RootFolder generateds) {
+        this.rootFoldersByNames.put(GENERATED, generateds);
     }
 
     public RootFolder getSettings() {
@@ -62,9 +64,8 @@ public class Workspace implements Serializable {
 
         Workspace workspace = (Workspace) o;
 
-        if (!rootFoldersByNames.equals(workspace.rootFoldersByNames)) return false;
+        return rootFoldersByNames.equals(workspace.rootFoldersByNames);
 
-        return true;
     }
 
     @Override

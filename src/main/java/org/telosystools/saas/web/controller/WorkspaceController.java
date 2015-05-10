@@ -5,9 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.telosystools.saas.domain.filesystem.File;
 import org.telosystools.saas.domain.filesystem.FileData;
-import org.telosystools.saas.domain.filesystem.Folder;
+import org.telosystools.saas.domain.filesystem.RootFolder;
 import org.telosystools.saas.domain.filesystem.Workspace;
 import org.telosystools.saas.exception.FileNotFoundException;
 import org.telosystools.saas.exception.FolderNotFoundException;
@@ -49,10 +48,10 @@ public class WorkspaceController {
      *
      * @param projectId Project ID
      * @param fileData  folder path as json object
-     * @return new Folder
+     * @return updated RootFolder
      */
     @RequestMapping(value = "/folders", method = RequestMethod.POST)
-    public ResponseEntity<Folder> createFolder(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
+    public ResponseEntity<RootFolder> createFolder(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
         if (StringUtils.isEmpty(fileData.getPath())) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         try {
             return new ResponseEntity<>(workspaceService.createFolder(fileData.getPath(), projectId), HttpStatus.CREATED);
@@ -113,10 +112,10 @@ public class WorkspaceController {
      *
      * @param projectId The project id
      * @param fileData  The file to add
-     * @return a new File if created, error 404 if the parent folder doesn't exist
+     * @return the updated RootFolder if created, error 404 if the parent folder doesn't exist
      */
     @RequestMapping(value = "/files", method = RequestMethod.POST)
-    public ResponseEntity<File> createFile(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
+    public ResponseEntity<RootFolder> createFile(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
         try {
             if (StringUtils.isEmpty(fileData.getPath())) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             return new ResponseEntity<>(workspaceService.createFile(fileData.getPath(), fileData.getContent(), projectId),
@@ -171,16 +170,17 @@ public class WorkspaceController {
 
     /**
      * Return the content of the given file.
+     * We have to look for the path by parsing the request uri.
      *
      * @param projectId Project ID
-     * @param fileData  the file path as a json object
+     * @param path the file path
      * @return The file content as a String
      */
     @RequestMapping(value = "/files", method = RequestMethod.GET)
-    public ResponseEntity<FileData> getFileContent(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
-        if (StringUtils.isEmpty(fileData.getPath())) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public ResponseEntity<FileData> getFileContent(@PathVariable("id") String projectId, @RequestParam("path") String path) {
+        if (StringUtils.isEmpty(path)) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         try {
-            return new ResponseEntity<>(workspaceService.getFileContent(fileData.getPath(), projectId), HttpStatus.OK);
+            return new ResponseEntity<>(workspaceService.getFileContent(path, projectId), HttpStatus.OK);
         } catch (FileNotFoundException | ProjectNotFoundException e) {
             return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
         }

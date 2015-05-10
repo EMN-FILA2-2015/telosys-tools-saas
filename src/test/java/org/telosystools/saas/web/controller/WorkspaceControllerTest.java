@@ -15,7 +15,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.telosystools.saas.Application;
 import org.telosystools.saas.config.MongoConfiguration;
-import org.telosystools.saas.domain.filesystem.*;
+import org.telosystools.saas.domain.filesystem.FileData;
+import org.telosystools.saas.domain.filesystem.Folder;
+import org.telosystools.saas.domain.filesystem.RootFolder;
+import org.telosystools.saas.domain.filesystem.Workspace;
 import org.telosystools.saas.domain.project.Project;
 import org.telosystools.saas.service.ProjectService;
 import org.telosystools.saas.service.WorkspaceService;
@@ -121,9 +124,10 @@ public class WorkspaceControllerTest {
                 .andReturn();
 
         String jsonContent = mvcResult.getResponse().getContentAsString();
-        File file = mapper.readValue(jsonContent, File.class);
-        assertNotNull(file);
-        assertEquals(filePath, file.getAbsolutePath().replace('*', '.'));
+        RootFolder rootFolder = mapper.readValue(jsonContent, RootFolder.class);
+        assertNotNull(rootFolder);
+        assertTrue(rootFolder.getFiles().containsKey("model_1+xml"));
+        assertEquals(filePath, rootFolder.getFiles().get("model_1+xml").getAbsolutePath());
     }
 
     @Test
@@ -231,9 +235,11 @@ public class WorkspaceControllerTest {
 
         // Assert
         String jsonConent = mvcResult.getResponse().getContentAsString();
-        Folder folder = mapper.readValue(jsonConent, Folder.class);
-        assertNotNull(folder);
-        assertEquals(folderPath, folder.getAbsolutePath());
+        RootFolder rootFolder = mapper.readValue(jsonConent, RootFolder.class);
+        // Check filesystem tree
+        assertNotNull(rootFolder);
+        assertEquals("templates", rootFolder.getAbsolutePath());
+        assertEquals(folderPath, rootFolder.getFolders().get("test").getAbsolutePath());
 
         // Creation of a sub-folder
         folderPath = "templates/test/createFolder";
@@ -246,9 +252,10 @@ public class WorkspaceControllerTest {
 
         // Assert
         jsonConent = mvcResult.getResponse().getContentAsString();
-        folder = mapper.readValue(jsonConent, Folder.class);
-        assertNotNull(folder);
-        assertEquals(folderPath, folder.getAbsolutePath());
+        rootFolder = mapper.readValue(jsonConent, RootFolder.class);
+        assertNotNull(rootFolder);
+        assertEquals(folderPath, rootFolder.getFolders()
+                .get("test").getFolders().get("createFolder").getAbsolutePath());
     }
 
     @Test
@@ -315,13 +322,11 @@ public class WorkspaceControllerTest {
         project.setName("New Project");
         String projectID = projectService.createProject(project).getId();
         String expectedContent = "Contenu du fichier";
-        File file = workspaceService.createFile("models/model_2.xml", expectedContent, projectID);
-
-        String fileData = "{\"path\":\"" + file.getAbsolutePath() + "\"}";
+        workspaceService.createFile("models/model_2.xml", expectedContent, projectID);
 
         // When
-        String jsonContent = this.mockMvc.perform(get("/projects/" + projectID + "/workspace/files")
-                .contentType(MediaType.APPLICATION_JSON).content(fileData))
+        final String url = "/projects/" + projectID + "/workspace/files?path=models/model_2.xml";
+        String jsonContent = this.mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
 
                 // Then
                 .andExpect(status().isOk())
@@ -358,7 +363,7 @@ public class WorkspaceControllerTest {
 
         String filePath = "models/model_2.xml";
 
-        File oldFile = workspaceService.createFile(filePath, "", projectID);
+        workspaceService.createFile(filePath, "", projectID);
 
         String fileContent = "content";
         String fileData = "{\"path\":\"" + filePath + "\", \"content\":\"" + fileContent + "\"}";
@@ -369,7 +374,7 @@ public class WorkspaceControllerTest {
                 // Then
                 .andExpect(status().isOk());
 
-        FileData newFile = workspaceService.getFileContent(oldFile.getAbsolutePath(), projectID);
+        FileData newFile = workspaceService.getFileContent(filePath, projectID);
         assertNotNull(newFile);
         assertEquals(fileContent, newFile.getContent());
     }

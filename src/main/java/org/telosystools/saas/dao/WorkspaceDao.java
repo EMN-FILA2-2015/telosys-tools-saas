@@ -7,6 +7,8 @@ import org.telosystools.saas.domain.filesystem.Workspace;
 
 /**
  * Created by luchabou on 27/02/2015.
+ *
+ * The workspace dao.
  */
 @Repository
 public class WorkspaceDao {
@@ -27,12 +29,12 @@ public class WorkspaceDao {
 
         RootFolder modelsFolder = rootFolderDao.findById(RootFolder.ID_PREFIX+Workspace.MODELS, database);
         RootFolder templatesFolder = rootFolderDao.findById(RootFolder.ID_PREFIX+Workspace.TEMPLATES, database);
-        RootFolder generatedsFolder = rootFolderDao.findById(RootFolder.ID_PREFIX+Workspace.GENERATEDS, database);
+        RootFolder generatedsFolder = rootFolderDao.findById(RootFolder.ID_PREFIX+Workspace.GENERATED, database);
         RootFolder settingsFolder = rootFolderDao.findById(RootFolder.ID_PREFIX+Workspace.SETTINGS, database);
 
         workspace.setModels(modelsFolder);
         workspace.setTemplates(templatesFolder);
-        workspace.setGenerateds(generatedsFolder);
+        workspace.setGenerated(generatedsFolder);
         workspace.setSettings(settingsFolder);
     }
 
@@ -40,7 +42,7 @@ public class WorkspaceDao {
 
         rootFolderDao.save(workspace.getModels(), database);
         rootFolderDao.save(workspace.getTemplates(), database);
-        rootFolderDao.save(workspace.getGenerateds(), database);
+        rootFolderDao.save(workspace.getGenerated(), database);
         rootFolderDao.save(workspace.getSettings(), database);
 
     }
