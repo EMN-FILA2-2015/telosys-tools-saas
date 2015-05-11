@@ -14,10 +14,8 @@ import org.telosystools.saas.dao.FileDao;
 import org.telosystools.saas.dao.WorkspaceDao;
 import org.telosystools.saas.domain.filesystem.File;
 import org.telosystools.saas.domain.filesystem.*;
+import org.telosystools.saas.exception.*;
 import org.telosystools.saas.exception.FileNotFoundException;
-import org.telosystools.saas.exception.FolderNotFoundException;
-import org.telosystools.saas.exception.InvalidPathException;
-import org.telosystools.saas.exception.ProjectNotFoundException;
 
 import javax.inject.Inject;
 import java.io.*;
@@ -113,6 +111,12 @@ public class WorkspaceServiceIntTest {
         assertTrue(expectedRoot.getFolders().containsKey("MY_FOLDER"));
     }
 
+    @Test(expected = DuplicateResourceException.class)
+    public void testCreateDuplicateFolder() throws Exception {
+        workspaceService.createFolder(FOLDER_PATH, PROJECT);
+        workspaceService.createFolder(FOLDER_PATH, PROJECT);
+    }
+
     @Test
     public void testRenameFolder() throws Exception {
         Folder expectedFolder = workspaceService.createFolder(FOLDER_PATH, PROJECT)
@@ -155,6 +159,12 @@ public class WorkspaceServiceIntTest {
         InputStream actualIn = fileDao.loadContent(actualFile.getGridFSId(), PROJECT);
         assertNotNull(actualIn);
         assertEqualsInputStream(createInputStream(FILE_CONTENT), actualIn);
+    }
+
+    @Test(expected = DuplicateResourceException.class)
+    public void testCreateDuplicateFile() throws Exception {
+        workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
+        workspaceService.createFile(FILE_PATH, FILE_CONTENT, PROJECT);
     }
 
     @Test(expected = InvalidPathException.class)

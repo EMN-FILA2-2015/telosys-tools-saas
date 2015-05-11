@@ -118,9 +118,13 @@ public class WorkspaceControllerTest {
 
         // When
         MvcResult mvcResult = this.mockMvc.perform(post("/projects/" + projectID + "/workspace/files").contentType(MediaType.APPLICATION_JSON).content(fileData))
-
                 // Then
                 .andExpect(status().isCreated())
+                .andReturn();
+
+        this.mockMvc.perform(post("/projects/" + projectID + "/workspace/files").contentType(MediaType.APPLICATION_JSON).content(fileData))
+                // Then
+                .andExpect(status().isConflict())
                 .andReturn();
 
         String jsonContent = mvcResult.getResponse().getContentAsString();
@@ -240,6 +244,13 @@ public class WorkspaceControllerTest {
         assertNotNull(rootFolder);
         assertEquals("templates", rootFolder.getAbsolutePath());
         assertEquals(folderPath, rootFolder.getFolders().get("test").getAbsolutePath());
+
+        // Try to create same folder
+        // When
+        this.mockMvc.perform(post("/projects/"+projectID+"/workspace/folders").contentType(MediaType.APPLICATION_JSON).content(fileData))
+                // Then
+                .andExpect(status().isConflict())
+                .andReturn();
 
         // Creation of a sub-folder
         folderPath = "templates/test/createFolder";

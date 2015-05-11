@@ -10,10 +10,7 @@ import org.telosystools.saas.dao.FileDao;
 import org.telosystools.saas.dao.RootFolderDao;
 import org.telosystools.saas.dao.WorkspaceDao;
 import org.telosystools.saas.domain.filesystem.*;
-import org.telosystools.saas.exception.FileNotFoundException;
-import org.telosystools.saas.exception.FolderNotFoundException;
-import org.telosystools.saas.exception.InvalidPathException;
-import org.telosystools.saas.exception.ProjectNotFoundException;
+import org.telosystools.saas.exception.*;
 import org.telosystools.saas.service.WorkspaceService;
 
 import java.io.ByteArrayInputStream;
@@ -74,14 +71,18 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public RootFolder createFolder(String absolutePath, String projectId) throws FolderNotFoundException, ProjectNotFoundException, org.telosystools.saas.exception.InvalidPathException {
+    public RootFolder createFolder(String absolutePath, String projectId) throws FolderNotFoundException, ProjectNotFoundException, InvalidPathException, DuplicateResourceException {
         if (absolutePath.matches(REGEX_FOLDERS)) throw new InvalidPathException(absolutePath);
 
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(absolutePath);
+
         Folder folderParent = getFolderForPath(workspace, path.getParent());
         if (folderParent == null)
             throw new FolderNotFoundException(path.getBasename(), projectId);
+
+        if (getFolderForPath(workspace, path) != null)
+            throw new DuplicateResourceException(absolutePath);
 
         Folder folder = new Folder(path);
         folderParent.addFolder(folder);
@@ -145,7 +146,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @param projectId    Project id
      */
     @Override
-    public RootFolder createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, FileNotFoundException, ProjectNotFoundException, InvalidPathException {
+    public RootFolder createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, FileNotFoundException, ProjectNotFoundException, InvalidPathException, DuplicateResourceException {
         Path path = Path.valueOf(absolutePath);
 
         if (path.getBasename().matches(REGEX_FOLDERS)) throw new InvalidPathException(absolutePath);
@@ -153,8 +154,12 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
         Workspace workspace = getWorkspace(projectId);
         Folder folderParent = getFolderForPath(workspace, path.getParent());
+
         if (folderParent == null)
             throw new FolderNotFoundException(path.getBasename(), projectId);
+
+        if (getFileForPath(workspace, path) != null)
+            throw new DuplicateResourceException(absolutePath);
 
         File file = new File(path);
         folderParent.addFile(file);

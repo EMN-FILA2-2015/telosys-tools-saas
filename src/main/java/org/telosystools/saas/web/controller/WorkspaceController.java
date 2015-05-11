@@ -8,10 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.telosystools.saas.domain.filesystem.FileData;
 import org.telosystools.saas.domain.filesystem.RootFolder;
 import org.telosystools.saas.domain.filesystem.Workspace;
-import org.telosystools.saas.exception.FileNotFoundException;
-import org.telosystools.saas.exception.FolderNotFoundException;
-import org.telosystools.saas.exception.InvalidPathException;
-import org.telosystools.saas.exception.ProjectNotFoundException;
+import org.telosystools.saas.exception.*;
 import org.telosystools.saas.service.WorkspaceService;
 
 import javax.inject.Inject;
@@ -59,6 +56,8 @@ public class WorkspaceController {
             return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
         } catch (InvalidPathException e) {
             return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.BAD_REQUEST);
+        } catch (DuplicateResourceException e) {
+            return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.CONFLICT);
         }
     }
 
@@ -124,6 +123,8 @@ public class WorkspaceController {
             return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
         } catch (InvalidPathException e) {
             return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.BAD_REQUEST);
+        } catch (DuplicateResourceException e) {
+            return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.CONFLICT);
         }
     }
 

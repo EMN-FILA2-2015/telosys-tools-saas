@@ -3,10 +3,7 @@ package org.telosystools.saas.service;
 import org.telosystools.saas.domain.filesystem.FileData;
 import org.telosystools.saas.domain.filesystem.RootFolder;
 import org.telosystools.saas.domain.filesystem.Workspace;
-import org.telosystools.saas.exception.FileNotFoundException;
-import org.telosystools.saas.exception.FolderNotFoundException;
-import org.telosystools.saas.exception.InvalidPathException;
-import org.telosystools.saas.exception.ProjectNotFoundException;
+import org.telosystools.saas.exception.*;
 
 /**
  * Created by Adrian on 20/04/15.
@@ -51,7 +48,7 @@ public interface WorkspaceService {
      * @param projectId Project id
      * @return updated folder tree
      */
-    RootFolder createFolder(String absolutePath, String projectId) throws FolderNotFoundException, ProjectNotFoundException, InvalidPathException;
+    RootFolder createFolder(String absolutePath, String projectId) throws FolderNotFoundException, ProjectNotFoundException, InvalidPathException, DuplicateResourceException;
 
     /**
      * Removes an existing folder.
@@ -81,7 +78,7 @@ public interface WorkspaceService {
      * @param projectId Project id
      * @return Updated folder tree
      */
-    RootFolder createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, FileNotFoundException, ProjectNotFoundException, InvalidPathException;
+    RootFolder createFile(String absolutePath, String content, String projectId) throws FolderNotFoundException, FileNotFoundException, ProjectNotFoundException, InvalidPathException, DuplicateResourceException;
 
     /**
      * Deletes a File.
