@@ -93,7 +93,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * {@inheritDoc}
      */
     @Override
-    public void renameFolder(String absolutePath, String folderName, String projectId) throws ProjectNotFoundException, InvalidPathException, FolderNotFoundException {
+    public RootFolder renameFolder(String absolutePath, String folderName, String projectId) throws ProjectNotFoundException, InvalidPathException, FolderNotFoundException {
         if (folderName.matches(REGEX_FOLDER)) throw new InvalidPathException(folderName);
         if (absolutePath.matches(REGEX_FOLDERS)) throw new InvalidPathException(absolutePath);
 
@@ -109,6 +109,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         folderParent.addFolder(folder);
 
         workspaceDao.save(workspace, projectId);
+        return this.getRootFolderForPath(workspace, path);
     }
 
     /**
@@ -118,7 +119,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @param absolutePath the path of the folder
      */
     @Override
-    public void removeFolder(String absolutePath, String projectId) throws ProjectNotFoundException, FolderNotFoundException, InvalidPathException {
+    public RootFolder removeFolder(String absolutePath, String projectId) throws ProjectNotFoundException, FolderNotFoundException, InvalidPathException {
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(absolutePath);
 
@@ -135,6 +136,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         Folder folderParent = getFolderForPath(workspace, path.getParent());
         folderParent.getFolders().remove(folder.getName());
         workspaceDao.save(workspace, projectId);
+        return this.getRootFolderForPath(workspace, path);
     }
 
     /**
@@ -176,7 +178,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @param projectId project unique identifier
      */
     @Override
-    public void renameFile(String absolutePath, String fileName, String projectId) throws ProjectNotFoundException, InvalidPathException, FileNotFoundException {
+    public RootFolder renameFile(String absolutePath, String fileName, String projectId) throws ProjectNotFoundException, InvalidPathException, FileNotFoundException {
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(absolutePath);
 
@@ -185,7 +187,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
         File file = getFileForPath(workspace, path);
         if (file == null) throw new FileNotFoundException(absolutePath);
-        if (file.getName().equals(fileName)) return;
+        if (file.getName().equals(fileName)) return this.getRootFolderForPath(workspace, path);
 
         Folder folderParent = getFolderForPath(workspace, path.getParent());
         folderParent.removeFile(file);
@@ -193,6 +195,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         folderParent.addFile(file);
 
         workspaceDao.save(workspace, projectId);
+        return this.getRootFolderForPath(workspace, path);
     }
 
     /**
@@ -202,7 +205,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @param projectId    Project id
      */
     @Override
-    public void removeFile(String absolutePath, String projectId) throws ProjectNotFoundException, InvalidPathException, FileNotFoundException {
+    public RootFolder removeFile(String absolutePath, String projectId) throws ProjectNotFoundException, InvalidPathException, FileNotFoundException {
         Workspace workspace = getWorkspace(projectId);
         Path path = Path.valueOf(absolutePath);
 
@@ -217,6 +220,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         folderParent.removeFile(file);
 
         workspaceDao.save(workspace, projectId);
+        return this.getRootFolderForPath(workspace, path);
     }
 
     /**

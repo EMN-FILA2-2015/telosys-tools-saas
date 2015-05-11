@@ -55,8 +55,9 @@ public interface WorkspaceService {
      *
      * @param absolutePath the path of the folder
      * @param projectId    project unique identifier
+     * return updated folder tree
      */
-    void removeFolder(String absolutePath, String projectId) throws ProjectNotFoundException, FolderNotFoundException, InvalidPathException;
+    RootFolder removeFolder(String absolutePath, String projectId) throws ProjectNotFoundException, FolderNotFoundException, InvalidPathException;
 
     /**
      * Renames a folder.
@@ -67,8 +68,9 @@ public interface WorkspaceService {
      * @throws ProjectNotFoundException
      * @throws FolderNotFoundException
      * @throws InvalidPathException
+     * return updated folder tree
      */
-    void renameFolder(String absolutePath, String folderName, String projectId) throws ProjectNotFoundException, InvalidPathException, FolderNotFoundException;
+    RootFolder renameFolder(String absolutePath, String folderName, String projectId) throws ProjectNotFoundException, InvalidPathException, FolderNotFoundException;
 
     /**
      * Creates a new file in an existing folder.
@@ -88,8 +90,9 @@ public interface WorkspaceService {
      * @throws ProjectNotFoundException
      * @throws FileNotFoundException
      * @throws InvalidPathException
+     * return updated folder tree
      */
-    void removeFile(String absolutePath, String projectId) throws ProjectNotFoundException, FileNotFoundException, InvalidPathException;
+    RootFolder removeFile(String absolutePath, String projectId) throws ProjectNotFoundException, FileNotFoundException, InvalidPathException;
 
     /**
      * Renames a file.
@@ -100,8 +103,9 @@ public interface WorkspaceService {
      * @throws ProjectNotFoundException
      * @throws FileNotFoundException
      * @throws InvalidPathException
+     * return updated folder tree
      */
-    void renameFile(String absolutePath, String fileName, String projectId) throws ProjectNotFoundException, FileNotFoundException, InvalidPathException;
+    RootFolder renameFile(String absolutePath, String fileName, String projectId) throws ProjectNotFoundException, FileNotFoundException, InvalidPathException;
 
     /**
      * Returns the file's content.

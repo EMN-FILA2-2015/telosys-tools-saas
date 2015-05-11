@@ -178,16 +178,22 @@ public class WorkspaceControllerTest {
         workspaceService.createFile(filePath, "", projectID);
         workspaceService.createFile("templates/test/remove/test2.txt", "", projectID);
 
-        String fileData = "{\"path\":\"" + filePath + "\"}";
-
         // When
-        this.mockMvc.perform(delete("/projects/" + projectID + "/workspace/files").contentType(MediaType.APPLICATION_JSON).content(fileData))
+        MvcResult mvcResult = this.mockMvc.perform(delete("/projects/" + projectID + "/workspace/files?path="+filePath).contentType(MediaType.APPLICATION_JSON))
                 // Then
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
 
+        String jsonContent = mvcResult.getResponse().getContentAsString();
+
+        RootFolder root = mapper.readValue(jsonContent, RootFolder.class);
         // Assert
         Workspace workspace = workspaceService.getWorkspace(projectID);
         Folder removeFolder = workspace.getTemplates().getFolders().get("test").getFolders().get("remove");
+        assertNotNull(removeFolder);
+        assertTrue(removeFolder.getFiles().containsKey("test2+txt"));
+        assertFalse(removeFolder.getFiles().containsKey("test+txt"));
+        removeFolder = root.getFolders().get("test").getFolders().get("remove");
         assertNotNull(removeFolder);
         assertTrue(removeFolder.getFiles().containsKey("test2+txt"));
         assertFalse(removeFolder.getFiles().containsKey("test+txt"));
@@ -207,11 +213,19 @@ public class WorkspaceControllerTest {
 
         String fileData = "{\"path\":\"" + filePath + "\", \"name\":\"renamedFile.pdf\"}";
         // When
-        this.mockMvc.perform(patch("/projects/" + projectID + "/workspace/files").contentType(MediaType.APPLICATION_JSON).content(fileData))
+        MvcResult mvcResult = this.mockMvc.perform(patch("/projects/" + projectID + "/workspace/files").contentType(MediaType.APPLICATION_JSON).content(fileData))
                 // Then
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+        String jsonContent = mvcResult.getResponse().getContentAsString();
+
         // Assert
-        final Folder parentFolder = workspaceService.getWorkspace(projectID).getTemplates().getFolders().get("rename").getFolders().get("test");
+        Folder parentFolder = workspaceService.getWorkspace(projectID).getTemplates().getFolders().get("rename").getFolders().get("test");
+        assertTrue(parentFolder.getFiles().containsKey("renamedFile+pdf"));
+        assertEquals("content", workspaceService.getFileContent("templates/rename/test/renamedFile.pdf", projectID).getContent());
+        assertEquals("templates/rename/test/renamedFile.pdf", parentFolder.getFiles().get("renamedFile+pdf").getAbsolutePath());
+        final RootFolder root = mapper.readValue(jsonContent, RootFolder.class);
+        parentFolder = root.getFolders().get("rename").getFolders().get("test");
         assertTrue(parentFolder.getFiles().containsKey("renamedFile+pdf"));
         assertEquals("content", workspaceService.getFileContent("templates/rename/test/renamedFile.pdf", projectID).getContent());
         assertEquals("templates/rename/test/renamedFile.pdf", parentFolder.getFiles().get("renamedFile+pdf").getAbsolutePath());
@@ -285,12 +299,17 @@ public class WorkspaceControllerTest {
         String fileData = "{\"path\":\"" + folderPath + "\"}";
 
         // Delete folder
-        this.mockMvc.perform(delete("/projects/" + projectID + "/workspace/folders").contentType(MediaType.APPLICATION_JSON).content(fileData))
+        MvcResult mvcResult = this.mockMvc.perform(delete("/projects/" + projectID + "/workspace/folders").contentType(MediaType.APPLICATION_JSON).content(fileData))
                 // Then
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+        String jsonContent = mvcResult.getResponse().getContentAsString();
 
         // Assert
         RootFolder root = workspaceService.getWorkspace(projectID).getTemplates();
+        assertTrue(root.getFolders().get("test").getFiles().containsKey("testParent+txt"));
+        assertTrue(root.getFolders().get("test").getFolders().isEmpty());
+        root = mapper.readValue(jsonContent, RootFolder.class);
         assertTrue(root.getFolders().get("test").getFiles().containsKey("testParent+txt"));
         assertTrue(root.getFolders().get("test").getFolders().isEmpty());
     }
@@ -312,11 +331,20 @@ public class WorkspaceControllerTest {
 
         // When
         final String url = "/projects/" + projectID + "/workspace/folders";
-        this.mockMvc.perform(patch(url).contentType(MediaType.APPLICATION_JSON).content(fileData))
+        MvcResult mvcResult = this.mockMvc.perform(patch(url).contentType(MediaType.APPLICATION_JSON).content(fileData))
                 // Then
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+        String jsonContent = mvcResult.getResponse().getContentAsString();
+
         // Assert
         Folder foo = workspaceService.getWorkspace(projectID).getTemplates().getFolders().get("foo");
+        assertNotNull(foo);
+        assertEquals("templates/foo/test", foo.getFolders().get("test").getAbsolutePath());
+        assertTrue(foo.getFiles().containsKey("testParent+txt"));
+        assertEquals("templates/foo/test/test.txt", foo.getFolders().get("test").getFiles().get("test+txt").getAbsolutePath());
+        RootFolder root = mapper.readValue(jsonContent, RootFolder.class);
+        foo = root.getFolders().get("foo");
         assertNotNull(foo);
         assertEquals("templates/foo/test", foo.getFolders().get("test").getAbsolutePath());
         assertTrue(foo.getFiles().containsKey("testParent+txt"));

@@ -66,14 +66,13 @@ public class WorkspaceController {
      *
      * @param projectId The project id
      * @param fileData The folder to delete
-     * @return OK - 200 if folder has been deleted.
+     * @return Updated rootFolder, OK - 200 if folder has been deleted.
      */
     @RequestMapping(value = "/folders", method = RequestMethod.DELETE)
-    public ResponseEntity<Object> deleteFolder(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
+    public ResponseEntity<RootFolder> deleteFolder(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
         if (StringUtils.isEmpty(fileData.getPath())) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         try {
-            workspaceService.removeFolder(fileData.getPath(), projectId);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(workspaceService.removeFolder(fileData.getPath(), projectId), HttpStatus.OK);
         } catch (ProjectNotFoundException | FolderNotFoundException e) {
             return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
         } catch (InvalidPathException e) {
@@ -86,15 +85,14 @@ public class WorkspaceController {
      *
      * @param projectId The project id
      * @param fileData The folder to patch
-     * @return OK - 200 if folder file has been renamed.
+     * @return updated RootFolder, OK - 200 if folder file has been renamed.
      */
     @RequestMapping(value = "/folders", method = RequestMethod.PATCH)
-    public ResponseEntity<Object> renameFolder(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
+    public ResponseEntity<RootFolder> renameFolder(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
         if (StringUtils.isEmpty(fileData.getPath()) || StringUtils.isEmpty(fileData.getName()))
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         try {
-            workspaceService.renameFolder(fileData.getPath(), fileData.getName(), projectId);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(workspaceService.renameFolder(fileData.getPath(), fileData.getName(), projectId), HttpStatus.OK);
         } catch (ProjectNotFoundException | FolderNotFoundException e) {
             return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
         } catch (InvalidPathException e) {
@@ -132,15 +130,14 @@ public class WorkspaceController {
      * Delete the file with the specified path.
      *
      * @param projectId The project id
-     * @param fileData The file to delete
-     * @return OK - 200 if file has been deleted.
+     * @param path The path to the file to delete
+     * @return The updated rootFolder, OK - 200 if file has been deleted.
      */
     @RequestMapping(value = "/files", method = RequestMethod.DELETE)
-    public ResponseEntity<Object> deleteFile(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
+    public ResponseEntity<RootFolder> deleteFile(@PathVariable("id") String projectId, @RequestParam("path") String path) {
         try {
-            if (StringUtils.isEmpty(fileData.getPath())) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            workspaceService.removeFile(fileData.getPath(), projectId);
-            return new ResponseEntity<>(HttpStatus.OK);
+            if (StringUtils.isEmpty(path)) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(workspaceService.removeFile(path, projectId), HttpStatus.OK);
         } catch (ProjectNotFoundException | FileNotFoundException e) {
             return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
         } catch (InvalidPathException e) {
@@ -153,15 +150,14 @@ public class WorkspaceController {
      *
      * @param projectId The project id
      * @param fileData The file to patch
-     * @return OK - 200 if the file has been renamed.
+     * @return Updated rootfolder, OK - 200 if the file has been renamed.
      */
     @RequestMapping(value = "/files", method = RequestMethod.PATCH)
-    public ResponseEntity<Object> renameFile(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
+    public ResponseEntity<RootFolder> renameFile(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
         if (StringUtils.isEmpty(fileData.getPath()) || StringUtils.isEmpty(fileData.getName()))
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         try {
-            workspaceService.renameFile(fileData.getPath(), fileData.getName(), projectId);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(workspaceService.renameFile(fileData.getPath(), fileData.getName(), projectId), HttpStatus.OK);
         } catch (ProjectNotFoundException | FileNotFoundException e) {
             return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
         } catch (InvalidPathException e) {
