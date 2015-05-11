@@ -14,7 +14,6 @@ public class Workspace implements Serializable {
     public static final String MODELS = "models";
     public static final String TEMPLATES = "templates";
     public static final String GENERATED = "generated";
-    public static final String SETTINGS = "settings";
 
     /**
      * Root folders
@@ -47,14 +46,6 @@ public class Workspace implements Serializable {
 
     public void setGenerated(RootFolder generateds) {
         this.rootFoldersByNames.put(GENERATED, generateds);
-    }
-
-    public RootFolder getSettings() {
-        return rootFoldersByNames.get(SETTINGS);
-    }
-
-    public void setSettings(RootFolder settings) {
-        this.rootFoldersByNames.put(SETTINGS, settings);
     }
 
     @Override

@@ -321,7 +321,6 @@ public class WorkspaceServiceIntTest {
         workspace.setModels(new RootFolder(Workspace.MODELS));
         workspace.setTemplates(new RootFolder(Workspace.TEMPLATES));
         workspace.setGenerated(new RootFolder(Workspace.GENERATED));
-        workspace.setSettings(new RootFolder(Workspace.SETTINGS));
         return workspace;
     }
 
