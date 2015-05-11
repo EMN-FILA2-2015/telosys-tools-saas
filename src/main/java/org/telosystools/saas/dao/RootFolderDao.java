@@ -35,11 +35,4 @@ public class RootFolderDao {
                 .save(folder, COLLECTION_FOLDERS);
     }
 
-    public void clean(String folderId, String database) {
-        RootFolder folder = findById(folderId, database);
-        mongoTemplateDatabase(database)
-                .remove(folder, COLLECTION_FOLDERS);
-        // TODO : suppression des fichiers dans gridfs
-    }
-
 }

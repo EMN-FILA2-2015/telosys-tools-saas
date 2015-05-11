@@ -113,7 +113,7 @@ public class WorkspaceControllerTest {
         Project project = new Project();
         project.setName("New Project");
         String projectID = projectService.createProject(project).getId();
-        String filePath = "models/model_1.xml";
+        String filePath = "model/model_1.xml";
         String fileData = "{\"path\":\"" + filePath + "\", \"content\":\"Contenu du fichier\"}";
 
         // When
@@ -139,7 +139,7 @@ public class WorkspaceControllerTest {
         // Given
         String projectID = ObjectId.get().toString();
 
-        String filePath = "models/model_1.xml";
+        String filePath = "model/model_1.xml";
         String fileData = "{\"path\":\"" + filePath + "\", \"content\":\"Contenu du fichier\"}";
 
         // When
@@ -155,7 +155,7 @@ public class WorkspaceControllerTest {
         Project project = new Project();
         project.setName("New Project");
         String projectID = projectService.createProject(project).getId();
-        String filePath = "models/folder1/model_1.xml";
+        String filePath = "model/folder1/model_1.xml";
         String fileData = "{\"path\":\"" + filePath + "\", \"content\":\"Contenu du fichier\"}";
 
         // When
@@ -333,10 +333,10 @@ public class WorkspaceControllerTest {
         project.setName("New Project");
         String projectID = projectService.createProject(project).getId();
         String expectedContent = "Contenu du fichier";
-        workspaceService.createFile("models/model_2.xml", expectedContent, projectID);
+        workspaceService.createFile("model/model_2.xml", expectedContent, projectID);
 
         // When
-        final String url = "/projects/" + projectID + "/workspace/files?path=models/model_2.xml";
+        final String url = "/projects/" + projectID + "/workspace/files?path=model/model_2.xml";
         String jsonContent = this.mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
 
                 // Then
@@ -372,7 +372,7 @@ public class WorkspaceControllerTest {
         project.setName("New Project");
         String projectID = projectService.createProject(project).getId();
 
-        String filePath = "models/model_2.xml";
+        String filePath = "model/model_2.xml";
 
         workspaceService.createFile(filePath, "", projectID);
 
@@ -396,7 +396,7 @@ public class WorkspaceControllerTest {
         // Given
         String projectID = ObjectId.get().toString();
 
-        String filePath = "models/model_2.xml";
+        String filePath = "model/model_2.xml";
 
         String fileContent = "content";
         String fileData = "{\"path\":\"" + filePath + "\", \"content\":\"" + fileContent + "\"}";
@@ -416,7 +416,7 @@ public class WorkspaceControllerTest {
         project.setName("New Project");
         String projectID = projectService.createProject(project).getId();
 
-        String filePath = "models/model_2.xml";
+        String filePath = "model/model_2.xml";
 
         String fileContent = "content";
         String fileData = "{\"path\":\"" + filePath + "\", \"content\":\"" + fileContent + "\"}";

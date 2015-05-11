@@ -11,7 +11,7 @@ import java.util.TreeMap;
  */
 public class Workspace implements Serializable {
 
-    public static final String MODELS = "models";
+    public static final String MODEL = "model";
     public static final String TEMPLATES = "templates";
     public static final String GENERATED = "generated";
 
@@ -24,12 +24,12 @@ public class Workspace implements Serializable {
         return rootFoldersByNames.get(name);
     }
 
-    public RootFolder getModels() {
-        return rootFoldersByNames.get(MODELS);
+    public RootFolder getModel() {
+        return rootFoldersByNames.get(MODEL);
     }
 
-    public void setModels(RootFolder models) {
-        rootFoldersByNames.put(MODELS, models);
+    public void setModel(RootFolder models) {
+        rootFoldersByNames.put(MODEL, models);
     }
 
     public RootFolder getTemplates() {

@@ -43,10 +43,10 @@ public class WorkspaceServiceIntTest {
     private static final String MODIFIED_FOLDER_PATH = Workspace.GENERATED +"/"+ MODIFIED_FOLDER_NAME;
     private static final String MODIFIED_SUBFOLDER_PATH = FOLDER_PATH+"/"+MODIFIED_SUBFOLDER_NAME;
     private static final String FILE_NAME = "MY_FILE.java";
-    private static final String FILE_PATH = Workspace.MODELS+ "/"+ FILE_NAME;
+    private static final String FILE_PATH = Workspace.MODEL + "/"+ FILE_NAME;
     private static final String FILE_EXT = "java";
     private static final String MODIFIED_FILE_NAME = "RENAMED_FILE";
-    private static final String MODIFIED_FILE_PATH = Workspace.MODELS+"/"+ MODIFIED_FILE_NAME;
+    private static final String MODIFIED_FILE_PATH = Workspace.MODEL +"/"+ MODIFIED_FILE_NAME;
     public static final String FILE_CONTENT = "Fichier example";
     public static final String MODIFIED_FILE_CONTENT = "fichier modifié";
 
@@ -318,7 +318,7 @@ public class WorkspaceServiceIntTest {
 
     private Workspace buildWorkspace() {
         Workspace workspace = new Workspace();
-        workspace.setModels(new RootFolder(Workspace.MODELS));
+        workspace.setModel(new RootFolder(Workspace.MODEL));
         workspace.setTemplates(new RootFolder(Workspace.TEMPLATES));
         workspace.setGenerated(new RootFolder(Workspace.GENERATED));
         return workspace;

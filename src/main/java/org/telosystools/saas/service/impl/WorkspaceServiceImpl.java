@@ -45,7 +45,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public Workspace createWorkspace(String projectId) {
         Workspace workspace = new Workspace();
 
-        workspace.setModels(new RootFolder(Workspace.MODELS));
+        workspace.setModel(new RootFolder(Workspace.MODEL));
         workspace.setTemplates(new RootFolder(Workspace.TEMPLATES));
         workspace.setGenerated(new RootFolder(Workspace.GENERATED, true));
 

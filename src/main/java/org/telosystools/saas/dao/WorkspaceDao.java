@@ -27,17 +27,17 @@ public class WorkspaceDao {
 
     public void refresh(Workspace workspace, String database) {
 
-        RootFolder modelsFolder = rootFolderDao.findById(RootFolder.ID_PREFIX+Workspace.MODELS, database);
+        RootFolder modelsFolder = rootFolderDao.findById(RootFolder.ID_PREFIX+Workspace.MODEL, database);
         RootFolder templatesFolder = rootFolderDao.findById(RootFolder.ID_PREFIX+Workspace.TEMPLATES, database);
         RootFolder generatedsFolder = rootFolderDao.findById(RootFolder.ID_PREFIX+Workspace.GENERATED, database);
 
-        workspace.setModels(modelsFolder);
+        workspace.setModel(modelsFolder);
         workspace.setTemplates(templatesFolder);
         workspace.setGenerated(generatedsFolder);
     }
 
     public void save(Workspace workspace, String database) {
-        rootFolderDao.save(workspace.getModels(), database);
+        rootFolderDao.save(workspace.getModel(), database);
         rootFolderDao.save(workspace.getTemplates(), database);
         rootFolderDao.save(workspace.getGenerated(), database);
     }
