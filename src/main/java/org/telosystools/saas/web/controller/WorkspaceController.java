@@ -65,14 +65,14 @@ public class WorkspaceController {
      * Delete the folder with the specified path.
      *
      * @param projectId The project id
-     * @param fileData The folder to delete
+     * @param path The path of the folder to delete
      * @return Updated rootFolder, OK - 200 if folder has been deleted.
      */
     @RequestMapping(value = "/folders", method = RequestMethod.DELETE)
-    public ResponseEntity<RootFolder> deleteFolder(@PathVariable("id") String projectId, @RequestBody FileData fileData) {
-        if (StringUtils.isEmpty(fileData.getPath())) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public ResponseEntity<RootFolder> deleteFolder(@PathVariable("id") String projectId,  @RequestParam("path") String path) {
+        if (StringUtils.isEmpty(path)) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         try {
-            return new ResponseEntity<>(workspaceService.removeFolder(fileData.getPath(), projectId), HttpStatus.OK);
+            return new ResponseEntity<>(workspaceService.removeFolder(path, projectId), HttpStatus.OK);
         } catch (ProjectNotFoundException | FolderNotFoundException e) {
             return new ResponseEntity<>(this.getErrorHttpHeaders(e), HttpStatus.NOT_FOUND);
         } catch (InvalidPathException e) {
