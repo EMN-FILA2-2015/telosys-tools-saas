@@ -28,7 +28,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Component
 public class WorkspaceServiceImpl implements WorkspaceService {
 
-    public static final String REGEX_FILENAME = "^([_A-Za-z0-9\\-]+\\.[A-Za-z0-9\\-]+)$";
+    public static final String REGEX_FILENAME = "^([_A-Za-z0-9\\-]+(\\.[A-Za-z0-9\\-]+)?)$";
     public static final String REGEX_FOLDER = "[^_A-Za-z0-9/\\-]";
     public static final String REGEX_FOLDERS = REGEX_FOLDER + "*";
 

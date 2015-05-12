@@ -296,10 +296,8 @@ public class WorkspaceControllerTest {
         workspaceService.createFile("templates/test/remove/test.txt", "", projectID);
         workspaceService.createFile("templates/test/testParent.txt", "", projectID);
 
-        String fileData = "{\"path\":\"" + folderPath + "\"}";
-
         // Delete folder
-        MvcResult mvcResult = this.mockMvc.perform(delete("/projects/" + projectID + "/workspace/folders").contentType(MediaType.APPLICATION_JSON).content(fileData))
+        MvcResult mvcResult = this.mockMvc.perform(delete("/projects/" + projectID + "/workspace/folders?path="+folderPath))
                 // Then
                 .andExpect(status().isOk())
                 .andReturn();
