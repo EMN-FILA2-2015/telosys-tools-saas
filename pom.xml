@@ -6,7 +6,7 @@
     <groupId>org.telosys.tools</groupId>
     <artifactId>telosys-tools-saas</artifactId>
     <version>1.0</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <name>telosys-tools-saas</name>
 
@@ -289,7 +289,7 @@
                 <configuration>
                     <webResources>
                         <resource>
-                            <directory>yo/dist</directory>
+                            <directory>yo/dist/public</directory>
                         </resource>
                     </webResources>
                 </configuration>
