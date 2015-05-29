@@ -10,7 +10,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.telosystools.saas.Application;
 import org.telosystools.saas.config.MongoConfiguration;
-import org.telosystools.saas.domain.User;
+import org.telosystools.saas.security.domain.User;
+import org.telosystools.saas.security.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;

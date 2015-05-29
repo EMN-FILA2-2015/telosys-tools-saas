@@ -5,6 +5,6 @@ package org.telosystools.saas.exception;
  */
 public class UserNotFoundException extends Exception {
     public UserNotFoundException(String login) {
-        super("The user" + login + " cannot be found.");
+        super("The user " + login + " cannot be found.");
     }
 }

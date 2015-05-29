@@ -14,7 +14,7 @@ import org.telosystools.saas.service.WorkspaceService;
 import javax.inject.Inject;
 
 @RestController
-@RequestMapping("/projects/{id}/workspace")
+@RequestMapping("/api/projects/{id}/workspace")
 public class WorkspaceController {
 
     @Inject

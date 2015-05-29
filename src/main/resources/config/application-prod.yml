@@ -9,3 +9,29 @@ spring:
         mongodb:
             host: mongodb
             port: 27017
+    thymeleaf:
+        mode: XHTML
+        cache: true
+
+metrics:
+    jmx.enabled: true
+    spark:
+        enabled: false
+        host: localhost
+        port: 9999
+    graphite:
+        enabled: false
+        host: localhost
+        port: 2003
+        prefix: myimmo
+
+http:
+    cache:
+        timeToLiveInDays: 31
+
+cache:
+    timeToLiveSeconds: 3600
+    hazelcast:
+        debug: false
+        stickySession: false
+        backupCount: 1

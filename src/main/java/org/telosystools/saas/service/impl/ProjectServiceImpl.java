@@ -5,8 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telosystools.saas.dao.ProjectRepository;
-import org.telosystools.saas.dao.UserRepository;
-import org.telosystools.saas.domain.User;
+import org.telosystools.saas.security.repository.UserRepository;
+import org.telosystools.saas.security.domain.User;
 import org.telosystools.saas.domain.project.Project;
 import org.telosystools.saas.domain.project.ProjectConfiguration;
 import org.telosystools.saas.exception.DuplicateProjectNameException;
@@ -16,8 +16,9 @@ import org.telosystools.saas.service.ProjectService;
 import org.telosystools.saas.service.WorkspaceService;
 
 import java.util.List;
+import java.util.Optional;
 
-import static org.telosystools.saas.web.SecurityUtils.getCurrentLogin;
+import static org.telosystools.saas.security.security.SecurityUtils.getCurrentLogin;
 
 /**
  * Created by Adrian on 29/01/15.
@@ -42,20 +43,21 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<Project> findAllByUser() throws UserNotFoundException {
         String login = getCurrentLogin();
-        User currentUser = userRepository.findOne(login);
-        if (currentUser != null) {
-            List<Project> projects = projectRepository.findByOwner(login);
-
-            if (!currentUser.getContributions().isEmpty()) {
-                // Récupération des contributions
-                final Iterable<Project> contributions = projectRepository.findAll(currentUser.getContributions());
-                contributions.forEach(projects::add);
-            }
-
-            return projects;
-        } else {
+        Optional<User> optionalUser = userRepository.findOneByLogin(login);
+        if (!optionalUser.isPresent()) {
             throw new UserNotFoundException(login);
         }
+        User currentUser = optionalUser.get();
+
+        List<Project> projects = projectRepository.findByOwner(login);
+
+        if (!currentUser.getContributions().isEmpty()) {
+            // Récupération des contributions
+            final Iterable<Project> contributions = projectRepository.findAll(currentUser.getContributions());
+            contributions.forEach(projects::add);
+        }
+
+        return projects;
     }
 
     @Override

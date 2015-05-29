@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
  * MongoDB configuration.
  */
 @Configuration
-@EnableMongoRepositories("org.telosystools.saas.dao")
+@EnableMongoRepositories("org.telosystools.saas")
 public class MongodbConfiguration {
 
     public @Bean
