@@ -197,6 +197,14 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>${project.basedir}/yo/dist</directory>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -264,7 +272,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/classes/static</outputDirectory>
+                            <outputDirectory>${basedir}/target/static</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>yo/dist/public</directory>
