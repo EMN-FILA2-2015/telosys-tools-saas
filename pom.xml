@@ -6,7 +6,7 @@
     <groupId>org.telosys.tools</groupId>
     <artifactId>telosys-tools-saas</artifactId>
     <version>1.0</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <name>telosys-tools-saas</name>
 
@@ -164,14 +164,6 @@
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <directory>${project.basedir}/src/main/resources</directory>
-            </resource>
-            <resource>
-                <directory>${project.basedir}/yo/dist</directory>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -208,60 +200,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.github.trecloux</groupId>
-                <artifactId>yeoman-maven-plugin</artifactId>
-                <version>0.4</version>
-                <executions>
-                    <execution>
-                        <id>run-frontend-build</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                        <configuration>
-                            <skipTests>true</skipTests>
-                            <buildTool>grunt</buildTool>
-                            <buildArgs>build --force --no-color</buildArgs>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <yeomanProjectDirectory>${project.basedir}/yo</yeomanProjectDirectory>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/static</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>yo/dist/public</directory>
-                                    <filtering>false</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.3</version>
-                <configuration>
-                    <webResources>
-                        <resource>
-                            <directory>yo/dist/public</directory>
-                        </resource>
-                    </webResources>
-                </configuration>
-            </plugin>
-            <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>2.5</version>
                 <configuration>
@@ -288,65 +226,64 @@
 
     <profiles>
         <profile>
-            <id>grunt</id>
+            <id>prod</id>
             <properties>
-                <!-- log configuration -->
-                <logback.loglevel>DEBUG</logback.loglevel>
+                <logback.loglevel>WARN</logback.loglevel>
             </properties>
             <build>
-                <resources>
-                    <resource>
-                        <directory>${project.basedir}/src/main/resources</directory>
-                    </resource>
-                </resources>
-                <plugins>
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <configuration>
-                            <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</jvmArguments>
-                            <arguments>
-                                <argument>--spring.profiles.active=dev</argument>
-                            </arguments>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.github.trecloux</groupId>
-                        <artifactId>yeoman-maven-plugin</artifactId>
-                        <version>0.4</version>
-                        <configuration combine.children="override">
-                            <skip>true</skip>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-war-plugin</artifactId>
-                        <version>2.3</version>
-                        <configuration combine.children="override"/>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-clean-plugin</artifactId>
-                        <version>2.5</version>
-                        <configuration combine.children="override"/>
-                    </plugin>
-                </plugins>
+            
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/src/main/resources</directory>
+                </resource>
+                <resource>
+                  <directory>${project.basedir}/yo/dist</directory>
+                </resource>
+              </resources>
+              
+              <plugins>
+                <plugin>
+                  <groupId>com.github.trecloux</groupId>
+                  <artifactId>yeoman-maven-plugin</artifactId>
+                  <version>0.4</version>
+                  <executions>
+                      <execution>
+                          <id>run-frontend-build</id>
+                          <phase>generate-resources</phase>
+                          <goals>
+                              <goal>build</goal>
+                          </goals>
+                          <configuration>
+                              <skipTests>true</skipTests>
+                              <buildtool>grunt</buildtool>
+                              <buildargs>build --force --no-color</buildargs>
+                          </configuration>
+                      </execution>
+                  </executions>
+                  <configuration>
+                      <yeomanprojectdirectory>${project.basedir}/yo</yeomanprojectdirectory>
+                  </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <configuration>
+                        <arguments>
+                            <argument>--spring.profiles.active=prod</argument>
+                        </arguments>
+                    </configuration>
+                </plugin>
+              </plugins>
+              
             </build>
         </profile>
+
         <profile>
             <id>dev</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-            <properties>
-                <!-- log configuration -->
-                <logback.loglevel>DEBUG</logback.loglevel>
-            </properties>
-        </profile>
-        <profile>
-            <id>prod</id>
-            <properties>
-                <!-- log configuration -->
-                <logback.loglevel>WARN</logback.loglevel>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -354,7 +291,7 @@
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
                             <arguments>
-                                <argument>--spring.profiles.active=prod</argument>
+                                <argument>--spring.profiles.active=dev</argument>
                             </arguments>
                         </configuration>
                     </plugin>
