@@ -1,0 +1,38 @@
+.project-configuration {
+  .panel-heading {
+    &:hover {
+      cursor: pointer;
+    }
+  }
+  .save-config {
+    float: right;
+  }
+  .hasError {
+    @extend .alert-danger;
+  }
+  .panel-body-nav {
+    ul {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      li {
+        margin: 0;
+        display: block;
+        width: 100%;
+        border-bottom: 1px solid lightgray;
+        a {
+          padding: 10px 15px;
+          display:block;
+          text-decoration: none;
+          width: 100%;
+        }
+      }
+      li :hover {
+        background-color: #fafafa;
+      }
+      .selected {
+        border-left: 2px solid #357ebd;
+      }
+    }
+  }
+}

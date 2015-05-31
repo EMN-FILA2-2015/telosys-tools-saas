@@ -1,0 +1,40 @@
+.project {
+  .container {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    .buttons-bar {
+      padding: 0;
+      margin: 0;
+      border-bottom: 1px solid #dedede;
+    }
+    .nav-tabs {
+      padding: 0 0;
+      background-color: #ffffff;
+      border-bottom: none;
+      li {
+        text-align: center;
+        padding: 0;
+        margin: 0;
+      }
+      li a {
+        display: inline-block;
+        margin: none;
+        border: 0;
+        color: #888888;
+        padding: 20px;
+      }
+      li a:hover {
+        background-color: #ffffff;
+        border-color: #cfcfcf;
+        border: 0;
+        color: black;
+      }
+      li.active a {
+        border: 0;
+        border-bottom: 2px solid #357ebd;
+        color: black;
+      }
+    }
+  }
+}

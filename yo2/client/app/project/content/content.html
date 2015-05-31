@@ -1,0 +1,98 @@
+<div class="project-content row">
+  <alert ng-repeat="alert in content.alerts" type="{{alert.type}}" close="content.closeAlert($index)">
+    <span translate="{{alert.msg}}" translate-values="{name:content.selectedNode.path, path:content.currentPath, message:content.errorMessage}"></span>
+  </alert>
+
+  <div class="project-files col-lg-4">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <a ng-click="content.addEntity('model', content.selectedNode.path)" class="btn btn-default btn-treedata"><span class="glyphicon glyphicon-plus" style="font-weight: normal"></span>&nbsp;<span translate="project.content.button.add_entity"></span></a>
+        <h6 class="panel-title">Model</h6>
+      </div>
+      <div class="panel-body">
+        <!-- -->
+        <!-- treecontrol : -->
+        <!-- Documentation : http://wix.github.io/angular-tree-control/ -->
+        <!-- -->
+        <treecontrol class="tree-light"
+                     options="content.treeOptions"
+                     tree-model="content.model.treedata"
+                     expanded-nodes="content.model.expandedNodes"
+                     on-selection="content.showSelected(node, selected)"
+                     selected-node="content.selectedNode">
+          <span class="glyphicon glyphicon-folder-close" ng-if="node.type == 'folder'"></span>
+          {{node.name}}
+        </treecontrol>
+      </div>
+      <div class="panel-footer" ng-show="(content.selectedNode.type == 'folder'&& content.selectedNode.path.indexOf('model')===0)">
+        <a ng-click="content.renameFolder('model',content.selectedNode.path)" class="btn btn-default"><span class="glyphicon glyphicon-pencil"></span>&nbsp;<span translate="project.content.button.rename_folder"></span></a></li>
+        <a ng-click="content.deleteFolder('model',content.selectedNode.path)" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span>&nbsp;<span translate="project.content.button.delete_folder"></span></a></li>
+
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <a ng-click="content.addFile('templates', content.selectedNode.path)" class="btn btn-default btn-treedata"><span class="glyphicon glyphicon-plus" style="font-weight: normal"></span>&nbsp;<span translate="project.content.button.add_file"></span></a>
+        <a ng-click="content.addFolder('templates', content.selectedNode.path)" class="btn btn-default btn-treedata"><span class="glyphicon glyphicon-plus" style="font-weight: normal"></span>&nbsp;<span translate="project.content.button.add_folder"></span></a>
+        <h6 class="panel-title">Templates</h6>
+      </div>
+      <div class="panel-body">
+        <!-- -->
+        <!-- treecontrol : -->
+        <!-- Documentation : http://wix.github.io/angular-tree-control/ -->
+        <!-- -->
+        <treecontrol class="tree-light"
+                     options="content.treeOptions"
+                     tree-model="content.templates.treedata"
+                     expanded-nodes="content.templates.expandedNodes"
+                     on-selection="content.showSelected(node, selected)"
+                     selected-node="content.selectedNode">
+          <span class="glyphicon glyphicon-folder-close" ng-if="node.type == 'folder'"></span>
+          {{node.name}}
+        </treecontrol>
+      </div>
+      <div class="panel-footer" ng-show="(content.selectedNode.type == 'folder' && content.selectedNode.path.indexOf('templates')===0)">
+        <a ng-click="content.renameFolder('templates',content.selectedNode.path)" class="btn btn-default"><span class="glyphicon glyphicon-pencil"></span>&nbsp;<span translate="project.content.button.rename_folder"></span></a></li>
+        <a ng-click="content.deleteFolder('templates',content.selectedNode.path)" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span>&nbsp;<span translate="project.content.button.delete_folder"></span></a></li>
+
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading"><h6 class="panel-title">Generated files</h6></div>
+      <div class="panel-body">
+        <!-- -->
+        <!-- treecontrol : -->
+        <!-- Documentation : http://wix.github.io/angular-tree-control/ -->
+        <!-- -->
+        <treecontrol class="tree-light"
+                     options="content.treeOptions"
+                     tree-model="content.generated.treedata"
+                     expanded-nodes="content.generated.expandedNodes"
+                     on-selection="content.showSelected(node, selected)"
+                     selected-node="content.selectedNode">
+          <span class="glyphicon glyphicon-folder-close" ng-if="node.type == 'folder'"></span>
+          {{node.name}}
+        </treecontrol>
+      </div>
+    </div>
+  </div>
+  <div id="editor" class="project-editor col-lg-8" ng-show="content.selectedNode.type == 'file'">
+    <div class="editor-tabs">
+      <ul>
+        <li>
+          <a href="#" class="active">{{content.selectedNode.name}}</a>
+        </li>
+      </ul>
+    </div>
+    <div class="editor-toolbar">
+      <ul ng-hide="content.selectedNode.readOnly">
+        <li><a ng-click="content.saveFile(content.selectedNode)"><span class="glyphicon glyphicon-floppy-disk"></span>&nbsp;<span translate="project.content.button.save_file"></span></a></li>
+        <li><a ng-click="content.renameFile(content.selectedTree, content.selectedNode.path)"><span class="glyphicon glyphicon-pencil"></span>&nbsp;<span translate="project.content.button.rename_file"></span></a></li>
+        <li><a ng-click="content.deleteFileModal(content.selectedNode)"><span class="glyphicon glyphicon-remove"></span>&nbsp;<span translate="project.content.button.delete_file"></span></a></li>
+      </ul>
+    </div>
+    <div>
+      <div ui-ace="content.aceOptions" ng-trim="true"></div>
+    </div>
+  </div>
+</div>

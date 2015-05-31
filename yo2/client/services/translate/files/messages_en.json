@@ -1,0 +1,296 @@
+{
+  "global" : {
+    "menu" : {
+      "account": {
+        "main": "Account",
+        "settings": "Settings",
+        "password": "Password",
+        "sessions": "Sessions",
+        "login": "Authenticate",
+        "logout": "Log out",
+        "register": "Register"
+      }
+    },
+    "form": {
+      "username": "Login",
+      "username.placeholder": "Your login",
+      "newpassword": "New password",
+      "newpassword.placeholder": "New password",
+      "confirmpassword": "New password confirmation",
+      "confirmpassword.placeholder": "Confirm the new password",
+      "email": "E-mail",
+      "email.placeholder": "Your e-mail"
+    },
+    "messages": {
+      "info": {
+        "authenticated": "If you want to <a href=\"#/login\">authenticate</a>, you can try the default accounts:<br/>- Administrator (login=\"admin\" and password=\"admin\") <br/>- User (login=\"user\" and password=\"user\").",
+        "register": "You don't have an account yet? <a href=\"#/register\">Register a new account</a>"
+      },
+      "error": {
+        "dontmatch" : "The password and its confirmation do not match!"
+      },
+      "validate": {
+        "newpassword": {
+          "required": "Your password is required.",
+          "minlength": "Your password is required to be at least 5 characters.",
+          "maxlength": "Your password cannot be longer than 50 characters.",
+          "strength": "Password strength:"
+        },
+        "confirmpassword": {
+          "required": "Your confirmation password is required.",
+          "minlength": "Your confirmation password is required to be at least 5 characters.",
+          "maxlength": "Your confirmation password cannot be longer than 50 characters."
+        },
+        "email": {
+          "required": "Your e-mail is required.",
+          "invalid": "Your e-mail is invalid.",
+          "minlength": "Your e-mail is required to be at least 5 characters.",
+          "maxlength": "Your e-mail cannot be longer than 50 characters."
+        }
+      }
+    }
+  },
+  "login": {
+    "title": "Authentication",
+    "form": {
+      "password": "Password",
+      "password.placeholder": "Your password",
+      "rememberme": "Automatic Login",
+      "button": "Authenticate"
+    },
+    "messages": {
+      "error": {
+        "authentication": "<strong>Authentication failed!</strong> Please check your credentials and try again."
+      }
+    },
+    "password" : {
+      "forgot": "Did you forget your password?"
+    }
+  },
+  "activate": {
+    "title": "Activation",
+    "messages": {
+      "success": "<strong>Your user has been activated.</strong> Please <a href=\"#/login\">authenticate</a>.",
+      "error": "<strong>Your user could not be activated.</strong> Please use the registration form to sign up."
+    }
+  },
+  "password": {
+    "title": "Password for [<b>{{username}}</b>]",
+    "form": {
+      "button": "Save"
+    },
+    "messages": {
+      "error":  "<strong>An error has occurred!</strong> The password could not be changed.",
+      "success": "<strong>Password changed!</strong>"
+    }
+  },
+  "register": {
+    "title": "Registration",
+    "form": {
+      "button": "Register"
+    },
+    "messages": {
+      "validate": {
+        "login": {
+          "required": "Your login is required.",
+          "minlength": "Your login is required to be at least 1 character",
+          "maxlength": "Your login cannot be longer than 50 characters",
+          "pattern": "Your login can only contain lower-case letters and digits"
+        }
+      },
+      "success": "<strong>Registration saved!</strong> Please check your email for confirmation.",
+      "error": {
+        "fail": "<strong>Registration failed!</strong> Please try again later.",
+        "userexists": "<strong>Login name already registered!</strong> Please choose another one.",
+        "emailexists": "<strong>E-mail is already in use!</strong> Please choose another one."
+      }
+    }
+  },
+  "reset": {
+    "request": {
+      "title": "Reset your password",
+      "form": {
+        "button": "Reset password"
+      },
+      "messages": {
+        "info": "Enter the e-mail address you used to register",
+        "success": "Check your e-mails for details on how to reset your password.",
+        "notfound": "<strong>E-Mail address isn't registered!</strong> Please check and try again"
+
+      }
+
+    },
+    "finish" : {
+      "title": "Reset password",
+      "form": {
+        "button": "Validate new password"
+      },
+      "messages": {
+        "info": "Choose a new password",
+        "success": "<strong>Your password has been reset.</strong> Please <a href=\"#/login\">authenticate</a>.",
+        "keymissing": "The reset key is missing.",
+        "error": "Your password couldn't be reset. Remember a password request is only valid for 24 hours."
+      }
+    }
+  },
+  "settings": {
+    "title": "User settings for [<b>{{username}}</b>]",
+    "form": {
+      "firstname": "First Name",
+      "firstname.placeholder": "Your first name",
+      "lastname": "Last Name",
+      "lastname.placeholder": "Your last name",
+      "language": "Language",
+      "button": "Save"
+    },
+    "messages": {
+      "error": {
+        "fail": "<strong>An error has occurred!</strong> Settings could not be saved.",
+        "emailexists": "<strong>E-mail is already in use!</strong> Please choose another one."
+      },
+      "success": "<strong>Settings saved!</strong>",
+      "validate": {
+        "firstname": {
+          "required": "Your first name is required.",
+          "minlength": "Your first name is required to be at least 1 character",
+          "maxlength": "Your first name cannot be longer than 50 characters"
+        },
+        "lastname": {
+          "required": "Your last name is required.",
+          "minlength": "Your last name is required to be at least 1 character",
+          "maxlength": "Your last name cannot be longer than 50 characters"
+        }
+      }
+    }
+  },
+  "navbar" : {
+    "home" : "Home",
+    "projects" : "Projects",
+    "language" : "Language"
+  },
+  "error" : {
+    "error" : "Error",
+    "default_message" : "An unexpected error occured."
+  },
+  "home" : {
+    "get_started" : "Kick-start your next web app with TelosysTools"
+  },
+  "project" : {
+    "menu" : {
+      "content" : "Content",
+      "configuration" : "Configuration",
+      "bundle" : "Bundle",
+      "generation" : "Generation"
+    },
+    "configuration" : {
+      "packages" : {
+        "label" : "Packages",
+        "description" : "Define here the project packages variables (usable in targets and templates).",
+        "root_package" : "Root package",
+        "entity_classes_package" : "Entity classes package",
+        "need_more" : "If you need more packages, define them in the \"Variables\" section."
+      },
+      "folders" : {
+        "label" : "Folders",
+        "description" : "Define here the project folders variables (usable in targets and templates).",
+        "sources" : "Sources",
+        "resources" : "Resources",
+        "web_content" : "Web content",
+        "tests_sources" : "Tests sources",
+        "tests_resources" : "Tests resources",
+        "documentation" : "Documentation",
+        "temporary_files" : "Temporary files",
+        "maven_folders" : "Maven folders",
+        "project_folders" : "Project folders",
+        "need_more" : "If you need more folders, define them in the \"Variables\" section."
+      },
+      "variables" : {
+        "label" : "Variables",
+        "description" : "Define here the project variables (usable in targets and templates).",
+        "name" : "Name",
+        "value" : "Value",
+        "action" : "Action",
+        "delete" : "Delete",
+        "insert" : "Insert variable",
+        "new" : "New variable",
+        "show_reserved" : "Show reserved variable names",
+        "hide_reserved" : "Hide reserved variable names"
+      },
+      "reinitialisation" : "Revert changes",
+      "save" : "Save",
+      "notification" : {
+        "saved" : "The configuration has been saved."
+      },
+      "error" : {
+        "getting" : "An arror occured while getting the configuration.",
+        "saving" : "An error occured while saving the configuration.",
+        "fields" : "You have either used a reserved variable name or not filled a field.."
+      }
+    },
+    "bundle" : {
+      "description" : "Download bundles from GitHub (templates and resources).",
+      "github_username" : "GitHub user name",
+      "get_available" : "Get available bundles",
+      "github_bundles" : "GitHub bundles",
+      "github_url_pattern" : "GitHub URL pattern",
+      "download" : "Download selected bundles",
+      "install" : "Install downloaded bundles",
+      "log" : "Logs"
+    },
+    "content" : {
+      "notification" : {
+        "saved" : "The file {{name}} has been successfully saved.",
+        "file_created": "The file {{path}} has been successfully created.",
+        "folder_created": "The folder {{path}} has been successfully created.",
+        "file_renamed": "The file {{path}} has been successfully renamed.",
+        "folder_renamed": "The folder {{path}} has been successfully renamed.",
+        "resource_deleted": "The resource {{path}} has been successfully deleted."
+      },
+      "error": {
+        "duplicate_folder" : "The folder {{path}} already exists.",
+        "duplicate_file": "The file {{path}} already exists.",
+        "parent_not_found": "Could not find parent folder for path {{path}}.",
+        "save_file": "Failed to save the file. Unexpected error trace : {{message}}",
+        "load_file": "Failed to load the file. Unexpected error trace : {{message}}",
+        "delete_file": "Failed to delete the file."
+      },
+      "button": {
+        "add_entity": "New entity",
+        "rename_entity": "Rename entity",
+        "add_file": "New file",
+        "rename_file": "Rename file",
+        "add_folder": "New folder",
+        "rename_folder": "Rename folder",
+        "save_file": "Save",
+        "delete_file": "Delete",
+        "delete_folder": "Delete Folder",
+        "ignore": "Ignore",
+        "cancel": "Cancel",
+        "validate": "Validate"
+      },
+      "modal": {
+        "unsaved-file": "The file {{name}} contains unsaved changes. Do you wish to discard them ?",
+        "confirm_delete_file": "The file {{path}} will be deleted. Do you wish to continue ?",
+        "confirm_delete_folder": "The folder {{path}} and all its subfolders will be deleted. Do you wish to continue ?"
+      }
+    }
+  },
+  "projects" : {
+    "list" : "Project list",
+    "creation" : "Project creation",
+    "name" : "Project name",
+    "no_project" : "No project found. You can create one right in this page!",
+    "go" : "Get started!",
+    "notification" : {
+      "created" : "The {{name}} project has been created. Redirecting..."
+    },
+    "error" : {
+      "getting_list" : "Unable to get the project list.",
+      "creating" : "Unable to create the project."
+    }
+  },
+  "footer" : {
+    "contact" : "Contact",
+    "terms" : "Terms"
+  }
+}

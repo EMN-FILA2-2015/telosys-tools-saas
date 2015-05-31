@@ -1,0 +1,181 @@
+<div class="project-configuration">
+
+  <!-- NOTIFICATIONS -->
+
+  <alert ng-repeat="alert in configuration.alerts" type="{{alert.type}}" close="configuration.closeAlert($index)">
+    <span translate="{{alert.msg}}"></span>
+  </alert>
+
+  <!-- SAVE -->  <div class="save-config" ng-include="'app/project/configuration/components/save.html'"></div>
+
+  <br/><br/><br/>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-3" role="navigation">
+        <div class="panel panel-default">
+          <div class="panel-heading">Configuration</div>
+          <div class="panel-body-nav">
+            <ul>
+              <li ng-class="{selected:configuration.panelSelected == 'packages'}">
+                <a href="" ng-click="configuration.panelSelected = 'packages'">Packages</a></li>
+              <li ng-class="{selected:configuration.panelSelected == 'folders'}">
+                <a href="" ng-click="configuration.panelSelected = 'folders'">Folders</a></li>
+              <li ng-class="{selected:configuration.panelSelected == 'variables'}">
+                <a href="" ng-click="configuration.panelSelected = 'variables'">Variables</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-9" role="navigation">
+
+        <!-- PACKAGES -->
+
+        <div class="panel panel-default" ng-if="configuration.panelSelected == 'packages'">
+
+          <div class="panel-heading" ng-click="configuration.editPackages = !configuration.editPackages"><span translate="project.configuration.packages.label"></span></div>
+
+          <div class="panel-body" ng-show="configuration.editPackages">
+
+            <form class="form-horizontal">
+
+              <div class="form-group">
+                <div class="col-lg-12">
+                  <span translate="project.configuration.packages.description"></span>
+                </div>
+              </div>
+
+              <br/>
+
+              <div class="form-group">
+                <div class="col-lg-6" ng-repeat="package in configuration.packages">
+                  <label for="{{package.id}}" translate="{{package.name}}"></label>
+                  <p>{{package.shortcut}}</p>
+                  <div>
+                    <input id="{{package.id}}" type="text" class="form-control" ng-model="package.value">
+                  </div>
+                </div>
+              </div>
+
+              <br/>
+
+              <div class="form-group">
+                <div class="col-lg-8">
+                  <span translate="project.configuration.packages.need_more"></span>
+                </div>
+              </div>
+
+            </form>
+
+          </div>
+
+        </div>
+
+        <!-- FOLDERS -->
+
+        <div class="panel panel-default" ng-if="configuration.panelSelected == 'folders'">
+
+          <div class="panel-heading" ng-click="configuration.editFolders = !configuration.editFolders"><span translate="project.configuration.folders.label"></span></div>
+
+          <div class="panel-body" ng-show="configuration.editFolders">
+
+            <form class="form-horizontal">
+
+              <div class="form-group">
+                <div class="col-lg-12">
+                  <span translate="project.configuration.folders.description"></span>
+                </div>
+              </div>
+
+              <br/>
+
+              <div class="form-group">
+                <div class="col-lg-12">
+                  Use predifined folders :
+                  <a class="btn btn-default" ng-click="configuration.setMavenFolders()"><span translate="project.configuration.folders.maven_folders"></span></a>
+                  <a class="btn btn-default" ng-click="configuration.setProjectFolders()"><span translate="project.configuration.folders.project_folders"></span></a>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="col-lg-4" ng-repeat="folder in configuration.folders">
+                  <br/>
+                  <label for="{{folder.id}}" translate="{{folder.name}}"></label>
+                  <p>{{folder.shortcut}}</p>
+                  <div>
+                    <input id="{{folder.id}}" type="text" class="form-control" ng-model="folder.value">
+                  </div>
+                </div>
+              </div>
+
+              <br/>
+
+              <div class="form-group">
+                <div class="col-lg-8">
+                  <span translate="project.configuration.folders.need_more"></span>
+                </div>
+              </div>
+
+            </form>
+
+          </div>
+
+        </div>
+
+        <!-- VARIABLES -->
+
+        <div class="panel panel-default" ng-if="configuration.panelSelected == 'variables'">
+
+          <div class="panel-heading" ng-click="configuration.editVariables = !configuration.editVariables"><span translate="project.configuration.variables.label"></span></div>
+
+          <div class="panel-body" ng-show="configuration.editVariables">
+
+            <form class="form-horizontal">
+
+              <div class="form-group">
+                <div class="col-lg-8">
+                  <span translate="project.configuration.variables.description"></span>
+                </div>
+              </div>
+
+              <br/>
+
+              <div class="form-group">
+                <div class="col-lg-8">
+                  <table ng-show="configuration.variables.length" class="table table-bordered table-hover">
+                    <tr>
+                      <th><span translate="project.configuration.variables.name"></span></th>
+                      <th><span translate="project.configuration.variables.value"></span></th>
+                      <th><span translate="project.configuration.variables.action"></span></th>
+                    </tr>
+                    <tr ng-repeat="variable in configuration.variables">
+                      <td><input id="variable-{{$index}}-name" type="text" class="form-control" ng-model="variable.name" ng-change="configuration.validateVariable('variable-{{$index}}-name')" placeholder="VARIABLE_NAME"></td>
+                      <td><input id="variable-{{$index}}-value" type="text" class="form-control" ng-model="variable.value" placeholder="VARIABLE_VALUE"></td>
+                      <td>
+                        <a class="btn btn-default" ng-click="configuration.deleteVariable($index)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>&nbsp; <span translate="project.configuration.variables.delete"></span></a>
+                      </td>
+                    </tr>
+                  </table>
+                  <a class="btn btn-default" ng-click="configuration.createVariable()"><span translate="project.configuration.variables.new"></span></a>
+                  <a class="btn btn-default" ng-hide="configuration.showReservedVariables" ng-click="configuration.showReservedVariables = true"><span translate="project.configuration.variables.show_reserved"></span></a>
+                  <a class="btn btn-default" ng-show="configuration.showReservedVariables" ng-click="configuration.showReservedVariables = false"><span translate="project.configuration.variables.hide_reserved"></span></a>
+                  <div ng-show="configuration.showReservedVariables">
+                    <br/><p ng-repeat="reservedVariables in configuration.reservedVariables">{{reservedVariables}}</p>
+                  </div>
+                </div>
+              </div>
+
+            </form>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SAVE -->  <div class="save-config" ng-include="'app/project/configuration/components/save.html'"></div>
+
+</div>

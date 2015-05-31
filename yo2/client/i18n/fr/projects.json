@@ -1,0 +1,17 @@
+{
+  "projects" : {
+    "create" : "Créer un projet",
+    "list" : "Liste des projets",
+    "creation" : "Création d'un projet",
+    "name" : "Nom du projet",
+    "no_project" : "Aucun projet n'a été trouvé. Vous pouvez en créer un ici !",
+    "go" : "C'est parti !",
+    "notification" : {
+      "created" : "Le projet {{name}} a été créé. Vous allez être redirigé..."
+    },
+    "error" : {
+      "getting_list" : "Impossible de récupérer la liste des projets.",
+      "creating" : "Impossible de créer le projet."
+    }
+  }
+}
