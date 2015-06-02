@@ -10,7 +10,12 @@
     .config(function ($stateProvider) {
       $stateProvider
         .state('project', {
+          parent: 'site',
           url: '/projects/{projectId}',
+          data: {
+            roles: ['ROLE_USER'],
+            pageTitle: 'global.menu.account.settings'
+          },
           views: {
             'content@': {
               templateUrl: 'app/project/project.html',

@@ -85,14 +85,12 @@
     $urlRouterProvider.otherwise('/');
     $stateProvider.state('site', {
       'abstract': true,
-      /*
       views: {
         'navbar@': {
           templateUrl: 'app/shared/navbar/navbar.html',
           controller: 'NavbarController'
         }
       },
-      */
       resolve: {
         authorize: ['Auth',
           function (Auth) {
@@ -102,6 +100,7 @@
         translatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate, $translatePartialLoader) {
           $translatePartialLoader.addPart('global');
           $translatePartialLoader.addPart('language');
+          $translatePartialLoader.addPart('navbar');
         }]
       }
     });

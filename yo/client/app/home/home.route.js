@@ -6,6 +6,7 @@
     .config(function ($stateProvider) {
       $stateProvider
         .state('home', {
+          parent: 'site',
           url: '/',
           data: {
             roles: [],

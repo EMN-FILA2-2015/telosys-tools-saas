@@ -29,7 +29,8 @@
     <![endif]-->
 
     <!-- Navbar always included -->
-    <div ng-include="'app/shared/navbar/navbar.html'"></div>
+    <!--div ng-include="'app/shared/navbar/navbar.html'"></div-->
+    <div ui-view="navbar" ng-cloak=""></div>
 
     <!-- Add your site or application content here -->
     <div ui-view="content"></div>
