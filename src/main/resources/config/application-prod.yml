@@ -9,9 +9,14 @@ spring:
         mongodb:
             host: mongodb
             port: 27017
+            database: db_general
     thymeleaf:
         mode: XHTML
         cache: true
+
+mongeez:
+    migrate:
+        true
 
 metrics:
     jmx.enabled: true

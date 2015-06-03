@@ -9,11 +9,16 @@ spring:
         mongodb:
             host: localhost
             port: 27017
+            database: db_general
     messages:
         cache-seconds: 1
     thymeleaf:
         mode: XHTML
         cache: false
+
+mongeez:
+    migrate:
+        true
 
 metrics:
     jmx.enabled: true

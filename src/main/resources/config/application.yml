@@ -1,12 +1,3 @@
-spring:
-    data:
-        mongodb:
-            database: db_general
-
-mongeez:
-    migrate:
-        true
-
 # Disable Jolokia - An http/json bridge for remote JMX access
 endpoints.jolokia.enabled: false
 
