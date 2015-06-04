@@ -82,7 +82,7 @@
       request: function(config) {
         // need more controlling when there is more than 1 domain involved
         console.log('config.url', config.url);
-        if(config.url.indexOf('http') != 0) {
+        if(config.url.indexOf(Configuration.backendHost) != 0) {
           if (config.url.indexOf('api/') == 0) {
             console.log('Configuration.backendHost', Configuration.backendHost);
             config.url = Configuration.backendHost + config.url
