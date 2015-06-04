@@ -14,10 +14,10 @@ RUN apt-get -y install oracle-java8-installer && apt-get clean
 
 # Set oracle java as the default java
 RUN update-java-alternatives -s java-8-oracle
-RUN echo "export JAVA_HOME=/usr/lib/jvm/java-8-oracle" >> ~/.bashrc
+ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 EXPOSE 8080
 
-ADD target/telosys-tools-saas-*.jar /opt/telosys-tools-saas.jar
+ADD target/telosys-tools-saas-*.war /opt/telosys-tools-saas.war
 
-CMD java -jar /opt/telosys-tools-saas.jar --spring.profiles.active=prod
+CMD java -jar /opt/telosys-tools-saas.war --spring.profiles.active=prod

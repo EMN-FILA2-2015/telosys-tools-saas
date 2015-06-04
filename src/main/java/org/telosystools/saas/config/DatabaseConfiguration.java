@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.mapping.event.ValidatingMongoEventListener;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -21,7 +22,7 @@ import javax.inject.Inject;
 
 @Configuration
 @Profile("!cloud")
-@EnableMongoRepositories("org.telosystools.saas.repository")
+@EnableMongoRepositories("org.telosystools.saas")
 @Import(value = MongoAutoConfiguration.class)
 @EnableMongoAuditing(auditorAwareRef = "springSecurityAuditorAware")
 public class DatabaseConfiguration extends AbstractMongoConfiguration {
@@ -52,6 +53,11 @@ public class DatabaseConfiguration extends AbstractMongoConfiguration {
     @Override
     public Mongo mongo() throws Exception {
         return mongo;
+    }
+
+    public @Bean
+    MongoTemplate mongoTemplate() throws Exception {
+        return new MongoTemplate(mongo(), getDatabaseName());
     }
 
     @Bean

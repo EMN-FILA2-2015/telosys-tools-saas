@@ -6,7 +6,7 @@
     <groupId>org.telosys.tools</groupId>
     <artifactId>telosys-tools-saas</artifactId>
     <version>1.0</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <name>telosys-tools-saas</name>
 
@@ -240,7 +240,7 @@
                   <directory>${project.basedir}/yo/dist</directory>
                 </resource>
               </resources>
-              
+
               <plugins>
                 <plugin>
                   <groupId>com.github.trecloux</groupId>
