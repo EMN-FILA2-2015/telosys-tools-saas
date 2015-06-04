@@ -76,15 +76,6 @@ module.exports = function (grunt) {
           host: 'localhost',
           port: 8080
         }
-        /*{
-          context: '/api',
-          host: 'localhost',
-          port: 8080
-        }, {
-          context: '/resource',
-          host: 'localhost',
-          port: 8080
-        }*/
       ],
       livereload: {
         options: {
@@ -240,7 +231,7 @@ module.exports = function (grunt) {
       target: {
         src: ['<%= yeoman.client %>/index.html','<%= yeoman.client %>/test.html'],
         ignorePath: '<%= yeoman.client %>/',
-        exclude: [/bootstrap-sass-official/, /bootstrap.js/, '/json3/', '/es5-shim/', /bootstrap.css/, /font-awesome.css/ ]
+        exclude: [/angular-i18n/, /bootstrap-sass-official/, /bootstrap.js/, '/json3/', '/es5-shim/', /bootstrap.css/, /font-awesome.css/ ]
       }
     },
 
@@ -373,7 +364,8 @@ module.exports = function (grunt) {
             'bower_components/**/*',
             'assets/images/{,*/}*.{webp}',
             'assets/fonts/**/*',
-            'index.html'
+            'index.html',
+            'i18n/**/*'
           ]
         }, {
           expand: true,
