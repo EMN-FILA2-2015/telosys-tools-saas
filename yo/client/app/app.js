@@ -121,7 +121,7 @@
 
     $httpProvider.interceptors.push('authInterceptor');
     if(Configuration.backendHost != '') {
-      $httpProvider.interceptors.push('middleware');
+      //$httpProvider.interceptors.push('middleware');
     }
 
     // Initialize angular-translate
