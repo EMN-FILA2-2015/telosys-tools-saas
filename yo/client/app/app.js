@@ -77,6 +77,20 @@
       }
     };
   })
+  .factory('middleware', function(Configuration) {
+    return {
+      request: function(config) {
+        // need more controlling when there is more than 1 domain involved
+        console.log('config.url', config.url);
+        if(config.url.indexOf('api/') == 0) {
+          console.log('Configuration.backendHost', Configuration.backendHost);
+          config.url = Configuration.backendHost + config.url
+          console.log('config.url', config.url);
+        }
+        return config;
+      }
+    };
+  })
   .config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider, $translateProvider, tmhDynamicLocaleProvider, httpRequestInterceptorCacheBusterProvider, RestangularProvider, Configuration, LoggerProvider) {
 
     //Cache everything except rest api requests
@@ -106,6 +120,9 @@
     });
 
     $httpProvider.interceptors.push('authInterceptor');
+    if(Configuration.backendHost != '') {
+      $httpProvider.interceptors.push('middleware');
+    }
 
     // Initialize angular-translate
     $translateProvider.useLoader('$translatePartialLoader', {

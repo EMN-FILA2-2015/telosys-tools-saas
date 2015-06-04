@@ -1,5 +1,5 @@
 {
   "env": "developement",
-  "backendHost": "localhost:8080",
+  "backendHost": "",
   "logLevel": "debug"
 }
