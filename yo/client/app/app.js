@@ -147,8 +147,8 @@
     /**
      * HTTP and REST Service configuration
      */
-    //RestangularProvider
-    //  .setBaseUrl('http://' + Configuration.backendHost);
+    RestangularProvider
+      .setBaseUrl('http://' + Configuration.backendHost);
 
     /**
      * Logger Configuration
